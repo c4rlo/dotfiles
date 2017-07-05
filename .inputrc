@@ -1,0 +1,7 @@
+$include /etc/inputrc
+
+$if Bash
+    "\e[A": history-search-backward
+    "\e[B": history-search-forward
+    "\el": "\C-e | less\r"
+$endif
