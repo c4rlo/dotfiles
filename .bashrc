@@ -10,11 +10,25 @@ shopt -s autocd extglob checkwinsize
 HISTCONTROL=ignoredups
 MAILCHECK=
 
+# Set up PATH
+export PATH=$HOME/bin:$HOME/go/bin:$PATH
+. ~/google-cloud-sdk/path.bash.inc
+
 # Tab completion
 complete -d -o bashdefault cd mkdir rmdir pushd popd
 complete -A enabled builtin
 complete -c type
 complete -u su
+. /usr/share/bash-completion/completions/pacman
+. /usr/share/bash-completion/completions/git
+. /usr/share/bash-completion/completions/rg
+. /usr/share/bash-completion/completions/systemctl
+. /usr/share/bash-completion/completions/journalctl
+. /usr/share/fzf/completion.bash
+. ~/google-cloud-sdk/completion.bash.inc
+
+# Key bindings
+. /usr/share/fzf/key-bindings.bash
 
 # Prompt
 function prompt_jobs {
@@ -57,22 +71,23 @@ fi
 
 # Aliases
 alias ls='ls --color=auto'
+alias l='ls -A --color=auto'
 alias ll='ls -l --color=auto'
+alias la='ls -Al --color=auto'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias vim='vim --servername VIM'
 alias v=vim
-alias vd=vimdiff
-alias vf='vim $(fzf)'
+alias vd='vim -d'
 alias vp='vim -p'
+alias vo='vim -O'
 alias gs='git status --short --branch'
 alias gdt='git difftool'
 alias gds='git diff --stat'
 alias gc='git commit'
 alias gb='git branch'
 alias gco='git checkout'
-alias tmux='tmux -2'
+alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,SIZE,FSUSE%'
 
 # Functions
 
@@ -82,28 +97,42 @@ function mkcd
     mkdir -p "$1" && cd "$1"
 }
 
+function clonecd
+{
+    local dir="${!###*[:/]}"
+    git clone "$@" && cd "$dir"
+}
+
+function upd
+{
+    /usr/lib/systemd/systemd-networkd-wait-online &&
+    sudo pacman -Sc --noconfirm &&
+    sudo pacman -Syu --noconfirm
+}
+
 function vupd
 {
-    echo '* vim -E -c PlugUpgrade -c q >/dev/null'
     vim -E -c PlugUpgrade -c q >/dev/null
-    echo '* vim -c PlugUpdate'
     vim -c PlugUpdate -c 'norm D'
 }
 
-function with
+function pkgs
 {
-    local -i rc=0
-    while true; do
-        local prompt=
-        if ((rc != 0)); then
-            prompt=$'\e[31m'${rc}$'\e[0m '
-        fi
-        prompt="${prompt}"$'$ \e[1m'"$@"$'\e[0m '
-        local args
-        read -e -p "${prompt}" args || break
-        eval "local -a a=(${args})"
-        "$@" "${a[@]}"
-        rc=$?
-    done
-    echo
+    pacman -Qq$@ |
+        fzf --preview 'pacman -Qil {}' --layout=reverse \
+            --bind 'enter:execute(pacman -Qil {} | less)'
+}
+
+function fixwifi
+{
+    echo "Stopping iwd" &&
+    sudo systemctl stop iwd &&
+    echo "Removing ath10k_pci kernel module" &&
+    sudo modprobe -r ath10k_pci &&
+    echo "Re-loading ath10k_pci kernel module" &&
+    sudo modprobe ath10k_pci &&
+    echo "Waiting a bit" &&
+    sleep 3 &&
+    echo "Starting iwd" &&
+    sudo systemctl start iwd
 }
