@@ -9,10 +9,7 @@
 shopt -s autocd extglob checkwinsize
 HISTCONTROL=ignoredups
 MAILCHECK=
-
-# Set up PATH
-export PATH=$HOME/bin:$HOME/go/bin:$PATH
-. ~/google-cloud-sdk/path.bash.inc
+CDPATH=:~/play
 
 # Tab completion
 complete -d -o bashdefault cd mkdir rmdir pushd popd
@@ -107,13 +104,25 @@ function upd
 {
     /usr/lib/systemd/systemd-networkd-wait-online &&
     sudo pacman -Sc --noconfirm &&
-    sudo pacman -Syu --noconfirm
+    sudo pacman -Syu --noconfirm &&
+    rustup update &&
+    cargo install-update -a
 }
 
 function vupd
 {
     vim -E -c PlugUpgrade -c q >/dev/null
     vim -c PlugUpdate -c 'norm D'
+}
+
+function vpgs {
+    local status
+    status="$(git status -s --no-renames)" || return 1
+    local -a files
+    files=($(while IFS='\n' read line; do
+                  echo "${line:3}"
+              done <<<"$status"))
+    vim -p "${files[@]}"
 }
 
 function pkgs
@@ -136,3 +145,18 @@ function fixwifi
     echo "Starting iwd" &&
     sudo systemctl start iwd
 }
+
+function aoc
+{
+    local day=$1
+    [[ -z "$day" ]] && day=$(date +%d)
+    local base=~/play/adventofcode2019
+    local dir=$base/$day
+    if [[ ! -d $dir ]]; then
+        mkdir $dir
+        cp $base/solution_template.py $dir/solution.py
+    fi
+    cd $dir
+}
+
+source /home/carlo/.config/broot/launcher/bash/br
