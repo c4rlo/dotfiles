@@ -9,7 +9,7 @@
 shopt -s autocd extglob checkwinsize
 HISTCONTROL=ignoredups
 MAILCHECK=
-CDPATH=:~/play
+CDPATH=:~/src:~/play
 
 # Tab completion
 complete -d -o bashdefault cd mkdir rmdir pushd popd

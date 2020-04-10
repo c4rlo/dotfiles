@@ -23,6 +23,7 @@ if exists('&cryptmethod')
     set cryptmethod=blowfish2
 endif
 set mouse=a
+set ttymouse=sgr
 
 " Set up plugins via vim-plug
 if empty(glob('~/.vim/autoload/plug.vim'))
