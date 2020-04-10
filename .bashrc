@@ -143,7 +143,11 @@ function fixwifi
     echo "Waiting a bit" &&
     sleep 3 &&
     echo "Starting iwd" &&
-    sudo systemctl start iwd
+    sudo systemctl start iwd &&
+    echo "Waiting a bit" &&
+    sleep 2 &&
+    echo "Restarting systemd-networkd" &&
+    sudo systemctl restart systemd-networkd
 }
 
 function aoc
