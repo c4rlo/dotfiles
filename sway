@@ -3,7 +3,7 @@
 set $mod Mod4
 set $term alacritty --config-file ~/.config/alacritty/sway.yml
 
-input "1:1:AT_Translated_Set_2_keyboard" xkb_file ~/src/xkb-config/custom.xkb
+input "1:1:AT_Translated_Set_2_keyboard" xkb_layout gb-custom
 output "eDP-1" scale 2
 
 xwayland disable

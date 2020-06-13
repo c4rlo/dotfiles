@@ -50,6 +50,7 @@ format = "{1m}"
 
 [[block]]
 block = "sound"
+driver = "alsa"
 
 [[block]]
 block = "time"

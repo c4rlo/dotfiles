@@ -1,0 +1,23 @@
+default partial alphanumeric_keys
+xkb_symbols   {
+    include "pc+gb+inet(evdev)"
+    name[Group1] = "English (UK) with customizations";
+    key <AD07> {
+        type = "FOUR_LEVEL_ALPHABETIC",
+        symbols[Group1] = [ u, U, udiaeresis, Udiaeresis ]
+    };
+    key <AD08> {
+        type = "FOUR_LEVEL_ALPHABETIC",
+        symbols[Group1] = [ i, I, idiaeresis, Idiaeresis ]
+    };
+    key <AD09> {
+        type = "FOUR_LEVEL_ALPHABETIC",
+        symbols[Group1] = [ o, O, odiaeresis, Odiaeresis ]
+    };
+    key <AC01> {
+        type = "FOUR_LEVEL_ALPHABETIC",
+        symbols[Group1] = [ a, A, adiaeresis, Adiaeresis ]
+    };
+};
+
+// vim: ft=xkb
