@@ -140,12 +140,15 @@ mode "resize" {
 }
 
 for_window [title="About Mozilla Firefox"] {
-        floating enable
-        border normal
+    floating enable
+    border normal
 }
 
 bar {
-        status_command i3status
+    status_command \
+        ~/src/i3status-rust/target/release/i3status-rs \
+        ~/.config/i3status-rust.toml
+    font pango:Droid Sans 13, FontAwesome 12
 }
 
 exec swayidle -w \
