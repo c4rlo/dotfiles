@@ -50,6 +50,8 @@ Plug 'rhysd/vim-clang-format'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'fatih/vim-go'  ", { 'do': ':GoUpdateBinaries' }
 Plug 'rust-lang/rust.vim'
+Plug 'cespare/vim-toml'
+Plug 'hjson/vim-hjson'
 call plug#end()
 
 " Set color scheme

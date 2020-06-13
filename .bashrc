@@ -60,8 +60,8 @@ if [ "$PS1" ]; then
     GIT_PS1_SHOWSTASHSTATE=1
     PS1='\t \[\e[1m\]\w$(__git_ps1 " (%s)")\[\e[0m\]$(prompt_jobs)$(prompt_exitstatus) \[\e[0m\e[1m\]\$\[\e[0m\] '
     case $TERM in
-    xterm*)
-        PROMPT_COMMAND='echo -ne "\033]0;${PWD/#$HOME/~}\007"'
+    xterm*|alacritty)
+        PROMPT_COMMAND='echo -ne "\033]0;${PWD/#$HOME/\~}\007"'
         ;;
     esac
 fi

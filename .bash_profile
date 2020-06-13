@@ -17,5 +17,6 @@ export PATH=$HOME/bin:$HOME/.local/bin/:$HOME/.cargo/bin:$HOME/go/bin:$PATH
 
 if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]
 then
-    exec startx
+    # exec startx
+    exec sway
 fi

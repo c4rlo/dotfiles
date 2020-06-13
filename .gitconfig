@@ -1,0 +1,21 @@
+[user]
+    name = Carlo Teubner
+    email = carlo@cteubner.net
+
+[diff]
+    tool = vimdiff
+
+[url "git@github.com:c4rlo/"]
+    insteadOf = c:
+
+[url "git@github.com:"]
+    insteadOf = g:
+    insteadOf = gh:
+    insteadOf = github.com:
+
+[url "git@gitlab.com:"]
+    insteadOf = gl:
+    insteadOf = gitlab.com:
+
+[url "https://aur.archlinux.org/"]
+    insteadOf = aur:
