@@ -2,6 +2,9 @@
     name = Carlo Teubner
     email = carlo@cteubner.net
 
+[pull]
+    ff = only
+
 [diff]
     tool = vimdiff
 
@@ -17,5 +20,5 @@
     insteadOf = gl:
     insteadOf = gitlab.com:
 
-[url "https://aur.archlinux.org/"]
+[url "ssh://aur/"]
     insteadOf = aur:
