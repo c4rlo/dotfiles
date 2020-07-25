@@ -157,6 +157,31 @@ function fixwifi
     sudo systemctl restart systemd-networkd
 }
 
+function priv
+{
+    case $1 in
+        on)
+            if systemctl is-active -q ~/private; then
+                echo "Already active"
+                return 1
+            fi
+            sudo systemctl start ~/private &&
+            pushd ~/private
+            ;;
+        off)
+            if ! systemctl is-active -q ~/private; then
+                echo "Already inactive"
+                return 1
+            fi
+            popd
+            sudo systemctl stop ~/private
+            ;;
+        *)
+            echo "Usage: priv on|off"
+            return 1
+    esac
+}
+
 function aoc
 {
     local day=$1
