@@ -52,7 +52,7 @@ format = "{average}°"
 
 [[block]]
 block = "net"
-device = "wlp59s0"
+device = "wlan0"
 signal_strength = true
 speed_up = false
 speed_down = false

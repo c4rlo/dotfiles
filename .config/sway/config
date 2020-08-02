@@ -142,7 +142,27 @@ mode "resize" {
     }
 }
 
-for_window [title="About Mozilla Firefox"] {
+for_window [app_id="firefox" title="About Mozilla Firefox"] {
+    floating enable
+    border normal
+}
+
+for_window [app_id="pcmanfm-qt" title="File Properties"] {
+    floating enable
+    border normal
+}
+
+for_window [app_id="pcmanfm-qt" title="Choose an Application"] {
+    floating enable
+    border normal
+}
+
+for_window [app_id="pcmanfm-qt" title="Search Files"] {
+    floating enable
+    border normal
+}
+
+for_window [app_id="pcmanfm-qt" title="Preferences"] {
     floating enable
     border normal
 }
