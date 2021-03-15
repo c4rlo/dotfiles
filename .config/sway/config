@@ -4,17 +4,33 @@ set $mod Mod4
 set $term alacritty
 
 input "1:1:AT_Translated_Set_2_keyboard" xkb_layout gb-custom
-output "eDP-1" scale 2
+input "76:620:Magic_Keyboard_with_Numeric_Keypad" xkb_layout macintosh_vndr/gb
+output "eDP-1" scale 2 pos 0 550
+output "DP-1" scale 1 pos 1920 0
 
-xwayland enable
+# xwayland disable
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:Droid Sans 14
+font pango:Roboto 14
 
 default_border pixel
 
 hide_edge_borders smart
+
+# Color scheme (Gruvbox dark)
+set $colour_fg4    #a89984
+set $colour_fg     #ebdbb2
+set $colour_bg     #282828
+set $colour_bg1    #3c3836
+set $colour_green  #b8bb26
+set $colour_yellow #d79921
+
+# Colors                  border          background      text          indicator     child_border
+client.focused            $colour_bg1     $colour_bg1     $colour_fg    $colour_green $colour_bg
+client.focused_inactive   $colour_bg1     $colour_bg1     $colour_fg    $colour_bg1   $colour_bg
+client.unfocused          $colour_bg      $colour_bg      $colour_fg4   $colour_bg1   $colour_bg
+client.urgent             $colour_yellow  $colour_yellow  $colour_bg    $colour_bg1   $colour_bg
 
 floating_modifier $mod
 
@@ -147,6 +163,10 @@ for_window [app_id="firefox" title="About Mozilla Firefox"] {
     border normal
 }
 
+for_window [app_id="soffice" title="Open"] {
+    floating enable
+}
+
 for_window [app_id="pcmanfm-qt" title="File Properties"] {
     floating enable
     border normal
@@ -168,13 +188,14 @@ for_window [app_id="pcmanfm-qt" title="Preferences"] {
 }
 
 bar {
-    status_command i3status-rs
-    font pango:Droid Sans 14, FontAwesome 13
+    swaybar_command waybar
+    # status_command i3status-rs
+    # font pango:Droid Sans 14, FontAwesome 13
 }
 
-exec systemd-cat -t swayidle swayidle -w \
-         timeout 600 'swaymsg "output * dpms off"' \
-              resume 'swaymsg "output * dpms on"'
+# exec systemd-cat -t swayidle swayidle -w \
+#          timeout 600 'swaymsg "output * dpms off"' \
+#               resume 'swaymsg "output * dpms on"'
 
 exec $term
 

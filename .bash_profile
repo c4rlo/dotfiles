@@ -5,6 +5,8 @@
 export EDITOR=vim
 export PS_PERSONALITY=linux
 
+export FZF_DEFAULT_COMMAND='fd --type f'
+
 export CMAKE_GENERATOR=Ninja
 export CTEST_OUTPUT_ON_FAILURE=ON
 export CTEST_PROGRESS_OUTPUT=ON

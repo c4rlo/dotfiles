@@ -16,13 +16,9 @@ complete -d -o bashdefault cd mkdir rmdir pushd popd
 complete -A enabled builtin
 complete -c type
 complete -u su
-. /usr/share/bash-completion/completions/pacman
-. /usr/share/bash-completion/completions/git
-. /usr/share/bash-completion/completions/rg
-. /usr/share/bash-completion/completions/systemctl
-. /usr/share/bash-completion/completions/journalctl
 . /usr/share/fzf/completion.bash
 . ~/google-cloud-sdk/completion.bash.inc
+. ~/.invoke-completion.sh
 
 # Key bindings
 . /usr/share/fzf/key-bindings.bash
@@ -64,6 +60,9 @@ if [ "$PS1" ]; then
         PROMPT_COMMAND='echo -ne "\033]0;${PWD/#$HOME/\~}\007"'
         ;;
     esac
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        . "$VIRTUAL_ENV"/bin/activate
+    fi
 fi
 
 # Aliases
@@ -165,15 +164,13 @@ function priv
                 echo "Already active"
                 return 1
             fi
-            sudo systemctl start ~/private &&
-            pushd ~/private
+            sudo systemctl start ~/private
             ;;
         off)
             if ! systemctl is-active -q ~/private; then
                 echo "Already inactive"
                 return 1
             fi
-            popd
             sudo systemctl stop ~/private
             ;;
         *)
@@ -194,5 +191,3 @@ function aoc
     fi
     cd $dir
 }
-
-source /home/carlo/.config/broot/launcher/bash/br

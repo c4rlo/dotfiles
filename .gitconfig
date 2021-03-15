@@ -16,9 +16,13 @@
     insteadOf = gh:
     insteadOf = github.com:
 
-[url "git@gitlab.com:"]
+; [url "git@gitlab.com:"]  -- gives me "git@gitlab.com: Permission denied (publickey)."
+[url "https://gitlab.com/"]
     insteadOf = gl:
     insteadOf = gitlab.com:
 
 [url "ssh://aur/"]
     insteadOf = aur:
+
+[init]
+    defaultBranch = master
