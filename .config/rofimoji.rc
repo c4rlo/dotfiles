@@ -1,0 +1,4 @@
+selector = wofi
+rofi-args = --gtk-dark --insensitive
+files = [arrows, emojis, general_punctuation, geometric_shapes, geometric_shapes_extended, latin-1_supplement, latin_extended-a, letterlike_symbols, mathematical_operators, miscellaneous_symbols, miscellaneous_symbols_and_pictographs, number_forms, ornamental_dingbats, superscripts_and_subscripts, supplemental_symbols_and_pictographs, symbols_and_pictographs_extended-a, transport_and_map_symbols]
+skin-tone = light

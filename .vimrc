@@ -1,5 +1,6 @@
 unlet! skip_defaults_vim
 source $VIMRUNTIME/defaults.vim
+augroup vimStartup | au! | augroup END  " don't jump to last cursor pos
 
 " Set some global options
 set secure

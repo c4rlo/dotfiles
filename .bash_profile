@@ -21,7 +21,7 @@ if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]
 then
     # exec systemd-cat -t xorg startx
     export QT_QPA_PLATFORMTHEME=qt5ct \
-        QT_QPA_PLATFORM=wayland-egl \
+        QT_QPA_PLATFORM=wayland \
         MOZ_ENABLE_WAYLAND=1
     exec systemd-cat -t sway sway
 fi

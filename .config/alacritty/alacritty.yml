@@ -1,0 +1,8 @@
+font:
+  size: 16.0
+
+key_bindings:
+  # Fix Shift-Enter and Control-Enter for Vim.
+  # https://stackoverflow.com/a/42461580
+  - { key: Return,   mods: Shift,   chars: "\x1b[13;2u" }
+  - { key: Return,   mods: Control, chars: "\x1b[13;5u" }
