@@ -3,12 +3,15 @@
 set $mod Mod4
 set $term alacritty
 
-input "1:1:AT_Translated_Set_2_keyboard" xkb_layout gb-custom
+input "1:1:AT_Translated_Set_2_keyboard" {
+    xkb_layout gb-custom
+    xkb_options compose:prsc
+}
 input "76:620:Magic_Keyboard_with_Numeric_Keypad" xkb_layout macintosh_vndr/gb
 output "eDP-1" scale 2 pos 0 550
 output "DP-1" scale 1.5 pos 1920 0
 
-xwayland disable
+# xwayland disable
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -40,6 +43,9 @@ bindsym {
 
     # Start Firefox
     $mod+grave exec firefox
+
+    # Start LibreOffice
+    $mod+o exec libreoffice
 
     # Kill focused window
     $mod+Shift+q kill

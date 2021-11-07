@@ -102,10 +102,7 @@ function clonecd
 function upd
 {
     /usr/lib/systemd/systemd-networkd-wait-online &&
-    sudo pacman -Sc --noconfirm &&
-    sudo pacman -Syu --noconfirm &&
-    rustup update &&
-    cargo install-update -a
+    ~/src/updall/updall
 }
 
 function vupd

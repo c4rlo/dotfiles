@@ -8,6 +8,19 @@
 [diff]
     tool = vimdiff
 
+[init]
+    defaultBranch = master
+
+[credential]
+    helper = cache
+
+[sendemail]
+    confirm = auto
+    smtpServer = smtp.fastmail.com
+    smtpServerPort = 465
+    smtpEncryption = ssl
+    smtpUser = carlo@cteubner.net
+
 [url "git@github.com:c4rlo/"]
     insteadOf = c:
 
@@ -23,6 +36,3 @@
 
 [url "ssh://aur/"]
     insteadOf = aur:
-
-[init]
-    defaultBranch = master
