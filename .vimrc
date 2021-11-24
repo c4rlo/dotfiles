@@ -65,6 +65,7 @@ Plug 'fatih/vim-go'
 " Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'rust-lang/rust.vim'
 Plug 'cespare/vim-toml'
+Plug 'jasonccox/vim-wayland-clipboard'
 call plug#end()
 
 " Set color scheme

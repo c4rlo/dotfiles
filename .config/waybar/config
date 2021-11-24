@@ -49,3 +49,5 @@
         "spacing": 10
     }
 }
+
+// vim: ft=jsonc

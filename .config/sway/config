@@ -8,6 +8,9 @@ input "1:1:AT_Translated_Set_2_keyboard" {
     xkb_options compose:prsc
 }
 input "76:620:Magic_Keyboard_with_Numeric_Keypad" xkb_layout macintosh_vndr/gb
+
+input type:touchpad tap enabled
+
 output "eDP-1" scale 2 pos 0 550
 output "DP-1" scale 1.5 pos 1920 0
 
@@ -58,7 +61,7 @@ bindsym {
     $mod+Shift+c reload
 
     # Exit sway (logs you out of your Wayland session)
-    $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'
+    $mod+Shift+e exec swaynag -t warning -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
 
     # Start your launcher
     $mod+d exec bemenu-run -p '' --fn 'monospace 16'
@@ -164,7 +167,7 @@ mode "resize" {
     }
 }
 
-for_window [app_id="firefox" title="About Mozilla Firefox"] {
+for_window [app_id="firefox" title="About (?:Mozilla Firefox|Tor Browser)"] {
     floating enable
     border normal
 }
@@ -193,18 +196,12 @@ for_window [app_id="pcmanfm-qt" title="Preferences"] {
     border normal
 }
 
-for_window [app_id="electron" title="Open File"] {
-    floating enable
-}
-
-for_window [app_id="electron" title="Open Folder"] {
+for_window [app_id="electron" title="Open (?:File|Folder)"] {
     floating enable
 }
 
 bar {
     swaybar_command waybar
-    # status_command i3status-rs
-    # font pango:Droid Sans 14, FontAwesome 13
 }
 
 # exec systemd-cat -t swayidle swayidle -w \
