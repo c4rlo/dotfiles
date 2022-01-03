@@ -19,8 +19,9 @@ export PATH=$HOME/bin:$HOME/.local/bin/:$HOME/.cargo/bin:$HOME/go/bin:$PATH
 
 if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]
 then
-    # exec systemd-cat -t xorg startx
-    export QT_QPA_PLATFORMTHEME=qt5ct \
+    export \
+        NO_AT_BRIDGE=1 \
+        QT_QPA_PLATFORMTHEME=qt5ct \
         QT_QPA_PLATFORM=wayland \
         MOZ_ENABLE_WAYLAND=1
     exec systemd-cat -t sway sway
