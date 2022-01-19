@@ -22,6 +22,8 @@ set wildmode=list:longest,full
 set wildignore=*.o,*.pyc,*.pyo
 set colorcolumn=+1
 set pastetoggle=<F11>
+set splitbelow
+set splitright
 if exists('&cryptmethod')
     set cryptmethod=blowfish2
 endif

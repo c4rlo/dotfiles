@@ -48,7 +48,7 @@ bindsym {
     $mod+grave exec firefox
 
     # Start LibreOffice
-    $mod+o exec libreoffice
+    $mod+o exec libreoffice --nologo
 
     # Kill focused window
     $mod+Shift+q kill
