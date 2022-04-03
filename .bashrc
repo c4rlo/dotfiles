@@ -101,8 +101,7 @@ function clonecd
 
 function upd
 {
-    /usr/lib/systemd/systemd-networkd-wait-online &&
-    ~/src/archupd/archupd
+    /usr/lib/systemd/systemd-networkd-wait-online && archupd
 }
 
 function vupd

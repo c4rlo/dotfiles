@@ -16,7 +16,7 @@
         "format-alt": "{ifname}: {ipaddr}/{cidr}"
     },
     "cpu": {
-        "format": "{load} "
+        "format": "{load:.1} "
     },
     "temperature": {
         "hwmon-path": "/sys/class/hwmon/hwmon6/temp1_input",
