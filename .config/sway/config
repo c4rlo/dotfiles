@@ -14,11 +14,13 @@ input type:touchpad tap enabled
 output "eDP-1" scale 2 pos 0 550
 output "DP-1" scale 1.5 pos 1920 0
 
-# xwayland disable
+xwayland disable
+
+# focus_follows_mouse no
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:Roboto 14
+font pango:system-ui 14
 
 default_border pixel
 
@@ -61,10 +63,10 @@ bindsym {
     $mod+Shift+c reload
 
     # Exit sway (logs you out of your Wayland session)
-    $mod+Shift+e exec swaynag -t warning -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
+    $mod+Shift+e exec swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
 
     # Start your launcher
-    $mod+d exec bemenu-run -p '' --fn 'monospace 16'
+    $mod+d exec fuzzel -f 'system\-ui:size=20' -T alacritty --log-level=warning
 
     # Move your focus around
     $mod+h focus left

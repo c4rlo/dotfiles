@@ -12,7 +12,7 @@
 * {
     border: none;
     border-radius: 0;
-    font-family: Roboto;
+    font-family: system-ui;
     font-size: 14pt;
     min-height: 0;
 }

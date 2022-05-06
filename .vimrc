@@ -42,7 +42,6 @@ call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-sensible'
 Plug 'morhetz/gruvbox'
 Plug 'vim-airline/vim-airline'
-Plug 'majutsushi/tagbar'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'b4winckler/vim-angry'

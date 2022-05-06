@@ -8,8 +8,14 @@
 [diff]
     tool = vimdiff
 
+[merge]
+    conflictStyle = zdiff3
+
 [init]
     defaultBranch = master
+
+[rebase]
+    autoSquash = true
 
 [credential]
     helper = cache

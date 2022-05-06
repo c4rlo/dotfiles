@@ -11,11 +11,8 @@ HISTCONTROL=ignoredups
 MAILCHECK=
 CDPATH=:~/src:~/play
 
-# Tab completion
-complete -d -o bashdefault cd mkdir rmdir pushd popd
-complete -A enabled builtin
-complete -c type
-complete -u su
+# Tab completion; note that /etc/bash/bashrc already loads
+# /usr/share/bash-completion/bash_completion, which sets up most of it.
 . /usr/share/fzf/completion.bash
 . ~/google-cloud-sdk/completion.bash.inc
 . ~/.invoke-completion.sh
@@ -77,13 +74,24 @@ alias v=vim
 alias vd='vim -d'
 alias vp='vim -p'
 alias vo='vim -O'
-alias gs='git status --short --branch'
-alias gdt='git difftool'
-alias gds='git diff --stat'
-alias gc='git commit'
-alias gb='git branch'
-alias gco='git checkout'
 alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,SIZE,FSUSE%'
+
+# The git completion gets loaded on-demand by
+# /usr/share/bash-completion/bash_completion, but we have to explicitly load it
+# now in order to load the '__git_complete' function.
+. /usr/share/bash-completion/completions/git
+alias gs='git status --short --branch'
+__git_complete gs _git_status
+alias gdt='git difftool'
+__git_complete gdt _git_difftool
+alias gds='git diff --stat'
+__git_complete gds _git_diff
+alias gc='git commit'
+__git_complete gc _git_commit
+alias gb='git branch'
+__git_complete gb _git_branch
+alias gco='git checkout'
+__git_complete gco _git_checkout
 
 # Functions
 
