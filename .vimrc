@@ -29,6 +29,11 @@ if exists('&cryptmethod')
 endif
 set ttymouse=sgr
 
+if &term == 'xterm-kitty'
+    " https://sw.kovidgoyal.net/kitty/faq/#using-a-color-theme-with-a-background-color-does-not-work-well-in-vim
+    let &t_ut = ''
+endif
+
 " Enable built-in plugins
 packadd! matchit
 
