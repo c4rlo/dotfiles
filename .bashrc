@@ -74,7 +74,7 @@ alias v=vim
 alias vd='vim -d'
 alias vp='vim -p'
 alias vo='vim -O'
-alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,SIZE,FSUSE%'
+alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSUSE%'
 
 # The git completion gets loaded on-demand by
 # /usr/share/bash-completion/bash_completion, but we have to explicitly load it

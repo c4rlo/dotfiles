@@ -24,6 +24,7 @@ set colorcolumn=+1
 set pastetoggle=<F11>
 set splitbelow
 set splitright
+set shortmess=aoOtTI
 if exists('&cryptmethod')
     set cryptmethod=blowfish2
 endif
