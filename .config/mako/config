@@ -1,1 +1,3 @@
 font=system-ui 16
+icon-path=/usr/share/icons/Adwaita
+max-icon-size=32
