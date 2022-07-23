@@ -71,9 +71,6 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias v=vim
-alias vd='vim -d'
-alias vp='vim -p'
-alias vo='vim -O'
 alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSUSE%'
 
 # The git completion gets loaded on-demand by
@@ -118,14 +115,11 @@ function vupd
     vim -c PlugUpdate -c 'norm D'
 }
 
-function vpgs {
-    local status
-    status="$(git status -s --no-renames)" || return 1
+function vigs {
     local -a files
-    files=($(while IFS='\n' read line; do
-                  echo "${line:3}"
-              done <<<"$status"))
-    vim -p "${files[@]}"
+    while IFS=' ' read -d '' -r -a fields; do files+=("${fields[8]}"); done \
+        < <(git status -uno --no-renames --porcelain=2 -z)
+    vim "$@" "${files[@]}"
 }
 
 function pkgs
