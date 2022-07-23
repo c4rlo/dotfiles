@@ -117,8 +117,9 @@ function vupd
 
 function vigs {
     local -a files
-    while IFS=' ' read -d '' -r -a fields; do files+=("${fields[8]}"); done \
-        < <(git status -uno --no-renames --porcelain=2 -z)
+    while IFS=' ' read -d '' -r -a fields; do
+        [[ "${fields[0]}" != '#' ]] && files+=("${fields[8]}")
+    done < <(git status -uno --no-renames --porcelain=2 -z)
     vim "$@" "${files[@]}"
 }
 
