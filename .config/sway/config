@@ -49,7 +49,7 @@ bindsym {
     $mod+Return exec $term
 
     # Start Firefox
-    $mod+grave exec firefox
+    $mod+grave exec systemd-cat -t firefox firefox
 
     # Start LibreOffice
     $mod+o exec libreoffice --nologo
@@ -208,7 +208,9 @@ bar {
     swaybar_command waybar
 }
 
-# exec systemd-cat -t swayidle swayidle -w \
+exec systemd-cat swayidle timeout 600 /usr/local/bin/on_idle
+
+# exec systemd-cat swayidle -w \
 #          timeout 600 'swaymsg "output * dpms off"' \
 #               resume 'swaymsg "output * dpms on"'
 

@@ -24,5 +24,5 @@ then
         QT_QPA_PLATFORMTHEME=qt5ct \
         QT_QPA_PLATFORM=wayland \
         MOZ_ENABLE_WAYLAND=1
-    exec systemd-cat -t sway sway
+    exec systemd-cat sway
 fi

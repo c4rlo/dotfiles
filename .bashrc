@@ -11,7 +11,7 @@ HISTCONTROL=ignoredups
 MAILCHECK=
 CDPATH=:~/src:~/play
 
-# Tab completion; note that /etc/bash/bashrc already loads
+# Tab completion; note that /etc/bash.bashrc already loads
 # /usr/share/bash-completion/bash_completion, which sets up most of it.
 . /usr/share/fzf/completion.bash
 . ~/google-cloud-sdk/completion.bash.inc
@@ -71,6 +71,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias v=vim
+alias hx=helix
 alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSUSE%'
 
 # The git completion gets loaded on-demand by
@@ -134,7 +135,7 @@ function jctl
 {
     # systemd default if 'SYSTEMD_LESS' not provided is 'FRSXMK'. We remove the
     # 'S' option to get back word wrap.
-    SYSTEMD_LESS=FRXMK journalctl -o with-unit --no-hostname -e -n 20000 -b "$@"
+    SYSTEMD_LESS=FRXMK journalctl -o short-full --no-hostname -e -n 20000 -b "$@"
 }
 
 function fixwifi
@@ -176,17 +177,4 @@ function priv
             echo "Usage: priv on|off"
             return 1
     esac
-}
-
-function aoc
-{
-    local day=$1
-    [[ -z "$day" ]] && day=$(date +%d)
-    local base=~/play/adventofcode2019
-    local dir=$base/$day
-    if [[ ! -d $dir ]]; then
-        mkdir $dir
-        cp $base/solution_template.py $dir/solution.py
-    fi
-    cd $dir
 }
