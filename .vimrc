@@ -1,7 +1,6 @@
 vim9script
 
 source $VIMRUNTIME/defaults.vim
-augroup vimStartup | au! | augroup END  # don't jump to last cursor pos
 
 # Set some global options
 set secure
@@ -10,28 +9,25 @@ set noswapfile
 set undofile
 set expandtab
 set shiftwidth=4
-set number
 set textwidth=80
-set breakindent
-set hlsearch
-set cinoptions=:0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1
-set formatoptions=tcroqlnj
-set wildmode=list:longest,full
-set wildignore=*.o,*.pyc,*.pyo
 set colorcolumn=+1
-set pastetoggle=<F11>
+set breakindent
+set number
+set hlsearch
 set splitbelow
 set splitright
 set shortmess=aoOtTI
+set wildmode=list:longest,full
+set wildignore=*.o,*.pyc,*.pyo
+set formatoptions=tcroqlnj
+set cinoptions=:0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1
 set ttymouse=sgr
+set pastetoggle=<F11>
 
 if &term == 'xterm-kitty'
     # https://sw.kovidgoyal.net/kitty/faq/#using-a-color-theme-with-a-background-color-does-not-work-well-in-vim
     &t_ut = ''
 endif
-
-# Disable persistent undo for private files
-au BufWritePre /home/carlo/private/* setl noundofile
 
 # Set up plugins via vim-plug
 if empty(glob('~/.vim/autoload/plug.vim'))
@@ -61,20 +57,41 @@ Plug 'tpope/vim-dispatch'
 Plug 'derekwyatt/vim-fswitch'
 Plug 'junegunn/fzf.vim'
 Plug 'Olical/vim-enmasse'
-Plug 'rhysd/vim-clang-format', { 'for': [ 'c', 'cpp' ] }
-Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
-Plug 'raimon49/requirements.txt.vim', { 'for': 'requirements' }
-Plug 'Glench/Vim-Jinja2-Syntax', { 'for': 'jinja' }
-Plug 'fatih/vim-go', { 'for': 'go' }
-# Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'rust-lang/rust.vim', { 'for': 'rust' }
-Plug 'cespare/vim-toml', { 'for': 'toml' }
 Plug 'jasonccox/vim-wayland-clipboard'
+Plug 'cespare/vim-toml'
+Plug 'Glench/Vim-Jinja2-Syntax'
+Plug 'raimon49/requirements.txt.vim'
+Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
+Plug 'fatih/vim-go'  # , { 'do': ':GoUpdateBinaries' }
+Plug 'rust-lang/rust.vim'
+Plug 'dense-analysis/ale'
 plug#end()
 
 # Set color scheme
 set background=dark
-colo gruvbox
+colorscheme gruvbox
+
+# Configure ALE
+g:ale_python_pylsp_config = {
+    'pylsp': {
+        'plugins': {
+            'pycodestyle': { 'enabled': v:false },
+            'mccabe': { 'enabled': v:false },
+            'pyflakes': { 'enabled': v:false },
+            'flake8': { 'enabled': v:true },
+            'black': { 'enabled': v:true }
+        },
+        'configurationSources': ['flake8']
+    }
+}
+g:ale_completion_enabled = 1
+set omnifunc=ale#completion#OmniFunc
+g:airline#extensions#ale#enabled = 1
+
+# Configure vim-go
+# g:go_fmt_command = "goimports"
+g:go_fmt_command = "golines"
+g:go_fmt_options = { 'golines': '-m 88' }
 
 # Custom keybindings
 nnoremap Q <Cmd>qa<CR>
@@ -85,7 +102,7 @@ nnoremap <silent> <S-Right> <Cmd>bn<CR>
 nnoremap <silent> <S-Left> <Cmd>bp<CR>
 nnoremap <CR> o<Esc>
 # nnoremap <S-CR> O<Esc>  # Does't work: Terminal emulator does not see the Shift
-nnoremap \s <Cmd>%s/\<<C-R><C-W>\>//cg<Left><Left><Left>
+nnoremap <Leader>s :%s/\<<C-R><C-W>\>//cg<Left><Left><Left>
 
 # Custom commands
 command Cx :Chmod +x
@@ -105,32 +122,19 @@ nnoremap <C-p> <Cmd>Files<CR>
 imap <C-x><C-f> <Plug>(fzf-complete-path)
 imap <C-x><C-l> <Plug>(fzf-complete-line)
 
-# Go file handling
-au FileType go setlocal noexpandtab tabstop=4 textwidth=88
-au FileType go nmap <Leader>b <Plug>(go-build)
-au FileType go nmap <Leader>r <Plug>(go-run)
-au FileType go nmap <Leader>t <Plug>(go-test)
-au FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
-# g:go_fmt_command = "goimports"
-g:go_fmt_command = "golines"
-g:go_fmt_options = { 'golines': '-m 88' }
-
-# Python file handling
-au FileType python setlocal textwidth=88
+# Disable persistent undo for private files
+au BufWritePre ~/private/* setlocal noundofile
 
 # HTML/CSS file handling
 au FileType html,css,jinja setlocal shiftwidth=2 textwidth&
 
 # C/C++ file handling
 au BufEnter /usr/include/c++/* setf cpp
-au FileType c,cpp Configure_c_cpp()
-def Configure_c_cpp()
-    # Builtin ftplugin "c.vim" sets fo-=t so we need to restore it
-    setl formatoptions+=t commentstring=//\ %s
-    # clang-format on buffer write for C/C++
-    # ClangFormatAutoEnable
-    # Abbreviations
-    iab #i #include 
-    iab #d #define 
-    iab #u #undef 
-enddef
+au FileType c,cpp {
+        # Builtin ftplugin "c.vim" sets fo-=t so we need to restore it
+        setlocal formatoptions+=t commentstring=//\ %s
+        # Abbreviations
+        iab <buffer> #i #include 
+        iab <buffer> #d #define 
+        iab <buffer> #u #undef 
+    }
