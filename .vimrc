@@ -9,7 +9,7 @@ set noswapfile
 set undofile
 set expandtab
 set shiftwidth=4
-set textwidth=80
+set textwidth=88
 set colorcolumn=+1
 set breakindent
 set number
@@ -64,34 +64,52 @@ Plug 'raimon49/requirements.txt.vim'
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 Plug 'fatih/vim-go'  # , { 'do': ':GoUpdateBinaries' }
 Plug 'rust-lang/rust.vim'
-Plug 'dense-analysis/ale'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
 plug#end()
 
 # Set color scheme
 set background=dark
 colorscheme gruvbox
 
-# Configure ALE
-g:ale_python_pylsp_config = {
-    'pylsp': {
-        'plugins': {
-            'pycodestyle': { 'enabled': v:false },
-            'mccabe': { 'enabled': v:false },
-            'pyflakes': { 'enabled': v:false },
-            'flake8': { 'enabled': v:true },
-            'black': { 'enabled': v:true }
-        },
-        'configurationSources': ['flake8']
-    }
+# Configure vim-lsp
+g:lsp_fold_enabled = v:false
+g:lsp_diagnostics_echo_cursor = v:true
+autocmd User lsp_setup lsp#register_server({
+ \      'name': 'pylsp',
+ \      'cmd': ['pylsp'],
+ \      'allowlist': ['python'],
+ \      'workspace_config': {
+ \          'pylsp': {
+ \              'plugins': {
+ \                  'pycodestyle': { 'enabled': v:false },
+ \                  'mccabe': { 'enabled': v:false },
+ \                  'pyflakes': { 'enabled': v:false },
+ \                  'flake8': { 'enabled': v:true },
+ \                  'black': { 'enabled': v:true }
+ \              },
+ \              'configurationSources': ['flake8']
+ \          }
+ \      }
+ \  })
+autocmd User lsp_buffer_enabled {
+    setlocal signcolumn=yes omnifunc=lsp#complete tagfunc=lsp#tagfunc
+    nmap <buffer> gd <Plug>(lsp-definition)
+    nmap <buffer> gr <Plug>(lsp-references)
+    nmap <buffer> <Leader>r <Plug>(lsp-rename)
+    nmap <buffer> [g <Plug>(lsp-previous-diagnostic)
+    nmap <buffer> ]g <Plug>(lsp-next-diagnostic)
+    nmap <buffer> K <Plug>(lsp-hover)
+    autocmd BufWritePre <buffer> LspDocumentFormatSync
 }
-g:ale_completion_enabled = 1
-set omnifunc=ale#completion#OmniFunc
-g:airline#extensions#ale#enabled = 1
 
 # Configure vim-go
-# g:go_fmt_command = "goimports"
 g:go_fmt_command = "golines"
 g:go_fmt_options = { 'golines': '-m 88' }
+
+# Custom commands
+command Cx :Chmod +x
 
 # Custom keybindings
 nnoremap Q <Cmd>qa<CR>
@@ -104,8 +122,10 @@ nnoremap <CR> o<Esc>
 # nnoremap <S-CR> O<Esc>  # Does't work: Terminal emulator does not see the Shift
 nnoremap <Leader>s :%s/\<<C-R><C-W>\>//cg<Left><Left><Left>
 
-# Custom commands
-command Cx :Chmod +x
+# Asyncomplete keybindings
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <CR>    pumvisible() ? asyncomplete#close_popup() : "\<CR>"
 
 # EasyAlign keybindings
 xmap <silent> gA <Plug>(EasyAlign)
