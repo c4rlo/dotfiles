@@ -21,6 +21,7 @@ set wildmode=list:longest,full
 set wildignore=*.o,*.pyc,*.pyo
 set formatoptions=tcroqlnj
 set cinoptions=:0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1
+set termguicolors
 set ttymouse=sgr
 set pastetoggle=<F11>
 
@@ -41,7 +42,7 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-sensible'
-Plug 'morhetz/gruvbox'
+Plug 'lifepillar/vim-gruvbox8'
 Plug 'vim-airline/vim-airline'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'junegunn/vim-easy-align'
@@ -66,6 +67,7 @@ Plug 'mhinz/vim-startify'
 Plug 'cespare/vim-toml'
 Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'raimon49/requirements.txt.vim'
+Plug 'jeetsukumaran/vim-pythonsense'
 Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
 Plug 'fatih/vim-go'  # , { 'do': ':GoUpdateBinaries' }
 Plug 'rust-lang/rust.vim'
@@ -76,7 +78,7 @@ plug#end()
 
 # Set color scheme
 set background=dark
-colorscheme gruvbox
+colorscheme gruvbox8
 
 # Configure vim-lsp
 g:lsp_auto_enable = v:false
@@ -102,12 +104,16 @@ autocmd User lsp_setup lsp#register_server({
  \  })
 autocmd User lsp_buffer_enabled {
     setlocal signcolumn=yes omnifunc=lsp#complete tagfunc=lsp#tagfunc
-    nmap <buffer> gd <Plug>(lsp-definition)
-    nmap <buffer> gr <Plug>(lsp-references)
-    nmap <buffer> <Leader>r <Plug>(lsp-rename)
-    nmap <buffer> [g <Plug>(lsp-previous-diagnostic)
-    nmap <buffer> ]g <Plug>(lsp-next-diagnostic)
-    nmap <buffer> K <Plug>(lsp-hover)
+    nnoremap <buffer> gd <Plug>(lsp-peek-definition)
+    nnoremap <buffer> gD <Plug>(lsp-definition)
+    nnoremap <buffer> <C-W>gD <Cmd>vsplit<CR><Plug>(lsp-definition)
+    nnoremap <buffer> gr <Plug>(lsp-references)
+    nnoremap <buffer> gs <Plug>(lsp-document-symbol-search)
+    nnoremap <buffer> gS <Plug>(lsp-workspace-symbol-search)
+    nnoremap <buffer> <Leader>r <Plug>(lsp-rename)
+    nnoremap <buffer> [g <Plug>(lsp-previous-diagnostic)
+    nnoremap <buffer> ]g <Plug>(lsp-next-diagnostic)
+    nnoremap <buffer> K <Plug>(lsp-hover)
     autocmd BufWritePre <buffer> LspDocumentFormatSync
 }
 
@@ -124,6 +130,8 @@ g:startify_custom_header = ''
 command Cx :Chmod +x
 
 # Custom keybindings
+inoremap jk <Esc>
+inoremap kj <Esc>
 nnoremap Q <Cmd>qa<CR>
 nnoremap Y y$
 nnoremap ' `
