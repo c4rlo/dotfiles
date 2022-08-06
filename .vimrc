@@ -24,10 +24,14 @@ set cinoptions=:0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1
 set ttymouse=sgr
 set pastetoggle=<F11>
 
-if &term == 'xterm-kitty'
-    # https://sw.kovidgoyal.net/kitty/faq/#using-a-color-theme-with-a-background-color-does-not-work-well-in-vim
-    &t_ut = ''
-endif
+# Put all autocommands defined in this file into a "vimrc" group, and clear that
+# group. This ensures the autocommands don't get defined multiple times when
+# re-sourcing this file.
+augroup vimrc
+autocmd!
+
+# https://sw.kovidgoyal.net/kitty/faq/#using-a-color-theme-with-a-background-color-does-not-work-well-in-vim
+if &term == 'xterm-kitty' | &t_ut = '' | endif
 
 # Set up plugins via vim-plug
 if empty(glob('~/.vim/autoload/plug.vim'))
@@ -58,6 +62,7 @@ Plug 'derekwyatt/vim-fswitch'
 Plug 'junegunn/fzf.vim'
 Plug 'Olical/vim-enmasse'
 Plug 'jasonccox/vim-wayland-clipboard'
+Plug 'mhinz/vim-startify'
 Plug 'cespare/vim-toml'
 Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'raimon49/requirements.txt.vim'
@@ -74,6 +79,8 @@ set background=dark
 colorscheme gruvbox
 
 # Configure vim-lsp
+g:lsp_auto_enable = v:false
+autocmd BufEnter *.py if !&diff | lsp#enable() | endif
 g:lsp_fold_enabled = v:false
 g:lsp_diagnostics_echo_cursor = v:true
 autocmd User lsp_setup lsp#register_server({
@@ -107,6 +114,11 @@ autocmd User lsp_buffer_enabled {
 # Configure vim-go
 g:go_fmt_command = "golines"
 g:go_fmt_options = { 'golines': '-m 88' }
+
+# Configure startify
+g:startify_change_to_dir = v:false
+g:startify_fortune_use_unicode = v:true
+g:startify_custom_header = ''
 
 # Custom commands
 command Cx :Chmod +x
@@ -143,14 +155,14 @@ imap <C-x><C-f> <Plug>(fzf-complete-path)
 imap <C-x><C-l> <Plug>(fzf-complete-line)
 
 # Disable persistent undo for private files
-au BufWritePre ~/private/* setlocal noundofile
+autocmd BufWritePre ~/private/* setlocal noundofile
 
 # HTML/CSS file handling
-au FileType html,css,jinja setlocal shiftwidth=2 textwidth&
+autocmd FileType html,css,jinja setlocal shiftwidth=2 textwidth&
 
 # C/C++ file handling
-au BufEnter /usr/include/c++/* setf cpp
-au FileType c,cpp {
+autocmd BufEnter /usr/include/c++/* setf cpp
+autocmd FileType c,cpp {
         # Builtin ftplugin "c.vim" sets fo-=t so we need to restore it
         setlocal formatoptions+=t commentstring=//\ %s
         # Abbreviations
