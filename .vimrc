@@ -2,6 +2,19 @@ vim9script
 
 source $VIMRUNTIME/defaults.vim
 
+# Replace the "jump to last cursor position" feature from defaults.vim with an improved
+# version that skips it when diffing:
+autocmd! vimStartup BufReadPost * {
+    const l = line("'\"")
+    if 1 <= l && l <= line('$') && &ft !~ 'commit' && !&diff
+        # &diff is not yet set at this point when using vimdiff, so we need to also
+        # check this a different way:
+        if fnamemodify(v:argv[0], ':t') != 'vimdiff' && index(v:argv, '-d') == -1
+            exe 'normal! g`"'
+        endif
+    endif
+}
+
 # Set some global options
 set secure
 set hidden
@@ -13,6 +26,7 @@ set textwidth=88
 set colorcolumn=+1
 set breakindent
 set number
+set signcolumn=number
 set hlsearch
 set splitbelow
 set splitright
@@ -80,6 +94,14 @@ plug#end()
 set background=dark
 colorscheme gruvbox8
 
+# Configure airline
+g:airline_skip_empty_sections = v:true
+g:airline#parts#ffenc#skip_expected_string = 'utf-8[unix]'
+g:airline_powerline_fonts = v:true
+# https://github.com/vim-airline/vim-airline/issues/2563
+if !exists('g:airline_symbols') | g:airline_symbols = {} | endif
+g:airline_symbols.colnr = ' ㏇:'
+
 # Configure vim-lsp
 g:lsp_auto_enable = v:false
 autocmd BufEnter *.py if !&diff | lsp#enable() | endif
@@ -103,7 +125,7 @@ autocmd User lsp_setup lsp#register_server({
  \      }
  \  })
 autocmd User lsp_buffer_enabled {
-    setlocal signcolumn=yes omnifunc=lsp#complete tagfunc=lsp#tagfunc
+    setlocal omnifunc=lsp#complete tagfunc=lsp#tagfunc
     nnoremap <buffer> gd <Plug>(lsp-peek-definition)
     nnoremap <buffer> gD <Plug>(lsp-definition)
     nnoremap <buffer> <C-W>gD <Cmd>vsplit<CR><Plug>(lsp-definition)
@@ -118,7 +140,7 @@ autocmd User lsp_buffer_enabled {
 }
 
 # Configure vim-go
-g:go_fmt_command = "golines"
+g:go_fmt_command = 'golines'
 g:go_fmt_options = { 'golines': '-m 88' }
 
 # Configure startify
@@ -127,7 +149,7 @@ g:startify_fortune_use_unicode = v:true
 g:startify_custom_header = ''
 
 # Custom commands
-command Cx :Chmod +x
+command! Cx :Chmod +x
 
 # Custom keybindings
 inoremap jk <Esc>
@@ -138,8 +160,6 @@ nnoremap ' `
 nnoremap ; :
 nnoremap <silent> <S-Right> <Cmd>bn<CR>
 nnoremap <silent> <S-Left> <Cmd>bp<CR>
-nnoremap <CR> o<Esc>
-# nnoremap <S-CR> O<Esc>  # Does't work: Terminal emulator does not see the Shift
 nnoremap <Leader>s :%s/\<<C-R><C-W>\>//cg<Left><Left><Left>
 
 # Asyncomplete keybindings
@@ -177,4 +197,4 @@ autocmd FileType c,cpp {
         iab <buffer> #i #include 
         iab <buffer> #d #define 
         iab <buffer> #u #undef 
-    }
+}

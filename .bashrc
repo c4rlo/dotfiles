@@ -124,6 +124,10 @@ function vigs {
     vim "$@" "${files[@]}"
 }
 
+function vh {
+    vim -c "help $* | only"
+}
+
 function pkgs
 {
     pacman -Qq$@ |
