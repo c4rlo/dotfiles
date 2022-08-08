@@ -97,7 +97,7 @@ colorscheme gruvbox8
 
 # Configure lightline
 g:lightline = {
-        'colorscheme': 'jellybeans',
+        'colorscheme': 'gruvbox8',
         'active': { 'right': [ ['lineinfo'], ['percent'], ['filetype'] ] }
     }
 
