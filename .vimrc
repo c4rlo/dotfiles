@@ -27,6 +27,7 @@ set colorcolumn=+1
 set breakindent
 set number
 set signcolumn=number
+set noshowmode
 set hlsearch
 set splitbelow
 set splitright
@@ -57,7 +58,7 @@ endif
 plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-sensible'
 Plug 'lifepillar/vim-gruvbox8'
-Plug 'vim-airline/vim-airline'
+Plug 'itchyny/lightline.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'b4winckler/vim-angry'
@@ -94,19 +95,18 @@ plug#end()
 set background=dark
 colorscheme gruvbox8
 
-# Configure airline
-g:airline_skip_empty_sections = v:true
-g:airline#parts#ffenc#skip_expected_string = 'utf-8[unix]'
-g:airline_powerline_fonts = v:true
-# https://github.com/vim-airline/vim-airline/issues/2563
-if !exists('g:airline_symbols') | g:airline_symbols = {} | endif
-g:airline_symbols.colnr = ' ㏇:'
+# Configure lightline
+g:lightline = {
+        'colorscheme': 'jellybeans',
+        'active': { 'right': [ ['lineinfo'], ['percent'], ['filetype'] ] }
+    }
 
 # Configure vim-lsp
 g:lsp_auto_enable = v:false
 autocmd BufEnter *.py if !&diff | lsp#enable() | endif
 g:lsp_fold_enabled = v:false
 g:lsp_diagnostics_echo_cursor = v:true
+g:lsp_diagnostics_echo_delay = 150
 autocmd User lsp_setup lsp#register_server({
  \      'name': 'pylsp',
  \      'cmd': ['pylsp'],
