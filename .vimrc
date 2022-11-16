@@ -151,8 +151,6 @@ g:startify_custom_header = ''
 command! Cx :Chmod +x
 
 # Custom keybindings
-inoremap jk <Esc>
-inoremap kj <Esc>
 nnoremap Q <Cmd>qa<CR>
 nnoremap Y y$
 nnoremap ' `

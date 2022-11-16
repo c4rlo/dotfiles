@@ -70,8 +70,7 @@ alias la='ls -Al --color=auto'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias v=vim
-alias hx=helix
+alias v=nvim
 alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSUSE%'
 
 # The git completion gets loaded on-demand by
@@ -121,11 +120,11 @@ function vigs {
     while IFS=' ' read -d '' -r -a fields; do
         [[ "${fields[0]}" != '#' ]] && files+=("${fields[8]}")
     done < <(git status -uno --no-renames --porcelain=2 -z)
-    vim "$@" "${files[@]}"
+    nvim "$@" "${files[@]}"
 }
 
-function vh {
-    vim -c "help $* | only"
+function gd {
+    nvim -c "DiffviewOpen $*"
 }
 
 function pkgs
