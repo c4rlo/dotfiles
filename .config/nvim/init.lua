@@ -12,21 +12,22 @@ end
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
   use 'tpope/vim-unimpaired'
-  use 'tpope/vim-surround'
   use 'tpope/vim-sleuth'
+  use 'tpope/vim-surround'
   use 'tpope/vim-fugitive'
-  use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
+  use 'andymass/vim-matchup'
   use { 'numToStr/Comment.nvim', config = function() require('Comment').setup() end }
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
   use { 'nvim-treesitter/nvim-treesitter-textobjects', after = { 'nvim-treesitter' } }
   use 'neovim/nvim-lspconfig'
   use { 'hrsh7th/nvim-cmp', requires = { 'hrsh7th/cmp-nvim-lsp' } }
   use { 'L3MON4D3/LuaSnip', requires = { 'saadparwaiz1/cmp_luasnip' } }
-  use 'ellisonleao/gruvbox.nvim'
-  use 'nvim-tree/nvim-web-devicons'
-  use 'nvim-lualine/lualine.nvim'
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x', requires = 'nvim-lua/plenary.nvim' }
   use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
+  use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
+  use 'nvim-lualine/lualine.nvim'
+  use 'ellisonleao/gruvbox.nvim'
+  use 'nvim-tree/nvim-web-devicons'
 
   if is_bootstrap then require('packer').sync() end
 end)
@@ -96,7 +97,7 @@ vim.keymap.set('n', '<c-p>', require('telescope.builtin').find_files)
 vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep)
 
 require('nvim-treesitter.configs').setup {
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust' },
+  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown' },
   highlight = { enable = true },
   indent = { enable = true },
   incremental_selection = {
