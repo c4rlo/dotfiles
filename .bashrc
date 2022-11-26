@@ -115,6 +115,11 @@ function vupd
     vim -c PlugUpdate -c 'norm D'
 }
 
+function nvupd
+{
+    nvim -c PackerSync
+}
+
 function vigs {
     local -a files
     while IFS=' ' read -d '' -r -a fields; do

@@ -2,7 +2,7 @@
 # ~/.bash_profile
 #
 
-export EDITOR=vim
+export EDITOR=nvim
 export PS_PERSONALITY=linux
 
 export FZF_DEFAULT_COMMAND='fd --type f'
