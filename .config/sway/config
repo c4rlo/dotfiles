@@ -200,7 +200,7 @@ for_window [app_id="pcmanfm-qt" title="Preferences"] {
     border normal
 }
 
-for_window [app_id="electron|chromium" title="Open (?:File|Folder)"] {
+for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }
 

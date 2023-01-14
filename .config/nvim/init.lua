@@ -31,6 +31,7 @@ require('packer').startup(function(use)
   use 'nvim-lualine/lualine.nvim'
   use 'ellisonleao/gruvbox.nvim'
   use 'nvim-tree/nvim-web-devicons'
+  use 'Glench/Vim-Jinja2-Syntax'
 
   if is_bootstrap then require('packer').sync() end
 end)
@@ -45,7 +46,7 @@ vim.api.nvim_create_autocmd('BufWritePost', {
   pattern = vim.fn.expand '$MYVIMRC',
 })
 
--- [[ Options ]]
+-- Options
 
 vim.o.hlsearch = false
 vim.wo.number = true
@@ -75,7 +76,7 @@ vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 
--- [[ Highlight on yank ]]
+-- Highlight on yank
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank() end,
@@ -89,7 +90,9 @@ require('telescope').setup{
   defaults = {
     mappings = {
       i = {
-        ['<esc>'] = require('telescope.actions').close
+        ['<esc>'] = require('telescope.actions').close,
+        ['<C-k>'] = require('telescope.actions').move_selection_previous,
+        ['<C-j>'] = require('telescope.actions').move_selection_next,
       }
     }
   }
@@ -100,7 +103,7 @@ vim.keymap.set('n', '<c-p>', require('telescope.builtin').find_files)
 vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep)
 
 require('nvim-treesitter.configs').setup {
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown' },
+  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
   highlight = { enable = true },
   indent = { enable = true },
   incremental_selection = {
