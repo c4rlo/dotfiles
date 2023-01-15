@@ -5,7 +5,7 @@ local install_path = vim.fn.stdpath 'data' .. '/site/pack/packer/start/packer.nv
 local is_bootstrap = false
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   is_bootstrap = true
-  vim.fn.execute('!git clone https://github.com/wbthomason/packer.nvim ' .. install_path)
+  vim.fn.system { 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path }
   vim.cmd [[packadd packer.nvim]]
 end
 
@@ -19,7 +19,7 @@ require('packer').startup(function(use)
   use 'tpope/vim-eunuch'
   use 'andymass/vim-matchup'
   use { 'numToStr/Comment.nvim', config = function() require('Comment').setup() end }
-  use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+  use { 'nvim-treesitter/nvim-treesitter', run = function() pcall(require('nvim-treesitter.install').update { with_sync = true }) end }
   use { 'nvim-treesitter/nvim-treesitter-textobjects', after = 'nvim-treesitter' }
   use 'neovim/nvim-lspconfig'
   use { 'hrsh7th/nvim-cmp',
@@ -31,6 +31,7 @@ require('packer').startup(function(use)
   use 'nvim-lualine/lualine.nvim'
   use 'ellisonleao/gruvbox.nvim'
   use 'nvim-tree/nvim-web-devicons'
+  use 'Vimjas/vim-python-pep8-indent'
   use 'Glench/Vim-Jinja2-Syntax'
 
   if is_bootstrap then require('packer').sync() end
@@ -41,14 +42,14 @@ if is_bootstrap then return end
 -- Automatically source and re-compile packer whenever you save this init.lua
 local packer_group = vim.api.nvim_create_augroup('Packer', { clear = true })
 vim.api.nvim_create_autocmd('BufWritePost', {
-  command = 'source <afile> | PackerCompile',
+  command = 'source <afile> | silent! LspStop | silent! LspStart | PackerCompile',
   group = packer_group,
   pattern = vim.fn.expand '$MYVIMRC',
 })
 
 -- Options
 
-vim.o.hlsearch = false
+-- vim.o.hlsearch = false
 vim.wo.number = true
 vim.o.mouse = 'a'
 vim.o.breakindent = true
@@ -98,20 +99,22 @@ require('telescope').setup{
   }
 }
 require('telescope').load_extension('fzf')
-vim.keymap.set('n', '<c-k>', require('telescope.builtin').buffers)
-vim.keymap.set('n', '<c-p>', require('telescope.builtin').find_files)
-vim.keymap.set('n', '<leader>g', require('telescope.builtin').live_grep)
+vim.keymap.set('n', '<C-k>', require('telescope.builtin').buffers)
+vim.keymap.set('n', '<C-p>', require('telescope.builtin').find_files)
+vim.keymap.set('n', '<Leader>p', require('telescope.builtin').git_files)
+vim.keymap.set('n', '<Leader>g', require('telescope.builtin').live_grep)
+vim.keymap.set('n', '<Leader>w', require('telescope.builtin').grep_string)
 
 require('nvim-treesitter.configs').setup {
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
+  ensure_installed = { 'vim', 'help', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
   highlight = { enable = true },
-  indent = { enable = true },
+  indent = { enable = true, disable = { "python" } },
   incremental_selection = {
     enable = true,
     keymaps = {
-      init_selection = '<c-space>',
-      node_incremental = '<c-space>',
-      node_decremental = '<c-backspace>',
+      init_selection = '<C-space>',
+      node_incremental = '<C-space>',
+      node_decremental = '<C-backspace>',
     },
   },
   textobjects = {
@@ -150,10 +153,10 @@ require('nvim-treesitter.configs').setup {
     swap = {
       enable = true,
       swap_next = {
-        ['g>'] = '@parameter.inner',
+        ['<Leader>>'] = '@parameter.inner',
       },
       swap_previous = {
-        ['g<'] = '@parameter.inner',
+        ['<Leader><'] = '@parameter.inner',
       },
     },
   },
@@ -162,8 +165,8 @@ require('nvim-treesitter.configs').setup {
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
+vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 
 -- LSP settings.
 local on_attach = function(_, bufnr)
@@ -171,25 +174,23 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr })
   end
 
-  nmap('<leader>r', vim.lsp.buf.rename)
-  nmap('<leader>a', vim.lsp.buf.code_action)
+  nmap('<Leader>r', vim.lsp.buf.rename)
+  nmap('<Leader>a', vim.lsp.buf.code_action)
 
   nmap('gd', vim.lsp.buf.definition)
   nmap('gD', vim.lsp.buf.declaration)
-  nmap('gi', vim.lsp.buf.implementation)
+  nmap('gI', vim.lsp.buf.implementation)
   nmap('gr', require('telescope.builtin').lsp_references)
 
   nmap('K', vim.lsp.buf.hover)
-  nmap('<leader>k', vim.lsp.buf.signature_help)
+  nmap('<Leader>k', vim.lsp.buf.signature_help)
 
   -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-    if vim.lsp.buf.format then
-      vim.lsp.buf.format()
-    elseif vim.lsp.buf.formatting then
-      vim.lsp.buf.formatting()
-    end
+    vim.lsp.buf.format()
   end, {})
+  -- Also create a keymap for it
+  nmap('<Leader>F', vim.lsp.buf.format)
 end
 
 -- nvim-cmp supports additional completion capabilities
@@ -208,15 +209,25 @@ lspconfig.pylsp.setup {
   settings = {
     pylsp = {
       plugins = {
-          pycodestyle = { enabled = false },
-          mccabe = { enabled = false },
-          pyflakes = { enabled = false },
-          flake8 = { enabled = true },
-          black = { enabled = true }
+        pycodestyle = { enabled = false },
+        mccabe = { enabled = false },
+        pyflakes = { enabled = false },
+        flake8 = { enabled = true },
+        black = { enabled = true }
       },
       configurationSources = { 'flake8' }
     }
-  }
+  },
+  before_init = function(_, config)
+    if not vim.env.VIRTUAL_ENV then
+      local path = require('lspconfig.util').path
+      local candidate = path.join(config.root_dir, '.venv')
+      if path.is_dir(candidate) then
+        config.settings.pylsp.plugins.jedi = { environment = candidate }
+        -- maybe should also set config.settings.python.pythonPath...
+      end
+    end
+  end
 }
 
 -- nvim-cmp setup
