@@ -9,15 +9,15 @@ if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
   vim.cmd [[packadd packer.nvim]]
 end
 
-require('packer').startup(function(use)
+require('packer').startup { function(use)
   use 'wbthomason/packer.nvim'
   use 'tpope/vim-unimpaired'
   use 'tpope/vim-characterize'
   use 'tpope/vim-sleuth'
-  use 'tpope/vim-surround'
   use 'tpope/vim-fugitive'
   use 'tpope/vim-eunuch'
   use 'andymass/vim-matchup'
+  use { 'kylechui/nvim-surround', tag = '*', config = function() require('nvim-surround').setup() end }
   use { 'numToStr/Comment.nvim', config = function() require('Comment').setup() end }
   use { 'nvim-treesitter/nvim-treesitter', run = function() pcall(require('nvim-treesitter.install').update { with_sync = true }) end }
   use { 'nvim-treesitter/nvim-treesitter-textobjects', after = 'nvim-treesitter' }
@@ -35,7 +35,9 @@ require('packer').startup(function(use)
   use 'Glench/Vim-Jinja2-Syntax'
 
   if is_bootstrap then require('packer').sync() end
-end)
+end,
+  config = { display = { open_cmd = 'e \\[packer\\]' } }
+}
 
 if is_bootstrap then return end
 

@@ -9,7 +9,7 @@
 shopt -s autocd extglob checkwinsize
 HISTCONTROL=ignoredups
 MAILCHECK=
-CDPATH=:~/src:~/play
+CDPATH=~/src
 
 # Tab completion; note that /etc/bash.bashrc already loads
 # /usr/share/bash-completion/bash_completion, which sets up most of it.

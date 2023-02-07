@@ -31,6 +31,7 @@ set noshowmode
 set hlsearch
 set splitbelow
 set splitright
+set fillchars=vert:│
 set shortmess=aoOtTI
 set wildmode=list:longest,full
 set wildignore=*.o,*.pyc,*.pyo
