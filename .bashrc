@@ -9,7 +9,6 @@
 shopt -s autocd extglob checkwinsize
 HISTCONTROL=ignoredups
 MAILCHECK=
-CDPATH=~/src
 
 # Tab completion; note that /etc/bash.bashrc already loads
 # /usr/share/bash-completion/bash_completion, which sets up most of it.
@@ -61,6 +60,9 @@ if [ "$PS1" ]; then
         . "$VIRTUAL_ENV"/bin/activate
     fi
 fi
+
+# zoxide (modifies $PROMPT_COMMAND)
+eval "$(zoxide init bash)"
 
 # Aliases
 alias ls='ls --color=auto'
