@@ -89,6 +89,7 @@ Plug 'rust-lang/rust.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'chrisbra/vim_faq'
 plug#end()
 
 # Set color scheme

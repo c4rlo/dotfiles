@@ -44,6 +44,10 @@ client.urgent             $colour_yellow  $colour_yellow  $colour_bg    $colour_
 
 floating_modifier $mod
 
+bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 10%-
+bindsym XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 10%+
+bindsym XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
+
 bindsym {
     # Start a terminal
     $mod+Return exec $term
