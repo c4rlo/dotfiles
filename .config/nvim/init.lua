@@ -1,52 +1,40 @@
--- Based on https://github.com/nvim-lua/kickstart.nvim
+-- Based on: https://github.com/nvim-lua/kickstart.nvim
+-- Also worth looking at: https://github.com/VonHeikemen/nvim-starter
 
--- Install packer
-local install_path = vim.fn.stdpath 'data' .. '/site/pack/packer/start/packer.nvim'
-local is_bootstrap = false
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-  is_bootstrap = true
-  vim.fn.system { 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path }
-  vim.cmd [[packadd packer.nvim]]
-end
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
 
-require('packer').startup { function(use)
-  use 'wbthomason/packer.nvim'
-  use 'tpope/vim-unimpaired'
-  use 'tpope/vim-characterize'
-  use 'tpope/vim-sleuth'
-  use 'tpope/vim-fugitive'
-  use 'tpope/vim-eunuch'
-  use 'andymass/vim-matchup'
-  use { 'kylechui/nvim-surround', tag = '*', config = function() require('nvim-surround').setup() end }
-  use { 'numToStr/Comment.nvim', config = function() require('Comment').setup() end }
-  use { 'nvim-treesitter/nvim-treesitter', run = function() pcall(require('nvim-treesitter.install').update { with_sync = true }) end }
-  use { 'nvim-treesitter/nvim-treesitter-textobjects', after = 'nvim-treesitter' }
-  use 'neovim/nvim-lspconfig'
-  use { 'hrsh7th/nvim-cmp',
-    requires = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' }
+local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system {
+    'git', 'clone', '--filter=blob:none', 'https://github.com/folke/lazy.nvim.git', '--branch=stable', lazypath,
   }
-  use { 'nvim-telescope/telescope.nvim', branch = '0.1.x', requires = 'nvim-lua/plenary.nvim' }
-  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
-  use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
-  use 'nvim-lualine/lualine.nvim'
-  use 'ellisonleao/gruvbox.nvim'
-  use 'nvim-tree/nvim-web-devicons'
-  use 'Vimjas/vim-python-pep8-indent'
-  use 'Glench/Vim-Jinja2-Syntax'
+end
+vim.opt.rtp:prepend(lazypath)
 
-  if is_bootstrap then require('packer').sync() end
-end,
-  config = { display = { open_cmd = 'e \\[packer\\]' } }
-}
-
-if is_bootstrap then return end
-
--- Automatically source and re-compile packer whenever you save this init.lua
-local packer_group = vim.api.nvim_create_augroup('Packer', { clear = true })
-vim.api.nvim_create_autocmd('BufWritePost', {
-  command = 'source <afile> | silent! LspStop | silent! LspStart | PackerCompile',
-  group = packer_group,
-  pattern = vim.fn.expand '$MYVIMRC',
+require('lazy').setup({
+  'tpope/vim-unimpaired',
+  'tpope/vim-characterize',
+  'tpope/vim-sleuth',
+  'tpope/vim-fugitive',
+  'tpope/vim-eunuch',
+  'andymass/vim-matchup',
+  { 'kylechui/nvim-surround', version = '*', opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
+  { 'nvim-treesitter/nvim-treesitter',
+    build = function() require('nvim-treesitter.install').update { with_sync = true } end,
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
+  'neovim/nvim-lspconfig',
+  { 'hrsh7th/nvim-cmp',
+    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' } },
+  { 'nvim-telescope/telescope.nvim', version = '*', dependencies = { 'nvim-lua/plenary.nvim' } },
+  { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+  { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
+  'nvim-lualine/lualine.nvim',
+  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = function() vim.cmd.colorscheme 'gruvbox' end },
+  'nvim-tree/nvim-web-devicons',
+  'Vimjas/vim-python-pep8-indent',
+  'Glench/Vim-Jinja2-Syntax',
 })
 
 -- Options
@@ -59,19 +47,14 @@ vim.o.splitbelow = true
 vim.o.splitright = true
 vim.o.swapfile = false
 vim.o.undofile = true
-vim.o.pastetoggle = '<F11>'
 vim.o.completeopt = 'menuone,noselect'
+vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
 vim.o.termguicolors = true
-vim.o.background = 'dark'
-vim.cmd [[colorscheme gruvbox]]
 
 vim.api.nvim_create_autocmd('BufWritePre', {
   pattern = vim.fn.expand('~/private') .. '*',
   callback = function() vim.bo.undofile = false end
 })
-
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
 
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', "'", '`')
@@ -84,7 +67,6 @@ local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = t
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank() end,
   group = highlight_group,
-  pattern = '*',
 })
 
 require('lualine').setup{ options = { theme = 'gruvbox_dark' } }
@@ -108,8 +90,8 @@ vim.keymap.set('n', '<Leader>g', require('telescope.builtin').live_grep)
 vim.keymap.set('n', '<Leader>w', require('telescope.builtin').grep_string)
 
 require('nvim-treesitter.configs').setup {
-  ensure_installed = { 'vim', 'help', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
-  highlight = { enable = true },
+  ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
+  highlight = { enable = true, disable = { "bash" } },
   indent = { enable = true, disable = { "python" } },
   incremental_selection = {
     enable = true,

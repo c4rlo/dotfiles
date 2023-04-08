@@ -108,7 +108,13 @@ function clonecd
 
 function upd
 {
-    /usr/lib/systemd/systemd-networkd-wait-online && archupd
+    local -
+    set -x
+    /usr/lib/systemd/systemd-networkd-wait-online &&
+    paru -Sc --noconfirm &&
+    paru -Syu &&
+    paru -c
+    # /usr/lib/systemd/systemd-networkd-wait-online && archupd
 }
 
 function vupd
@@ -141,6 +147,28 @@ function pkgs
             --bind 'enter:execute(pacman -Qil {} | less)'
 }
 
+function confdiff {
+    local file=$(realpath $1)
+    local owner=$(pacman -Qqo $file)
+    if [[ -z $owner ]]; then
+        echo "$file is not owned by any package"
+    fi
+    local pkgver=$(pacman -Q $owner | sed 's/ /-/')
+    if [[ -z $file || -z $pkgver ]]; then
+        echo "fail"
+        return 1
+    fi
+    local pkgfile=/var/cache/pacman/pkg/$pkgver-x86_64.pkg.tar.zst
+    if [[ ! -f $pkgfile ]]; then
+        pkgfile=/var/cache/pacman/pkg/$pkgver-any.pkg.tar.zst
+    fi
+    if [[ ! -f $pkgfile ]]; then
+        echo "$pkgfile does not exist"
+        return 1
+    fi
+    nvim -d <(tar -xOf $pkgfile ${file#/}) $file
+}
+
 function jctl
 {
     # systemd default if 'SYSTEMD_LESS' not provided is 'FRSXMK'. We remove the
@@ -150,20 +178,24 @@ function jctl
 
 function fixwifi
 {
-    echo "Stopping iwd" &&
-    sudo systemctl stop iwd &&
-    echo "Removing ath10k_pci kernel module" &&
-    sudo modprobe -r ath10k_pci &&
     echo "Re-loading ath10k_pci kernel module" &&
-    sudo modprobe ath10k_pci &&
-    echo "Waiting a bit" &&
-    sleep 3 &&
-    echo "Starting iwd" &&
-    sudo systemctl start iwd &&
-    echo "Waiting a bit" &&
-    sleep 2 &&
-    echo "Restarting systemd-networkd" &&
-    sudo systemctl restart systemd-networkd
+    sudo modprobe -r ath10k_pci &&
+    sudo modprobe ath10k_pci
+
+    # echo "Stopping iwd" &&
+    # sudo systemctl stop iwd &&
+    # echo "Removing ath10k_pci kernel module" &&
+    # sudo modprobe -r ath10k_pci &&
+    # echo "Re-loading ath10k_pci kernel module" &&
+    # sudo modprobe ath10k_pci &&
+    # echo "Waiting a bit" &&
+    # sleep 3 &&
+    # echo "Starting iwd" &&
+    # sudo systemctl start iwd &&
+    # echo "Waiting a bit" &&
+    # sleep 2 &&
+    # echo "Restarting systemd-networkd" &&
+    # sudo systemctl restart systemd-networkd
 }
 
 function priv
