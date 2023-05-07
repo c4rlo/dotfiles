@@ -21,9 +21,7 @@ require('lazy').setup({
   'andymass/vim-matchup',
   { 'kylechui/nvim-surround', version = '*', opts = {} },
   { 'numToStr/Comment.nvim', opts = {} },
-  { 'nvim-treesitter/nvim-treesitter',
-    build = function() require('nvim-treesitter.install').update { with_sync = true } end,
-    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
+  { 'nvim-treesitter/nvim-treesitter', build = ":TSUpdate", dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
   'neovim/nvim-lspconfig',
   { 'hrsh7th/nvim-cmp',
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' } },
@@ -43,11 +41,15 @@ require('lazy').setup({
 vim.wo.number = true
 vim.o.mouse = 'a'
 vim.o.breakindent = true
-vim.o.splitbelow = true
-vim.o.splitright = true
 vim.o.swapfile = false
 vim.o.undofile = true
+vim.o.expandtab = true
+vim.o.shiftwidth = 4
+vim.o.formatoptions = 'tcroqlnj'
+vim.o.cinoptions = ':0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1'
 vim.o.completeopt = 'menuone,noselect'
+vim.o.splitbelow = true
+vim.o.splitright = true
 vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
 vim.o.termguicolors = true
 
@@ -91,8 +93,9 @@ vim.keymap.set('n', '<Leader>w', require('telescope.builtin').grep_string)
 
 require('nvim-treesitter.configs').setup {
   ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
-  highlight = { enable = true, disable = { "bash" } },
-  indent = { enable = true, disable = { "python" } },
+  highlight = { enable = true },
+  -- highlight = { enable = true, disable = { "bash" } },
+  indent = { enable = true, disable = { "cpp", "python" } },
   incremental_selection = {
     enable = true,
     keymaps = {
@@ -152,6 +155,15 @@ require('nvim-treesitter.configs').setup {
   },
 }
 
+-- local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+-- parser_config.bash = {
+--   install_info = {
+--     url = "~/src/tree-sitter-bash/",
+--     files = {"src/parser.c", "src/scanner.cc"},
+--   },
+--   filetype = "sh",
+-- }
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
@@ -193,6 +205,14 @@ lspconfig.gopls.setup {
   on_attach = on_attach,
   capabilities = capabilities,
 }
+lspconfig.rust_analyzer.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
+}
+lspconfig.clangd.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
+}
 lspconfig.pylsp.setup {
   on_attach = on_attach,
   capabilities = capabilities,
@@ -202,7 +222,7 @@ lspconfig.pylsp.setup {
         pycodestyle = { enabled = false },
         mccabe = { enabled = false },
         pyflakes = { enabled = false },
-        flake8 = { enabled = true },
+        flake8 = { enabled = true, maxLineLength = 88 },
         black = { enabled = true }
       },
       configurationSources = { 'flake8' }

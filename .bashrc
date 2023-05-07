@@ -179,8 +179,7 @@ function jctl
 function fixwifi
 {
     echo "Re-loading ath10k_pci kernel module" &&
-    sudo modprobe -r ath10k_pci &&
-    sudo modprobe ath10k_pci
+    sudo /usr/local/bin/wifi_repair
 
     # echo "Stopping iwd" &&
     # sudo systemctl stop iwd &&

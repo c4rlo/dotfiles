@@ -2,14 +2,13 @@
 # ~/.bash_profile
 #
 
-export EDITOR=nvim
-export PS_PERSONALITY=linux
-
-export FZF_DEFAULT_COMMAND='fd --type f'
-
-export CMAKE_GENERATOR=Ninja
-export CTEST_OUTPUT_ON_FAILURE=ON
-export CTEST_PROGRESS_OUTPUT=ON
+export EDITOR=nvim \
+       LESS=--use-color \
+       PS_PERSONALITY=linux \
+       FZF_DEFAULT_COMMAND='fd --type f' \
+       CMAKE_GENERATOR=Ninja \
+       CTEST_OUTPUT_ON_FAILURE=ON \
+       CTEST_PROGRESS_OUTPUT=ON
 
 # Set up PATH
 . ~/google-cloud-sdk/path.bash.inc
