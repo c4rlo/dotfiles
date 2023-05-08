@@ -3,7 +3,8 @@
 #
 
 export EDITOR=nvim \
-       LESS=--use-color \
+       LESS='FRMK--use-color' \
+       SYSTEMD_LESS='FRMK--use-color' \
        PS_PERSONALITY=linux \
        FZF_DEFAULT_COMMAND='fd --type f' \
        CMAKE_GENERATOR=Ninja \

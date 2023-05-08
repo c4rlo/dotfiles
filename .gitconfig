@@ -20,9 +20,6 @@
 [credential]
     helper = cache
 
-[color]
-    ui = auto
-
 [sendemail]
     confirm = auto
     smtpServer = smtp.fastmail.com

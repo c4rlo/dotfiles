@@ -171,9 +171,7 @@ function confdiff {
 
 function jctl
 {
-    # systemd default if 'SYSTEMD_LESS' not provided is 'FRSXMK'. We remove the
-    # 'S' option to get back word wrap.
-    SYSTEMD_LESS=FRXMK journalctl -o short-full --no-hostname -e -n 20000 -b "$@"
+    journalctl -o short-full --no-hostname -e -n 20000 -b "$@"
 }
 
 function fixwifi
