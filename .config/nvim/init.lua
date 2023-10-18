@@ -25,7 +25,7 @@ require('lazy').setup({
   'neovim/nvim-lspconfig',
   { 'hrsh7th/nvim-cmp',
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' } },
-  { 'nvim-telescope/telescope.nvim', version = '*', dependencies = { 'nvim-lua/plenary.nvim' } },
+  { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
   { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
   'nvim-lualine/lualine.nvim',
@@ -33,6 +33,7 @@ require('lazy').setup({
   'nvim-tree/nvim-web-devicons',
   'Vimjas/vim-python-pep8-indent',
   'Glench/Vim-Jinja2-Syntax',
+  'jvirtanen/vim-hcl'
 })
 
 -- Options
@@ -40,6 +41,7 @@ require('lazy').setup({
 -- vim.o.hlsearch = false
 vim.wo.number = true
 vim.o.mouse = 'a'
+vim.o.mousemodel = 'extend'
 vim.o.breakindent = true
 vim.o.swapfile = false
 vim.o.undofile = true
@@ -170,6 +172,12 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 
+-- Go-specific options
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'go',
+  callback = function() vim.bo.tabstop = 4 end
+})
+
 -- LSP settings.
 local on_attach = function(_, bufnr)
   local nmap = function(keys, func)
@@ -219,13 +227,9 @@ lspconfig.pylsp.setup {
   settings = {
     pylsp = {
       plugins = {
-        pycodestyle = { enabled = false },
-        mccabe = { enabled = false },
-        pyflakes = { enabled = false },
-        flake8 = { enabled = true, maxLineLength = 88 },
-        black = { enabled = true }
-      },
-      configurationSources = { 'flake8' }
+        black = { enabled = true },
+        ruff = { enabled = true }
+      }
     }
   },
   before_init = function(_, config)
@@ -251,6 +255,8 @@ cmp.setup {
     end,
   },
   mapping = cmp.mapping.preset.insert {
+    ['<C-n>'] = cmp.mapping.select_next_item(),
+    ['<C-p>'] = cmp.mapping.select_prev_item(),
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
@@ -261,7 +267,7 @@ cmp.setup {
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
-      elseif luasnip.expand_or_jumpable() then
+      elseif luasnip.expand_or_locally_jumpable() then
         luasnip.expand_or_jump()
       else
         fallback()
@@ -270,7 +276,7 @@ cmp.setup {
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
+      elseif luasnip.locally_jumpable(-1) then
         luasnip.jump(-1)
       else
         fallback()

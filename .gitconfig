@@ -14,6 +14,9 @@
 [init]
     defaultBranch = master
 
+[advice]
+    detachedHead = false
+
 [rebase]
     autoSquash = true
 

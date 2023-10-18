@@ -180,32 +180,27 @@ for_window [app_id="firefox" title="About (?:Mozilla Firefox|Tor Browser)"] {
     border normal
 }
 
+for_window [app_id="thunderbird" title="Compact folders"] {
+    floating enable
+    border normal
+}
+
 for_window [app_id="soffice" title="Open"] {
     floating enable
 }
 
-for_window [app_id="pcmanfm-qt" title="File Properties"] {
-    floating enable
-    border normal
-}
-
-for_window [app_id="pcmanfm-qt" title="Choose an Application"] {
-    floating enable
-    border normal
-}
-
-for_window [app_id="pcmanfm-qt" title="Search Files"] {
-    floating enable
-    border normal
-}
-
-for_window [app_id="pcmanfm-qt" title="Preferences"] {
+for_window [app_id="pcmanfm-qt" title="File Properties|Choose an Application|Search Files|Preferences"] {
     floating enable
     border normal
 }
 
 for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
+}
+
+for_window [app_id="pychess" title="Tip Of The day|Ask for permissions|Choose a folder"] {
+    floating enable
+    border normal
 }
 
 bar {

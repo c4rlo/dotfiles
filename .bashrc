@@ -74,6 +74,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias v=nvim
 alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSUSE%'
+alias ip='ip -color=auto'
 
 # The git completion gets loaded on-demand by
 # /usr/share/bash-completion/bash_completion, but we have to explicitly load it
@@ -125,7 +126,7 @@ function vupd
 
 function nvupd
 {
-    nvim -c PackerSync
+    nvim -c 'Lazy sync'
 }
 
 function vigs {
@@ -151,11 +152,11 @@ function confdiff {
     local file=$(realpath $1)
     local owner=$(pacman -Qqo $file)
     if [[ -z $owner ]]; then
-        echo "$file is not owned by any package"
+        echo "$file is not owned by any package" >&2
     fi
     local pkgver=$(pacman -Q $owner | sed 's/ /-/')
     if [[ -z $file || -z $pkgver ]]; then
-        echo "fail"
+        echo "fail" >&2
         return 1
     fi
     local pkgfile=/var/cache/pacman/pkg/$pkgver-x86_64.pkg.tar.zst
@@ -163,7 +164,7 @@ function confdiff {
         pkgfile=/var/cache/pacman/pkg/$pkgver-any.pkg.tar.zst
     fi
     if [[ ! -f $pkgfile ]]; then
-        echo "$pkgfile does not exist"
+        echo "$pkgfile does not exist" >&2
         return 1
     fi
     nvim -d <(tar -xOf $pkgfile ${file#/}) $file
