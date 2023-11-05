@@ -21,6 +21,7 @@ if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]
 then
     export \
         NO_AT_BRIDGE=1 \
+        GTK_A11Y=none \
         QT_QPA_PLATFORMTHEME=qt5ct \
         QT_QPA_PLATFORM=wayland \
         MOZ_ENABLE_WAYLAND=1

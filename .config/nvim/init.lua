@@ -18,8 +18,7 @@ require('lazy').setup({
   'tpope/vim-sleuth',
   'tpope/vim-fugitive',
   'tpope/vim-eunuch',
-  'andymass/vim-matchup',
-  { 'kylechui/nvim-surround', version = '*', opts = {} },
+  { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
   { 'numToStr/Comment.nvim', opts = {} },
   { 'nvim-treesitter/nvim-treesitter', build = ":TSUpdate", dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
   'neovim/nvim-lspconfig',
@@ -93,69 +92,70 @@ vim.keymap.set('n', '<Leader>p', require('telescope.builtin').git_files)
 vim.keymap.set('n', '<Leader>g', require('telescope.builtin').live_grep)
 vim.keymap.set('n', '<Leader>w', require('telescope.builtin').grep_string)
 
-require('nvim-treesitter.configs').setup {
-  ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
-  highlight = { enable = true },
-  -- highlight = { enable = true, disable = { "bash" } },
-  indent = { enable = true, disable = { "cpp", "python" } },
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = '<C-space>',
-      node_incremental = '<C-space>',
-      node_decremental = '<C-backspace>',
-    },
-  },
-  textobjects = {
-    select = {
+vim.defer_fn(function()
+  require('nvim-treesitter.configs').setup {
+    ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'gomod', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
+    highlight = { enable = true },
+    indent = { enable = true, disable = { "cpp", "python" } },
+    incremental_selection = {
       enable = true,
-      lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
       keymaps = {
-        ['aa'] = '@parameter.outer',
-        ['ia'] = '@parameter.inner',
-        ['af'] = '@function.outer',
-        ['if'] = '@function.inner',
-        ['ac'] = '@class.outer',
-        ['ic'] = '@class.inner',
+        init_selection = '<C-space>',
+        node_incremental = '<C-space>',
+        node_decremental = '<C-backspace>',
       },
     },
-    move = {
-      enable = true,
-      set_jumps = true, -- whether to set jumps in the jumplist
-      goto_next_start = {
-        [']m'] = '@function.outer',
-        [']]'] = '@class.outer',
+    textobjects = {
+      select = {
+        enable = true,
+        lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+        keymaps = {
+          ['aa'] = '@parameter.outer',
+          ['ia'] = '@parameter.inner',
+          ['af'] = '@function.outer',
+          ['if'] = '@function.inner',
+          ['ac'] = '@class.outer',
+          ['ic'] = '@class.inner',
+        },
       },
-      goto_next_end = {
-        [']M'] = '@function.outer',
-        [']['] = '@class.outer',
+      move = {
+        enable = true,
+        set_jumps = true, -- whether to set jumps in the jumplist
+        goto_next_start = {
+          [']m'] = '@function.outer',
+          [']]'] = '@class.outer',
+        },
+        goto_next_end = {
+          [']M'] = '@function.outer',
+          [']['] = '@class.outer',
+        },
+        goto_previous_start = {
+          ['[m'] = '@function.outer',
+          ['[['] = '@class.outer',
+        },
+        goto_previous_end = {
+          ['[M'] = '@function.outer',
+          ['[]'] = '@class.outer',
+        },
       },
-      goto_previous_start = {
-        ['[m'] = '@function.outer',
-        ['[['] = '@class.outer',
+      swap = {
+        enable = true,
+        swap_next = {
+          ['<Leader>>'] = '@parameter.inner',
+        },
+        swap_previous = {
+          ['<Leader><'] = '@parameter.inner',
+        },
       },
-      goto_previous_end = {
-        ['[M'] = '@function.outer',
-        ['[]'] = '@class.outer',
+      lsp_interop = {
+        enable = true,
+        peek_definition_code = {
+          ['<Leader>d'] = '@function.outer',
+        },
       },
     },
-    swap = {
-      enable = true,
-      swap_next = {
-        ['<Leader>>'] = '@parameter.inner',
-      },
-      swap_previous = {
-        ['<Leader><'] = '@parameter.inner',
-      },
-    },
-    lsp_interop = {
-      enable = true,
-      peek_definition_code = {
-        ['<Leader>d'] = '@function.outer',
-      },
-    },
-  },
-}
+  }
+end, 0)
 
 -- local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 -- parser_config.bash = {
@@ -174,7 +174,7 @@ vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 
 -- Go-specific options
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'go',
+  pattern = {'go', 'gomod', 'gosum'},
   callback = function() vim.bo.tabstop = 4 end
 })
 
@@ -187,13 +187,16 @@ local on_attach = function(_, bufnr)
   nmap('<Leader>r', vim.lsp.buf.rename)
   nmap('<Leader>a', vim.lsp.buf.code_action)
 
-  nmap('gd', vim.lsp.buf.definition)
+  nmap('gd', require('telescope.builtin').lsp_definitions)
   nmap('gD', vim.lsp.buf.declaration)
-  nmap('gI', vim.lsp.buf.implementation)
+  nmap('<Leader>D', require('telescope.builtin').lsp_type_definitions)
+  nmap('gI', require('telescope.builtin').lsp_implementations)
   nmap('gr', require('telescope.builtin').lsp_references)
 
   nmap('K', vim.lsp.buf.hover)
   nmap('<Leader>k', vim.lsp.buf.signature_help)
+
+  nmap('<Leader>/', require('telescope.builtin').lsp_document_symbols)
 
   -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
@@ -212,6 +215,11 @@ local lspconfig = require 'lspconfig'
 lspconfig.gopls.setup {
   on_attach = on_attach,
   capabilities = capabilities,
+  settings = {
+    gopls = {
+      gofumpt = true
+    }
+  }
 }
 lspconfig.rust_analyzer.setup {
   on_attach = on_attach,
@@ -260,10 +268,7 @@ cmp.setup {
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
-    },
+    ['<CR>'] = cmp.mapping.confirm { select = true },
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
