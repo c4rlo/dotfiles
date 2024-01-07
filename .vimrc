@@ -6,7 +6,7 @@ source $VIMRUNTIME/defaults.vim
 # version that skips it when diffing:
 autocmd! vimStartup BufReadPost * {
     const l = line("'\"")
-    if 1 <= l && l <= line('$') && &ft !~ 'commit' && !&diff
+    if 1 <= l && l <= line('$') && &ft !~ 'commit' && index(['xxd', 'gitrebase'], &ft) == -1 && !&diff
         # &diff is not yet set at this point when using vimdiff, so we need to also
         # check this a different way:
         if fnamemodify(v:argv[0], ':t') != 'vimdiff' && index(v:argv, '-d') == -1
@@ -24,6 +24,7 @@ set expandtab
 set shiftwidth=4
 set textwidth=88
 set colorcolumn=+1
+set smoothscroll
 set breakindent
 set number
 set signcolumn=number
@@ -48,7 +49,43 @@ augroup vimrc
 autocmd!
 
 # https://sw.kovidgoyal.net/kitty/faq/#using-a-color-theme-with-a-background-color-does-not-work-well-in-vim
-if &term == 'xterm-kitty' | &t_ut = '' | endif
+if &term == 'xterm-kitty'
+    set balloonevalterm
+    # Styled and colored underline support
+    &t_AU = "\e[58:5:%dm"
+    &t_8u = "\e[58:2:%lu:%lu:%lum"
+    &t_Us = "\e[4:2m"
+    &t_Cs = "\e[4:3m"
+    &t_ds = "\e[4:4m"
+    &t_Ds = "\e[4:5m"
+    &t_Ce = "\e[4:0m"
+    # Strikethrough
+    &t_Ts = "\e[9m"
+    &t_Te = "\e[29m"
+    # Truecolor support
+    &t_8f = "\e[38:2:%lu:%lu:%lum"
+    &t_8b = "\e[48:2:%lu:%lu:%lum"
+    &t_RF = "\e]10;?\e\\"
+    &t_RB = "\e]11;?\e\\"
+    # Cursor control
+    &t_RC = "\e[?12$p"
+    &t_SH = "\e[%d q"
+    &t_RS = "\eP$q q\e\\"
+    &t_SI = "\e[5 q"
+    &t_SR = "\e[3 q"
+    &t_EI = "\e[1 q"
+    &t_VS = "\e[?12l"
+    # Focus tracking
+    &t_fe = "\e[?1004h"
+    &t_fd = "\e[?1004l"
+    # Window title
+    &t_ST = "\e[22;2t"
+    &t_RT = "\e[23;2t"
+    # Fix background color rendering
+    &t_ut = ''
+endif
+
+packadd! editorconfig
 
 # Set up plugins via vim-plug
 if empty(glob('~/.vim/autoload/plug.vim'))
@@ -60,7 +97,6 @@ plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-sensible'
 Plug 'lifepillar/vim-gruvbox8'
 Plug 'itchyny/lightline.vim'
-Plug 'editorconfig/editorconfig-vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'b4winckler/vim-angry'
 Plug 'tpope/vim-characterize'

@@ -23,7 +23,6 @@ then
         NO_AT_BRIDGE=1 \
         GTK_A11Y=none \
         QT_QPA_PLATFORMTHEME=qt5ct \
-        QT_QPA_PLATFORM=wayland \
-        MOZ_ENABLE_WAYLAND=1
+        QT_QPA_PLATFORM=wayland
     exec systemd-cat sway
 fi

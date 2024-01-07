@@ -111,7 +111,7 @@ function upd
 {
     local -
     set -x
-    /usr/lib/systemd/systemd-networkd-wait-online &&
+    # /usr/lib/systemd/systemd-networkd-wait-online &&
     paru -Sc --noconfirm &&
     paru -Syu &&
     paru -c
@@ -168,6 +168,27 @@ function confdiff {
         return 1
     fi
     nvim -d <(tar -xOf $pkgfile ${file#/}) $file
+}
+
+function _contains_match
+{
+    local -r pattern=$1
+    shift
+    for a in "$@"; do
+        if [[ "$a" =~ $pattern ]]; then return 0; fi
+    done
+    return 1
+}
+
+function sctl
+{
+    if _contains_match '^(start|stop|reload|restart|kill|enable|disable|mask|unmask|daemon-reload)$' "$@" &&
+      ! _contains_match '^--user$' "$@"
+    then
+        sudo systemctl "$@"
+    else
+        systemctl "$@"
+    fi
 }
 
 function jctl

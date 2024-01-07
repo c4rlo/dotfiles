@@ -8,26 +8,26 @@
         "enable-bar-scroll": true
     },
     "wireplumber": {
-        "format": "{volume}% 🔉",
+        "format": "🔉 {volume}%",
         "format-muted": "🔇"
     },
     "network": {
         // "interface": "wlp2*", // (Optional) To force the use of this interface
-        "format-wifi": "{essid} ({signalStrength}%) ",
-        "format-ethernet": "{ifname}: {ipaddr}/{cidr} 爵",
-        "format-linked": "{ifname} (No IP) 爵",
-        "format-disconnected": "Disconnected ⚠",
+        "format-wifi": " {essid} ({signalStrength}%)",
+        "format-ethernet": "爵 {ifname}: {ipaddr}/{cidr}",
+        "format-linked": "爵 {ifname} (No IP)",
+        "format-disconnected": "⚠ Disconnected",
         "format-alt": "{ifname}: {ipaddr}/{cidr}"
     },
     "cpu": {
-        "format": "{load:.1} "
+        "format": " {load:.1}"
     },
     "temperature": {
         // "hwmon-path": "/sys/class/hwmon/hwmon6/temp1_input",
         "thermal-zone": 9,
         "critical-threshold": 80,
         // "format-critical": "{temperatureC}°C {icon}",
-        "format": "{temperatureC}°C {icon}",
+        "format": "{icon} {temperatureC}°C",
         "format-icons": ["", "", ""]
     },
     "battery": {
@@ -37,10 +37,10 @@
             "warning": 30,
             "critical": 15
         },
-        "format": "{capacity}% {icon}",
-        "format-charging": "{capacity}% ",
-        "format-plugged": "{capacity}% ",
-        "format-alt": "{time} {icon}",
+        "format": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-alt": "{icon} {time}",
         // "format-good": "", // An empty format will hide the module
         // "format-full": "",
         "format-icons": ["", "", "", "", ""]

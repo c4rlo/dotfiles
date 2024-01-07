@@ -175,7 +175,12 @@ mode "resize" {
     }
 }
 
-for_window [app_id="firefox" title="About (?:Mozilla Firefox|Tor Browser)"] {
+for_window [app_id="firefox" title="About Mozilla Firefox|Page Info — .*"] {
+    floating enable
+    border normal
+}
+
+for_window [app_id="Tor Browser" title="About Tor.*"] {
     floating enable
     border normal
 }
