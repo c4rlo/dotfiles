@@ -38,7 +38,9 @@ require('lazy').setup({
 -- Options
 
 -- vim.o.hlsearch = false
-vim.wo.number = true
+vim.o.number = true
+vim.o.relativenumber = true
+vim.o.signcolumn = 'number'
 vim.o.mouse = 'a'
 vim.o.mousemodel = 'extend'
 vim.o.breakindent = true
@@ -51,6 +53,8 @@ vim.o.cinoptions = ':0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1'
 vim.o.completeopt = 'menuone,noselect'
 vim.o.splitbelow = true
 vim.o.splitright = true
+vim.o.showmode = false
+vim.o.shortmess = 'aoOtTI'
 vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
 vim.o.termguicolors = true
 
@@ -66,10 +70,8 @@ vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 
 -- Highlight on yank
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function() vim.highlight.on_yank() end,
-  group = highlight_group,
+  callback = function() vim.highlight.on_yank() end
 })
 
 require('lualine').setup{ options = { theme = 'gruvbox_dark' } }
@@ -156,15 +158,6 @@ vim.defer_fn(function()
     },
   }
 end, 0)
-
--- local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
--- parser_config.bash = {
---   install_info = {
---     url = "~/src/tree-sitter-bash/",
---     files = {"src/parser.c", "src/scanner.cc"},
---   },
---   filetype = "sh",
--- }
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)

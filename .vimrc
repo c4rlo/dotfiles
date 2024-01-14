@@ -27,6 +27,7 @@ set colorcolumn=+1
 set smoothscroll
 set breakindent
 set number
+set relativenumber
 set signcolumn=number
 set noshowmode
 set hlsearch
