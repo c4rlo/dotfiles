@@ -26,8 +26,12 @@ set textwidth=88
 set colorcolumn=+1
 set smoothscroll
 set breakindent
+set linebreak
+set showbreak=»\ 
 set number
 set relativenumber
+set cursorline
+set cursorlineopt=number
 set signcolumn=number
 set noshowmode
 set hlsearch
@@ -48,6 +52,9 @@ set pastetoggle=<F11>
 # re-sourcing this file.
 augroup vimrc
 autocmd!
+
+autocmd WinEnter * set cursorline
+autocmd WinLeave * set nocursorline
 
 # https://sw.kovidgoyal.net/kitty/faq/#using-a-color-theme-with-a-background-color-does-not-work-well-in-vim
 if &term == 'xterm-kitty'

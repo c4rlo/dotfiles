@@ -40,10 +40,14 @@ require('lazy').setup({
 -- vim.o.hlsearch = false
 vim.o.number = true
 vim.o.relativenumber = true
+vim.o.cursorline = true
+vim.o.cursorlineopt = 'number'
 vim.o.signcolumn = 'number'
 vim.o.mouse = 'a'
 vim.o.mousemodel = 'extend'
 vim.o.breakindent = true
+vim.o.linebreak = true
+vim.o.showbreak = '» '
 vim.o.swapfile = false
 vim.o.undofile = true
 vim.o.expandtab = true
@@ -57,6 +61,14 @@ vim.o.showmode = false
 vim.o.shortmess = 'aoOtTI'
 vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
 vim.o.termguicolors = true
+
+vim.api.nvim_create_autocmd('WinEnter', {
+  callback = function() vim.o.cursorline = true end
+})
+
+vim.api.nvim_create_autocmd('WinLeave', {
+  callback = function() vim.o.cursorline = false end
+})
 
 vim.api.nvim_create_autocmd('BufWritePre', {
   pattern = vim.fn.expand('~/private') .. '*',
