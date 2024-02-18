@@ -17,7 +17,7 @@ export PATH=$HOME/bin:$HOME/.local/bin/:$HOME/.cargo/bin:$HOME/go/bin:$PATH
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]
+if [[ -z "$WAYLAND_DISPLAY" && $XDG_VTNR -eq 1 ]]
 then
     export \
         NO_AT_BRIDGE=1 \

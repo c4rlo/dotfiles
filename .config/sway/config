@@ -203,20 +203,13 @@ for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }
 
-for_window [app_id="pychess" title="Tip Of The day|Ask for permissions|Choose a folder"] {
-    floating enable
-    border normal
-}
-
 bar {
     swaybar_command waybar
 }
 
-exec systemd-cat swayidle timeout 600 /usr/local/bin/on_idle
-
-# exec systemd-cat swayidle -w \
-#          timeout 600 'swaymsg "output * dpms off"' \
-#               resume 'swaymsg "output * dpms on"'
+exec systemd-cat swayidle -w \
+         timeout 600 '/usr/local/bin/on_idle idle' \
+              resume '/usr/local/bin/on_idle resume'
 
 exec $term
 
