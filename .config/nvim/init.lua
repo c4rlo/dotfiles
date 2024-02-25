@@ -35,9 +35,6 @@ require('lazy').setup({
   'jvirtanen/vim-hcl'
 })
 
--- Options
-
--- vim.o.hlsearch = false
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.cursorline = true
@@ -62,6 +59,16 @@ vim.o.shortmess = 'aoOtTI'
 vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
 vim.o.termguicolors = true
 
+vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set('n', "'", '`')
+vim.keymap.set('n', ';', ':')
+vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
+vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
+
 vim.api.nvim_create_autocmd('WinEnter', {
   callback = function() vim.o.cursorline = true end
 })
@@ -75,15 +82,18 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   callback = function() vim.bo.undofile = false end
 })
 
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-vim.keymap.set('n', "'", '`')
-vim.keymap.set('n', ';', ':')
-vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
-vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
-
--- Highlight on yank
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.highlight.on_yank() end
+})
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    if vim.o.diff then
+      for i, win in ipairs(vim.api.nvim_list_wins()) do
+        vim.wo[win].relativenumber = false
+      end
+    end
+  end
 })
 
 require('lualine').setup{ options = { theme = 'gruvbox_dark' } }
@@ -170,12 +180,6 @@ vim.defer_fn(function()
     },
   }
 end, 0)
-
--- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float)
-vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 
 -- Go-specific options
 vim.api.nvim_create_autocmd('FileType', {

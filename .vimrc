@@ -2,19 +2,6 @@ vim9script
 
 source $VIMRUNTIME/defaults.vim
 
-# Replace the "jump to last cursor position" feature from defaults.vim with an improved
-# version that skips it when diffing:
-autocmd! vimStartup BufReadPost * {
-    const l = line("'\"")
-    if 1 <= l && l <= line('$') && &ft !~ 'commit' && index(['xxd', 'gitrebase'], &ft) == -1 && !&diff
-        # &diff is not yet set at this point when using vimdiff, so we need to also
-        # check this a different way:
-        if fnamemodify(v:argv[0], ':t') != 'vimdiff' && index(v:argv, '-d') == -1
-            exe 'normal! g`"'
-        endif
-    endif
-}
-
 # Set some global options
 set secure
 set hidden
@@ -46,15 +33,6 @@ set cinoptions=:0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1
 set termguicolors
 set ttymouse=sgr
 set pastetoggle=<F11>
-
-# Put all autocommands defined in this file into a "vimrc" group, and clear that
-# group. This ensures the autocommands don't get defined multiple times when
-# re-sourcing this file.
-augroup vimrc
-autocmd!
-
-autocmd WinEnter * set cursorline
-autocmd WinLeave * set nocursorline
 
 # https://sw.kovidgoyal.net/kitty/faq/#using-a-color-theme-with-a-background-color-does-not-work-well-in-vim
 if &term == 'xterm-kitty'
@@ -92,6 +70,30 @@ if &term == 'xterm-kitty'
     # Fix background color rendering
     &t_ut = ''
 endif
+
+# Put all autocommands defined in this file into a "vimrc" group, and clear that
+# group. This ensures the autocommands don't get defined multiple times when
+# re-sourcing this file.
+augroup vimrc
+autocmd!
+
+autocmd WinEnter * set cursorline
+autocmd WinLeave * set nocursorline
+
+autocmd VimEnter * if &diff | exe "windo set norelativenumber" | endif
+
+# Replace the "jump to last cursor position" feature from defaults.vim with an improved
+# version that skips it when diffing:
+autocmd! vimStartup BufReadPost * {
+    const l = line("'\"")
+    if 1 <= l && l <= line('$') && &ft !~ 'commit' && index(['xxd', 'gitrebase'], &ft) == -1 && !&diff
+        # &diff is not yet set at this point when using vimdiff, so we need to also
+        # check this a different way:
+        if fnamemodify(v:argv[0], ':t') != 'vimdiff' && index(v:argv, '-d') == -1
+            exe 'normal! g`"'
+        endif
+    endif
+}
 
 packadd! editorconfig
 
