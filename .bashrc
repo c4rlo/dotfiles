@@ -111,7 +111,7 @@ function upd
 {
     local -
     set -x
-    # /usr/lib/systemd/systemd-networkd-wait-online &&
+    while ! getent hosts archlinux.org >/dev/null; do sleep 0.1; done
     paru -Sc --noconfirm &&
     paru -Syu &&
     paru -c
