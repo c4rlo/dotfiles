@@ -4,37 +4,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system {
-    'git', 'clone', '--filter=blob:none', 'https://github.com/folke/lazy.nvim.git', '--branch=stable', lazypath,
-  }
-end
-vim.opt.rtp:prepend(lazypath)
-
-require('lazy').setup({
-  'tpope/vim-unimpaired',
-  'tpope/vim-characterize',
-  'tpope/vim-sleuth',
-  'tpope/vim-fugitive',
-  'tpope/vim-eunuch',
-  { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
-  { 'numToStr/Comment.nvim', opts = {} },
-  { 'nvim-treesitter/nvim-treesitter', build = ":TSUpdate", dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
-  'neovim/nvim-lspconfig',
-  { 'hrsh7th/nvim-cmp',
-    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' } },
-  { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
-  { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-  { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
-  'nvim-lualine/lualine.nvim',
-  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = function() vim.cmd.colorscheme 'gruvbox' end },
-  'nvim-tree/nvim-web-devicons',
-  'Vimjas/vim-python-pep8-indent',
-  'Glench/Vim-Jinja2-Syntax',
-  'jvirtanen/vim-hcl'
-})
-
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.cursorline = true
@@ -96,26 +65,60 @@ vim.api.nvim_create_autocmd('VimEnter', {
   end
 })
 
-require('lualine').setup{ options = { theme = 'gruvbox_dark' } }
+local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system {
+    'git', 'clone', '--filter=blob:none', 'https://github.com/folke/lazy.nvim.git', '--branch=stable', lazypath,
+  }
+end
+vim.opt.rtp:prepend(lazypath)
 
-require('telescope').setup{
+require('lazy').setup({
+  'tpope/vim-unimpaired',
+  'tpope/vim-characterize',
+  'tpope/vim-sleuth',
+  'tpope/vim-fugitive',
+  'tpope/vim-eunuch',
+  { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
+  { 'nvim-treesitter/nvim-treesitter', build = ":TSUpdate", dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
+  'neovim/nvim-lspconfig',
+  { 'hrsh7th/nvim-cmp',
+    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' } },
+  { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
+  { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+  { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
+  { 'nvim-lualine/lualine.nvim', opts = {} },
+  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = function() vim.cmd.colorscheme 'gruvbox' end },
+  'nvim-tree/nvim-web-devicons',
+  'Vimjas/vim-python-pep8-indent',
+  'Glench/Vim-Jinja2-Syntax',
+  'jvirtanen/vim-hcl'
+})
+
+-- Configure telescope
+local telescope = require 'telescope'
+local telescope_actions = require 'telescope.actions'
+telescope.setup{
   defaults = {
     mappings = {
       i = {
-        ['<esc>'] = require('telescope.actions').close,
-        ['<C-k>'] = require('telescope.actions').move_selection_previous,
-        ['<C-j>'] = require('telescope.actions').move_selection_next,
+        ['<esc>'] = telescope_actions.close,
+        ['<C-k>'] = telescope_actions.move_selection_previous,
+        ['<C-j>'] = telescope_actions.move_selection_next,
       }
     }
   }
 }
-require('telescope').load_extension('fzf')
-vim.keymap.set('n', '<C-k>', require('telescope.builtin').buffers)
-vim.keymap.set('n', '<C-p>', require('telescope.builtin').find_files)
-vim.keymap.set('n', '<Leader>p', require('telescope.builtin').git_files)
-vim.keymap.set('n', '<Leader>g', require('telescope.builtin').live_grep)
-vim.keymap.set('n', '<Leader>w', require('telescope.builtin').grep_string)
+telescope.load_extension('fzf')
+local telescope_builtin = require 'telescope.builtin'
+vim.keymap.set('n', '<C-k>', telescope_builtin.buffers)
+vim.keymap.set('n', '<C-p>', telescope_builtin.find_files)
+vim.keymap.set('n', '<Leader>p', telescope_builtin.git_files)
+vim.keymap.set('n', '<Leader>g', telescope_builtin.live_grep)
+vim.keymap.set('n', '<Leader>w', telescope_builtin.grep_string)
 
+-- Configure treesitter
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'gomod', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
@@ -196,16 +199,17 @@ local on_attach = function(_, bufnr)
   nmap('<Leader>r', vim.lsp.buf.rename)
   nmap('<Leader>a', vim.lsp.buf.code_action)
 
-  nmap('gd', require('telescope.builtin').lsp_definitions)
+  nmap('gd', telescope_builtin.lsp_definitions)
   nmap('gD', vim.lsp.buf.declaration)
-  nmap('<Leader>D', require('telescope.builtin').lsp_type_definitions)
-  nmap('gI', require('telescope.builtin').lsp_implementations)
-  nmap('gr', require('telescope.builtin').lsp_references)
+  nmap('<Leader>D', telescope_builtin.lsp_type_definitions)
+  nmap('gI', telescope_builtin.lsp_implementations)
+  nmap('gr', telescope_builtin.lsp_references)
 
   nmap('K', vim.lsp.buf.hover)
   nmap('<Leader>k', vim.lsp.buf.signature_help)
 
-  nmap('<Leader>/', require('telescope.builtin').lsp_document_symbols)
+  nmap('<Leader>ds', telescope_builtin.lsp_document_symbols)
+  nmap('<Leader>ws', telescope_builtin.lsp_dynamic_workspace_symbols)
 
   -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
@@ -266,6 +270,13 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 
 cmp.setup {
+  enabled = function()
+    -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
+    if vim.api.nvim_get_mode().mode == 'c' then return true end
+    local context = require 'cmp.config.context'
+    return not context.in_treesitter_capture('comment') and
+      not context.in_syntax_group('Comment')
+  end,
   snippet = {
     expand = function(args)
       luasnip.lsp_expand(args.body)

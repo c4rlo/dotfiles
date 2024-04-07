@@ -39,6 +39,9 @@
 [advice]
     detachedHead = false
 
+[alias]
+    pushf = push -f --force-with-lease
+
 [url "git@github.com:c4rlo/"]
     insteadOf = c:
 
