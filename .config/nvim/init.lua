@@ -20,22 +20,18 @@ vim.o.expandtab = true
 vim.o.shiftwidth = 4
 vim.o.formatoptions = 'tcroqlnj'
 vim.o.cinoptions = ':0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1'
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = 'menuone,noselect,popup'
 vim.o.splitbelow = true
 vim.o.splitright = true
 vim.o.showmode = false
 vim.o.shortmess = 'aoOtTI'
 vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
-vim.o.termguicolors = true
 
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', "'", '`')
 vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 
 vim.api.nvim_create_autocmd('WinEnter', {
@@ -80,7 +76,6 @@ require('lazy').setup({
   'tpope/vim-fugitive',
   'tpope/vim-eunuch',
   { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
-  { 'numToStr/Comment.nvim', opts = {} },
   { 'nvim-treesitter/nvim-treesitter', build = ":TSUpdate", dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
   'neovim/nvim-lspconfig',
   { 'hrsh7th/nvim-cmp',
@@ -205,7 +200,6 @@ local on_attach = function(_, bufnr)
   nmap('gI', telescope_builtin.lsp_implementations)
   nmap('gr', telescope_builtin.lsp_references)
 
-  nmap('K', vim.lsp.buf.hover)
   nmap('<Leader>k', vim.lsp.buf.signature_help)
 
   nmap('<Leader>ds', telescope_builtin.lsp_document_symbols)

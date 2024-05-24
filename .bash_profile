@@ -15,8 +15,6 @@ export EDITOR=nvim \
 . ~/google-cloud-sdk/path.bash.inc
 export PATH=$HOME/bin:$HOME/.local/bin/:$HOME/.cargo/bin:$HOME/go/bin:$PATH
 
-[[ -f ~/.bashrc ]] && . ~/.bashrc
-
 if [[ -z "$WAYLAND_DISPLAY" && $XDG_VTNR -eq 1 ]]
 then
     export \
@@ -26,3 +24,5 @@ then
         QT_QPA_PLATFORM=wayland
     exec systemd-cat sway
 fi
+
+[[ -f ~/.bashrc ]] && . ~/.bashrc
