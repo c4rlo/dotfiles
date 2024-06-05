@@ -7,6 +7,7 @@ export EDITOR=nvim \
        SYSTEMD_LESS='FRMK--use-color' \
        PS_PERSONALITY=linux \
        FZF_DEFAULT_COMMAND='fd --type f' \
+       CMAKE_EXPORT_COMPILE_COMMANDS=ON \
        CMAKE_GENERATOR=Ninja \
        CTEST_OUTPUT_ON_FAILURE=ON \
        CTEST_PROGRESS_OUTPUT=ON
