@@ -75,6 +75,7 @@ require('lazy').setup({
   'tpope/vim-sleuth',
   'tpope/vim-fugitive',
   'tpope/vim-eunuch',
+  { 'jakemason/ouroboros', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
   { 'nvim-treesitter/nvim-treesitter', build = ":TSUpdate", dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
   'neovim/nvim-lspconfig',
@@ -183,6 +184,16 @@ end, 0)
 vim.api.nvim_create_autocmd('FileType', {
   pattern = {'go', 'gomod', 'gosum'},
   callback = function() vim.bo.tabstop = 4 end
+})
+
+-- C/C++-specific options
+local ouroboros = require('ouroboros')
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = {'c', 'cpp'},
+  callback = function()
+    vim.bo.commentstring = '// %s'  -- default is /*%s*/
+    vim.keymap.set('n', '<F2>', ouroboros.switch, { buffer = true })
+  end
 })
 
 -- LSP settings.
