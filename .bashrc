@@ -6,8 +6,10 @@
 [[ $- != *i* ]] && return
 
 # Options
-shopt -s autocd extglob checkwinsize
-HISTCONTROL=ignoredups
+shopt -s autocd extglob checkhash checkjobs checkwinsize failglob histappend globstar
+HISTCONTROL=ignorespace
+HISTSIZE=10000
+HISTTIMEFORMAT='[%F %T %Z] '
 MAILCHECK=
 
 # Tab completion; note that /etc/bash.bashrc already loads

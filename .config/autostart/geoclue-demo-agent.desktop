@@ -1,0 +1,14 @@
+[Desktop Entry]
+# Disable:
+Hidden=true
+
+# The below is copied from /etc/xdg/autostart/geoclue-demo-agent.desktop:
+Name=Geoclue Demo agent
+GenericName=Demo geoclue agent
+Keywords=geolocation;
+Exec=/usr/lib/geoclue-2.0/demos/agent
+Icon=mark-location-symbolic
+NotShowIn=GNOME;
+NoDisplay=true
+Terminal=false
+Type=Application

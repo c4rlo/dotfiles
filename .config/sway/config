@@ -50,29 +50,32 @@ bindsym XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
 
 bindsym {
     # Start a terminal
-    $mod+Return exec $term
+    $mod+Return exec uwsm app -- $term
 
     # Start Firefox
-    $mod+grave exec systemd-cat -t firefox firefox
+    $mod+grave exec uwsm app -- firefox
+
+    # TEMP
+    $mod+y exec uwsm app -- ~/play/siglog/siglog
 
     # Start LibreOffice
-    $mod+o exec libreoffice --nologo
+    $mod+o exec uwsm app -- libreoffice --nologo
 
     # Kill focused window
     $mod+Shift+q kill
     --release button2 kill
 
     # Insert Unicode character
-    $mod+period exec rofimoji
+    $mod+period exec uwsm app -- rofimoji
 
     # Reload the configuration file
     $mod+Shift+c reload
 
     # Exit sway (logs you out of your Wayland session)
-    $mod+Shift+e exec swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
+    $mod+Shift+e exec uwsm app -- swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
 
     # Start your launcher
-    $mod+d exec fuzzel -f 'system\-ui:size=20' -T $term --log-level=warning
+    $mod+d exec uwsm app -- fuzzel -f 'system\-ui:size=20' -T $term --log-level=warning --log-no-syslog --launch-prefix 'uwsm app --'
 
     # Move your focus around
     $mod+h focus left
@@ -203,18 +206,11 @@ for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }
 
-bar {
-    swaybar_command waybar
-}
+exec exec uwsm finalize SWAYSOCK I3SOCK
 
-exec systemd-cat swayidle -w \
-         timeout 600 '/usr/local/bin/on_idle idle' \
-              resume '/usr/local/bin/on_idle resume'
+# The below is not needed, as 'uwsm finalize' above takes care of importing env vars to systemd.
+# include /etc/sway/config.d/*
 
-exec $term
-
-include /etc/sway/config.d/*
-
-exec systemctl start --user gammastep
+exec uwsm app -- $term
 
 # vim: ft=conf

@@ -1,0 +1,15 @@
+[Unit]
+Description=Idle manager for Wayland
+Documentation=man:swayidle(1)
+After=graphical-session.target
+
+[Service]
+Type=exec
+ExecStart=swayidle -w \
+         timeout 600 '/usr/local/bin/on_idle idle' \
+              resume '/usr/local/bin/on_idle resume'
+Restart=on-failure
+Slice=session-graphical.slice
+
+[Install]
+WantedBy=wayland-wm@sway.service
