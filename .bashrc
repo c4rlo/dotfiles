@@ -6,7 +6,7 @@
 [[ $- != *i* ]] && return
 
 # Options
-shopt -s autocd extglob checkhash checkjobs checkwinsize failglob histappend globstar
+shopt -s autocd extglob checkhash checkjobs failglob histappend globstar
 HISTCONTROL=ignorespace
 HISTSIZE=10000
 HISTTIMEFORMAT='[%F %T %Z] '
@@ -71,6 +71,7 @@ alias ls='ls --color=auto'
 alias l='ls -A --color=auto'
 alias ll='ls -l --color=auto'
 alias la='ls -Al --color=auto'
+alias grep='grep --color=auto'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
@@ -78,22 +79,27 @@ alias v=nvim
 alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSUSE%'
 alias ip='ip -color=auto'
 
-# The git completion gets loaded on-demand by
-# /usr/share/bash-completion/bash_completion, but we have to explicitly load it
-# now in order to load the '__git_complete' function.
-. /usr/share/bash-completion/completions/git
-alias gs='git status --short --branch'
-__git_complete gs _git_status
-alias gdt='git difftool'
-__git_complete gdt _git_difftool
-alias gds='git diff --stat'
-__git_complete gds _git_diff
-alias gc='git commit'
-__git_complete gc _git_commit
-alias gb='git branch'
-__git_complete gb _git_branch
-alias gco='git checkout'
-__git_complete gco _git_checkout
+declare -A git_aliases=(
+    [gs]='status --short --branch'
+    [gdt]='difftool'
+    [gds]='diff --stat'
+    [gc]='commit'
+    [gb]='branch'
+    [gco]='checkout'
+)
+for a in "${!git_aliases[@]}"; do alias $a="git ${git_aliases[$a]}"; done
+function _comp_gitalias {
+    declare -F __git_complete >/dev/null || . /usr/share/bash-completion/completions/git
+    local -r gitcmd="${git_aliases[$1]%% *}"
+    # We are relying on a git bash completion impl detail here; alternatively,
+    # we could figure out the correct completion function using "complete -p $1".
+    local -r compfunc="__git_wrap_git_$gitcmd" 
+    # The below line sets up $compfunc as the completion function; hence next time
+    # completion for $1 happens, that will get called directly, rather than this function.
+    __git_complete "$1" "_git_$gitcmd"
+    "$compfunc" "$@"
+}
+complete -o bashdefault -o default -o nospace -F _comp_gitalias "${!git_aliases[@]}"
 
 # Functions
 
@@ -101,34 +107,6 @@ function mkcd
 {
     [[ -n "$1" ]] || return 1
     mkdir -p "$1" && cd "$1"
-}
-
-function clonecd
-{
-    local dir="${!###*[:/]}"
-    git clone "$@" && cd "$dir"
-}
-
-function upd
-{
-    local -
-    set -x
-    while ! getent hosts archlinux.org >/dev/null; do sleep 0.1; done
-    paru -Sc --noconfirm &&
-    paru -Syu &&
-    paru -c
-    # /usr/lib/systemd/systemd-networkd-wait-online && archupd
-}
-
-function vupd
-{
-    vim -E -c PlugUpgrade -c q >/dev/null
-    vim -c PlugUpdate -c 'norm D'
-}
-
-function nvupd
-{
-    nvim -c 'Lazy sync'
 }
 
 function vigs {
@@ -143,11 +121,56 @@ function gd {
     nvim -c "DiffviewOpen $*"
 }
 
+function clonecd
+{
+    local dir="${!###*[:/]}"
+    git clone "$@" && cd "$dir"
+}
+
+# https://junegunn.github.io/fzf/tips/ripgrep-integration/
+# https://github.com/junegunn/fzf/blob/master/ADVANCED.md#using-fzf-as-the-secondary-filter
+function rfv
+{
+    if [[ $# -lt 1 ]]; then
+        echo "usage: $FUNCNAME ARGS..." >&2
+        return 2
+    fi
+    rg --color=always --line-number --no-heading --smart-case "$@" |
+        fzf --ansi \
+            --color "hl:-1:underline,hl+:-1:underline:reverse" \
+            --delimiter : \
+            --preview 'bat --style=numbers -f --italic-text=always {1} --highlight-line {2}' \
+            --preview-window 'up,35%,border-bottom,+{2}+1/2' \
+            --bind 'enter:become(nvim {1} +{2})' \
+            --bind 'ctrl-o:execute(nvim {1} +{2})'
+}
+
 function pkgs
 {
     pacman -Qq$@ |
         fzf --preview 'pacman -Qil {}' --layout=reverse \
-            --bind 'enter:execute(pacman -Qil {} | less)'
+            --bind 'enter:execute(pacman -Qil {} | less -+F)'
+}
+
+function upd
+{
+    local -
+    set -x
+    while ! getent hosts archlinux.org >/dev/null; do sleep 0.1; done
+    paru -Sc --noconfirm &&
+    paru -Syu &&
+    paru -c
+}
+
+function vupd
+{
+    vim -E -c PlugUpgrade -c q >/dev/null
+    vim -c PlugUpdate -c 'norm D'
+}
+
+function nvupd
+{
+    nvim -c 'Lazy sync'
 }
 
 function confdiff {
@@ -192,31 +215,15 @@ function sctl
         systemctl "$@"
     fi
 }
+function _comp_sctl {
+    declare -F _systemctl >/dev/null || . /usr/share/bash-completion/completions/systemctl
+    _systemctl "$@"
+}
+complete -F _comp_sctl sctl
 
 function jctl
 {
     journalctl -o short-full --no-hostname -e -n 20000 -b "$@"
-}
-
-function fixwifi
-{
-    echo "Re-loading ath10k_pci kernel module" &&
-    sudo /usr/local/bin/wifi_repair
-
-    # echo "Stopping iwd" &&
-    # sudo systemctl stop iwd &&
-    # echo "Removing ath10k_pci kernel module" &&
-    # sudo modprobe -r ath10k_pci &&
-    # echo "Re-loading ath10k_pci kernel module" &&
-    # sudo modprobe ath10k_pci &&
-    # echo "Waiting a bit" &&
-    # sleep 3 &&
-    # echo "Starting iwd" &&
-    # sudo systemctl start iwd &&
-    # echo "Waiting a bit" &&
-    # sleep 2 &&
-    # echo "Restarting systemd-networkd" &&
-    # sudo systemctl restart systemd-networkd
 }
 
 function priv

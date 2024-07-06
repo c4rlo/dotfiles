@@ -2,6 +2,7 @@
 
 set $mod Mod4
 set $term kitty
+set $run exec uwsm app -t service --
 
 input "1:1:AT_Translated_Set_2_keyboard" {
     xkb_layout gb-custom
@@ -50,32 +51,32 @@ bindsym XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
 
 bindsym {
     # Start a terminal
-    $mod+Return exec uwsm app -- $term
+    $mod+Return $run $term
 
     # Start Firefox
-    $mod+grave exec uwsm app -- firefox
+    $mod+grave $run firefox
 
     # TEMP
-    $mod+y exec uwsm app -- ~/play/siglog/siglog
+    $mod+y $run ~/play/siglog/siglog
 
     # Start LibreOffice
-    $mod+o exec uwsm app -- libreoffice --nologo
+    $mod+o $run libreoffice --nologo
 
     # Kill focused window
     $mod+Shift+q kill
     --release button2 kill
 
     # Insert Unicode character
-    $mod+period exec uwsm app -- rofimoji
+    $mod+period $run rofimoji
 
     # Reload the configuration file
     $mod+Shift+c reload
 
     # Exit sway (logs you out of your Wayland session)
-    $mod+Shift+e exec uwsm app -- swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
+    $mod+Shift+e $run swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
 
     # Start your launcher
-    $mod+d exec uwsm app -- fuzzel -f 'system\-ui:size=20' -T $term --log-level=warning --log-no-syslog --launch-prefix 'uwsm app --'
+    $mod+d $run fuzzel -T $term --log-level=warning --log-no-syslog --launch-prefix 'uwsm app -t service --'
 
     # Move your focus around
     $mod+h focus left
@@ -206,11 +207,11 @@ for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }
 
-exec exec uwsm finalize SWAYSOCK I3SOCK
+exec uwsm app -t service -- $term
+
+exec uwsm finalize
 
 # The below is not needed, as 'uwsm finalize' above takes care of importing env vars to systemd.
 # include /etc/sway/config.d/*
-
-exec uwsm app -- $term
 
 # vim: ft=conf
