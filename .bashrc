@@ -7,7 +7,7 @@
 
 # Options
 shopt -s autocd extglob checkhash checkjobs failglob histappend globstar
-HISTCONTROL=ignorespace
+HISTCONTROL=ignoredups
 HISTSIZE=10000
 HISTTIMEFORMAT='[%F %T %Z] '
 MAILCHECK=
@@ -78,6 +78,8 @@ alias ....='cd ../../..'
 alias v=nvim
 alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSUSE%'
 alias ip='ip -color=auto'
+alias ffmpeg='ffmpeg -hide_banner'
+alias ffprobe='ffprobe -hide_banner'
 
 declare -A git_aliases=(
     [gs]='status --short --branch'
@@ -207,7 +209,7 @@ function _contains_match
 
 function sctl
 {
-    if _contains_match '^(start|stop|reload|restart|kill|enable|disable|mask|unmask|daemon-reload)$' "$@" &&
+    if _contains_match '^(start|stop|reload|restart|kill|enable|disable|mask|unmask|edit|revert|daemon-reload)$' "$@" &&
       ! _contains_match '^--user$' "$@"
     then
         sudo systemctl "$@"

@@ -2,7 +2,7 @@
 
 set $mod Mod4
 set $term kitty
-set $run exec uwsm app -t service --
+set $run exec uwsm-app -t service --
 
 input "1:1:AT_Translated_Set_2_keyboard" {
     xkb_layout gb-custom
@@ -207,7 +207,7 @@ for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }
 
-exec uwsm app -t service -- $term
+exec uwsm-app -t service -- $term
 
 exec uwsm finalize
 
