@@ -183,7 +183,10 @@ end, 0)
 -- Go-specific options
 vim.api.nvim_create_autocmd('FileType', {
   pattern = {'go', 'gomod', 'gosum'},
-  callback = function() vim.bo.tabstop = 4 end
+  callback = function()
+    vim.bo.expandtab = false
+    vim.bo.tabstop = 4
+  end
 })
 
 -- C/C++-specific options
