@@ -77,101 +77,106 @@ require('lazy').setup({
   'tpope/vim-eunuch',
   { 'jakemason/ouroboros', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
-  { 'nvim-treesitter/nvim-treesitter', build = ":TSUpdate", dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
+  { 'nvim-treesitter/nvim-treesitter',
+    build = ':TSUpdate',
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
+    config = function()
+      require'nvim-treesitter.configs'.setup{
+        ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'gomod', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
+        highlight = { enable = true },
+        indent = { enable = true, disable = { 'cpp', 'python' } },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = '<C-space>',
+            node_incremental = '<C-space>',
+            node_decremental = '<C-backspace>',
+          },
+        },
+        textobjects = {
+          select = {
+            enable = true,
+            lookahead = true, -- Automatically jump forward to textobj
+            keymaps = {
+              ['aa'] = '@parameter.outer',
+              ['ia'] = '@parameter.inner',
+              ['af'] = '@function.outer',
+              ['if'] = '@function.inner',
+              ['ac'] = '@class.outer',
+              ['ic'] = '@class.inner',
+            },
+          },
+          move = {
+            enable = true,
+            set_jumps = true, -- whether to set jumps in the jumplist
+            goto_next_start = {
+              [']m'] = '@function.outer',
+              [']]'] = '@class.outer',
+            },
+            goto_next_end = {
+              [']M'] = '@function.outer',
+              [']['] = '@class.outer',
+            },
+            goto_previous_start = {
+              ['[m'] = '@function.outer',
+              ['[['] = '@class.outer',
+            },
+            goto_previous_end = {
+              ['[M'] = '@function.outer',
+              ['[]'] = '@class.outer',
+            },
+          },
+          swap = {
+            enable = true,
+            swap_next = { ['<Leader>>'] = '@parameter.inner' },
+            swap_previous = { ['<Leader><'] = '@parameter.inner' },
+          },
+          lsp_interop = {
+            enable = true,
+            peek_definition_code = { ['<Leader>d'] = '@function.outer' },
+          },
+        },
+      }
+    end,
+  },
   'neovim/nvim-lspconfig',
   { 'hrsh7th/nvim-cmp',
     dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip',
       { 'rafamadriz/friendly-snippets', config = function() require'luasnip.loaders.from_vscode'.lazy_load() end }
     }
   },
-  { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
-  { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+  { 'nvim-telescope/telescope.nvim', branch = '0.1.x',
+    dependencies = { 'nvim-lua/plenary.nvim', { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' } },
+    config = function()
+      local telescope = require 'telescope'
+      local telescope_builtin = require 'telescope.builtin'
+      telescope.setup{
+        defaults = {
+          mappings = {
+            i = {
+              ['<C-k>'] = 'move_selection_previous',
+              ['<C-j>'] = 'move_selection_next',
+              ['<Esc>'] = 'close'
+            },
+          },
+        },
+      }
+      telescope.load_extension('fzf')
+      vim.keymap.set('n', '<C-k>', telescope_builtin.buffers)
+      vim.keymap.set('n', '<C-p>', telescope_builtin.find_files)
+      vim.keymap.set('n', '<Leader>p', telescope_builtin.git_files)
+      vim.keymap.set('n', '<Leader>g', telescope_builtin.live_grep)
+      vim.keymap.set('n', '<Leader>w', telescope_builtin.grep_string)
+    end
+  },
   { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'nvim-lualine/lualine.nvim', opts = {} },
   { 'ellisonleao/gruvbox.nvim', priority = 1000, config = function() vim.cmd.colorscheme 'gruvbox' end },
   'nvim-tree/nvim-web-devicons',
   'Vimjas/vim-python-pep8-indent',
   'Glench/Vim-Jinja2-Syntax',
-  'jvirtanen/vim-hcl'
+  'jvirtanen/vim-hcl',
 })
-
--- Configure telescope
-local telescope = require 'telescope'
-local telescope_actions = require 'telescope.actions'
-telescope.setup{}
-telescope.load_extension('fzf')
-local telescope_builtin = require 'telescope.builtin'
-vim.keymap.set('n', '<C-k>', telescope_builtin.buffers)
-vim.keymap.set('n', '<C-p>', telescope_builtin.find_files)
-vim.keymap.set('n', '<Leader>p', telescope_builtin.git_files)
-vim.keymap.set('n', '<Leader>g', telescope_builtin.live_grep)
-vim.keymap.set('n', '<Leader>w', telescope_builtin.grep_string)
-
--- Configure treesitter
-vim.defer_fn(function()
-  require('nvim-treesitter.configs').setup {
-    ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'gomod', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
-    highlight = { enable = true },
-    indent = { enable = true, disable = { "cpp", "python" } },
-    incremental_selection = {
-      enable = true,
-      keymaps = {
-        init_selection = '<C-space>',
-        node_incremental = '<C-space>',
-        node_decremental = '<C-backspace>',
-      },
-    },
-    textobjects = {
-      select = {
-        enable = true,
-        lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-        keymaps = {
-          ['aa'] = '@parameter.outer',
-          ['ia'] = '@parameter.inner',
-          ['af'] = '@function.outer',
-          ['if'] = '@function.inner',
-          ['ac'] = '@class.outer',
-          ['ic'] = '@class.inner',
-        },
-      },
-      move = {
-        enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          [']m'] = '@function.outer',
-          [']]'] = '@class.outer',
-        },
-        goto_next_end = {
-          [']M'] = '@function.outer',
-          [']['] = '@class.outer',
-        },
-        goto_previous_start = {
-          ['[m'] = '@function.outer',
-          ['[['] = '@class.outer',
-        },
-        goto_previous_end = {
-          ['[M'] = '@function.outer',
-          ['[]'] = '@class.outer',
-        },
-      },
-      swap = {
-        enable = true,
-        swap_next = {
-          ['<Leader>>'] = '@parameter.inner',
-        },
-        swap_previous = {
-          ['<Leader><'] = '@parameter.inner',
-        },
-      },
-      lsp_interop = {
-        enable = true,
-        peek_definition_code = {
-          ['<Leader>d'] = '@function.outer',
-        },
-      },
-    },
-  }
-end, 0)
 
 -- Go-specific options
 vim.api.nvim_create_autocmd('FileType', {
@@ -197,15 +202,16 @@ local on_attach = function(_, bufnr)
   local nmap = function(keys, func)
     vim.keymap.set('n', keys, func, { buffer = bufnr })
   end
+  local telescope_builtin = require 'telescope.builtin'
 
   nmap('<Leader>r', vim.lsp.buf.rename)
   nmap('<Leader>a', vim.lsp.buf.code_action)
 
   nmap('gd', telescope_builtin.lsp_definitions)
+  nmap('gr', telescope_builtin.lsp_references)
   nmap('gD', vim.lsp.buf.declaration)
   nmap('<Leader>D', telescope_builtin.lsp_type_definitions)
   nmap('gI', telescope_builtin.lsp_implementations)
-  nmap('gr', telescope_builtin.lsp_references)
 
   nmap('<Leader>k', vim.lsp.buf.signature_help)
 
@@ -285,16 +291,26 @@ cmp.setup {
   },
   completion = { completeopt = 'menu,menuone,noinsert' },
   mapping = cmp.mapping.preset.insert {
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<C-j>'] = cmp.mapping.select_next_item(),
+    ['<C-k>'] = cmp.mapping.select_prev_item(),
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-y>'] = cmp.mapping.confirm { select = true },
-    ['<C-l>'] = cmp.mapping(function()
-      if luasnip.expand_or_locally_jumpable() then luasnip.expand_or_jump() end
+    ['<CR>'] = cmp.mapping.confirm { select = true },
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.confirm()
+      elseif luasnip.expand_or_locally_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
     end, { 'i', 's' }),
-    ['<C-h>'] = cmp.mapping(function()
-      if luasnip.locally_jumpable(-1) then luasnip.jump(-1) end
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if luasnip.locally_jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
     end, { 'i', 's' }),
   },
   sources = {
