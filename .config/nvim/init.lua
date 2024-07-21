@@ -31,7 +31,7 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', "'", '`')
 vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
-vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
+vim.keymap.set('n', '\\s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 
 vim.api.nvim_create_autocmd('WinEnter', {
@@ -77,6 +77,8 @@ require('lazy').setup({
   'tpope/vim-eunuch',
   { 'jakemason/ouroboros', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
+  { 'Wansmer/treesj', keys = { '<space>m', '<space>j', '<space>s' }, dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    config = function() require('treesj').setup({}) end },
   { 'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
