@@ -80,7 +80,10 @@ require('lazy').setup({
   { 'nvim-treesitter/nvim-treesitter', build = ":TSUpdate", dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' } },
   'neovim/nvim-lspconfig',
   { 'hrsh7th/nvim-cmp',
-    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' } },
+    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip',
+      { 'rafamadriz/friendly-snippets', config = function() require'luasnip.loaders.from_vscode'.lazy_load() end }
+    }
+  },
   { 'nvim-telescope/telescope.nvim', branch = '0.1.x', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
   { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
@@ -95,17 +98,7 @@ require('lazy').setup({
 -- Configure telescope
 local telescope = require 'telescope'
 local telescope_actions = require 'telescope.actions'
-telescope.setup{
-  defaults = {
-    mappings = {
-      i = {
-        ['<esc>'] = telescope_actions.close,
-        ['<C-k>'] = telescope_actions.move_selection_previous,
-        ['<C-j>'] = telescope_actions.move_selection_next,
-      }
-    }
-  }
-}
+telescope.setup{}
 telescope.load_extension('fzf')
 local telescope_builtin = require 'telescope.builtin'
 vim.keymap.set('n', '<C-k>', telescope_builtin.buffers)
@@ -296,25 +289,12 @@ cmp.setup {
     ['<C-p>'] = cmp.mapping.select_prev_item(),
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<CR>'] = cmp.mapping.confirm { select = true },
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
+    ['<C-y>'] = cmp.mapping.confirm { select = true },
+    ['<C-l>'] = cmp.mapping(function()
+      if luasnip.expand_or_locally_jumpable() then luasnip.expand_or_jump() end
     end, { 'i', 's' }),
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
+    ['<C-h>'] = cmp.mapping(function()
+      if luasnip.locally_jumpable(-1) then luasnip.jump(-1) end
     end, { 'i', 's' }),
   },
   sources = {
