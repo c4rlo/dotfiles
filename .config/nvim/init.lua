@@ -31,7 +31,7 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', "'", '`')
 vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
-vim.keymap.set('n', '\\s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
+vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 
 vim.api.nvim_create_autocmd('WinEnter', {
@@ -62,7 +62,7 @@ vim.api.nvim_create_autocmd('VimEnter', {
 })
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
     'git', 'clone', '--filter=blob:none', 'https://github.com/folke/lazy.nvim.git', '--branch=stable', lazypath,
   }
@@ -77,8 +77,17 @@ require('lazy').setup({
   'tpope/vim-eunuch',
   { 'jakemason/ouroboros', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
-  { 'Wansmer/treesj', keys = { '<space>m', '<space>j', '<space>s' }, dependencies = { 'nvim-treesitter/nvim-treesitter' },
-    config = function() require('treesj').setup({}) end },
+  { 'Wansmer/treesj',
+    keys = { '<Leader>mm', '<Leader>mj', '<Leader>ms' },
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    config = function()
+      local treesj = require'treesj'
+      treesj.setup{ use_default_keymaps = false }
+      vim.keymap.set('n', '<Leader>mm', treesj.toggle)
+      vim.keymap.set('n', '<Leader>mj', treesj.join)
+      vim.keymap.set('n', '<Leader>ms', treesj.split)
+    end
+  },
   { 'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
@@ -90,9 +99,9 @@ require('lazy').setup({
         incremental_selection = {
           enable = true,
           keymaps = {
-            init_selection = '<C-space>',
-            node_incremental = '<C-space>',
-            node_decremental = '<C-backspace>',
+            init_selection = '<C-Space>',
+            node_incremental = '<C-Space>',
+            node_decremental = '<C-Backspace>',
           },
         },
         textobjects = {
