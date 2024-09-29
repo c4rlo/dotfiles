@@ -15,6 +15,6 @@ export EDITOR=nvim \
 export PATH=$HOME/bin:$HOME/.local/bin/:$HOME/.cargo/bin:$HOME/go/bin:$HOME/google-cloud-sdk/bin:$PATH
 
 if uwsm check may-start; then
-    # GUI-relevant env vars are set in ~/.config/uwsm-env
+    # GUI-relevant env vars are set in ~/.config/uwsm/env
     exec systemd-cat -t uwsm_start uwsm start -S sway
 fi

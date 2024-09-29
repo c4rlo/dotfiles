@@ -6,7 +6,7 @@
 [[ $- != *i* ]] && return
 
 # Options
-shopt -s autocd extglob checkhash checkjobs failglob histappend globstar
+shopt -s autocd extglob failglob globstar checkhash checkjobs histappend
 HISTCONTROL=ignoredups
 HISTSIZE=10000
 HISTTIMEFORMAT='[%F %T %Z] '

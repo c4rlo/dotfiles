@@ -323,6 +323,9 @@ cmp.setup {
         fallback()
       end
     end, { 'i', 's' }),
+    ['<C-,>'] = cmp.mapping(function()
+      luasnip.expand()
+    end, { 'i', 's' }),
   },
   sources = {
     { name = 'nvim_lsp' },
