@@ -291,6 +291,7 @@ cmp.setup {
   enabled = function()
     -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
     if vim.api.nvim_get_mode().mode == 'c' then return true end
+    if vim.bo.filetype == 'markdown' then return false end
     local context = require 'cmp.config.context'
     return not context.in_treesitter_capture('comment') and
       not context.in_syntax_group('Comment')

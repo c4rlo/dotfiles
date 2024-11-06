@@ -1,6 +1,5 @@
 # Read `man 5 sway` for a complete reference.
 
-set $mod Mod4
 set $term kitty
 set $run exec uwsm app -t service --
 
@@ -43,7 +42,7 @@ client.focused_inactive   $colour_bg1     $colour_bg1     $colour_fg    $colour_
 client.unfocused          $colour_bg      $colour_bg      $colour_fg4   $colour_bg1   $colour_bg
 client.urgent             $colour_yellow  $colour_yellow  $colour_bg    $colour_bg1   $colour_bg
 
-floating_modifier $mod
+floating_modifier Mod4
 
 bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 10%-
 bindsym XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 10%+
@@ -51,106 +50,106 @@ bindsym XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
 
 bindsym {
     # Start a terminal
-    $mod+Return $run $term
+    Mod4+Return $run $term
 
     # Start Firefox
-    $mod+grave $run firefox
-
-    # TEMP
-    $mod+y $run ~/play/siglog/siglog
+    Mod4+grave $run firefox
 
     # Start LibreOffice
-    $mod+o $run libreoffice --nologo
+    Mod4+o $run libreoffice --nologo
 
     # Kill focused window
-    $mod+Shift+q kill
+    Mod4+Shift+q kill
     --release button2 kill
 
     # Insert Unicode character
-    $mod+period $run rofimoji
+    Mod4+period $run rofimoji
+
+    # Take screenshot
+    Mod4+p $run grimshot copy anything
 
     # Reload the configuration file
-    $mod+Shift+c reload
+    Mod4+Shift+c reload
 
     # Exit sway (logs you out of your Wayland session)
-    $mod+Shift+e $run swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
+    Mod4+Shift+e $run swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
 
     # Start your launcher
-    $mod+d $run fuzzel -T $term --log-level=warning --log-no-syslog --launch-prefix 'uwsm app -t service --'
+    Mod4+d $run fuzzel -T $term --log-level=warning --log-no-syslog --launch-prefix 'uwsm app -t service --'
 
     # Move your focus around
-    $mod+h focus left
-    $mod+j focus down
-    $mod+k focus up
-    $mod+l focus right
-    # Or use $mod+[up|down|left|right]
-    $mod+Left focus left
-    $mod+Down focus down
-    $mod+Up focus up
-    $mod+Right focus right
+    Mod4+h focus left
+    Mod4+j focus down
+    Mod4+k focus up
+    Mod4+l focus right
+    # Or use Mod4+[up|down|left|right]
+    Mod4+Left focus left
+    Mod4+Down focus down
+    Mod4+Up focus up
+    Mod4+Right focus right
 
     # Move the focused window with the same, but add Shift
-    $mod+Shift+h move left
-    $mod+Shift+j move down
-    $mod+Shift+k move up
-    $mod+Shift+l move right
+    Mod4+Shift+h move left
+    Mod4+Shift+j move down
+    Mod4+Shift+k move up
+    Mod4+Shift+l move right
     # Ditto, with arrow keys
-    $mod+Shift+Left move left
-    $mod+Shift+Down move down
-    $mod+Shift+Up move up
-    $mod+Shift+Right move right
+    Mod4+Shift+Left move left
+    Mod4+Shift+Down move down
+    Mod4+Shift+Up move up
+    Mod4+Shift+Right move right
 
     # You can "split" the current object of your focus with
-    # $mod+b or $mod+v, for horizontal and vertical splits
+    # Mod4+b or Mod4+v, for horizontal and vertical splits
     # respectively.
-    $mod+b splith
-    $mod+v splitv
+    Mod4+b splith
+    Mod4+v splitv
 
     # Switch the current container between different layout styles
-    $mod+s layout stacking
-    $mod+w layout tabbed
-    $mod+e layout toggle split
+    Mod4+s layout stacking
+    Mod4+w layout tabbed
+    Mod4+e layout toggle split
 
     # Make the current focus fullscreen
-    $mod+f fullscreen
+    Mod4+f fullscreen
 
     # Toggle the current focus between tiling and floating mode
-    $mod+Shift+space floating toggle
+    Mod4+Shift+space floating toggle
 
     # Swap focus between the tiling area and the floating area
-    $mod+space focus mode_toggle
+    Mod4+space focus mode_toggle
 
     # Move focus to the parent container
-    $mod+q focus parent
+    Mod4+q focus parent
 
     # Move focus to the child container
-    $mod+a focus child
+    Mod4+a focus child
 
     # switch to workspace
-    $mod+1 workspace 1
-    $mod+2 workspace 2
-    $mod+3 workspace 3
-    $mod+4 workspace 4
-    $mod+5 workspace 5
-    $mod+6 workspace 6
-    $mod+7 workspace 7
-    $mod+8 workspace 8
-    $mod+9 workspace 9
-    $mod+0 workspace 10
+    Mod4+1 workspace 1
+    Mod4+2 workspace 2
+    Mod4+3 workspace 3
+    Mod4+4 workspace 4
+    Mod4+5 workspace 5
+    Mod4+6 workspace 6
+    Mod4+7 workspace 7
+    Mod4+8 workspace 8
+    Mod4+9 workspace 9
+    Mod4+0 workspace 10
 
     # move focused container to workspace
-    $mod+Shift+1 move container to workspace 1
-    $mod+Shift+2 move container to workspace 2
-    $mod+Shift+3 move container to workspace 3
-    $mod+Shift+4 move container to workspace 4
-    $mod+Shift+5 move container to workspace 5
-    $mod+Shift+6 move container to workspace 6
-    $mod+Shift+7 move container to workspace 7
-    $mod+Shift+8 move container to workspace 8
-    $mod+Shift+9 move container to workspace 9
-    $mod+Shift+0 move container to workspace 10
+    Mod4+Shift+1 move container to workspace 1
+    Mod4+Shift+2 move container to workspace 2
+    Mod4+Shift+3 move container to workspace 3
+    Mod4+Shift+4 move container to workspace 4
+    Mod4+Shift+5 move container to workspace 5
+    Mod4+Shift+6 move container to workspace 6
+    Mod4+Shift+7 move container to workspace 7
+    Mod4+Shift+8 move container to workspace 8
+    Mod4+Shift+9 move container to workspace 9
+    Mod4+Shift+0 move container to workspace 10
 
-    $mod+r mode "resize"
+    Mod4+r mode "resize"
 }
 
 # resize window (you can also use the mouse for that)
@@ -175,7 +174,7 @@ mode "resize" {
         # Return to default mode
         Return mode "default"
         Escape mode "default"
-        $mod+r mode "default"
+        Mod4+r mode "default"
     }
 }
 
@@ -207,11 +206,10 @@ for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }
 
-exec uwsm app -t service -- $term
+exec exec uwsm app -t service -- $term
 
-exec uwsm finalize
+include /etc/sway/config.d/*
 
-# The below is not needed, as 'uwsm finalize' above takes care of importing env vars to systemd.
-# include /etc/sway/config.d/*
+# exec exec uwsm finalize
 
 # vim: ft=conf
