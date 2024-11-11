@@ -1,4 +1,5 @@
-export NO_AT_BRIDGE=1 \
+export UWSM_WAIT_VARNAMES_SETTLETIME=0.1 \
+       NO_AT_BRIDGE=1 \
        GTK_A11Y=none \
        QT_QPA_PLATFORMTHEME=qt6ct:qt5ct \
        QT_QPA_PLATFORM=wayland

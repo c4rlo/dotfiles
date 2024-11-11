@@ -237,6 +237,13 @@ local on_attach = function(_, bufnr)
   nmap('<Leader>F', vim.lsp.buf.format)
 end
 
+-- Change diagnostic symbols in the sign column (gutter)
+local signs = { Error = '', Warn = '', Hint = '', Info = '' }
+for type, icon in pairs(signs) do
+  local hl = 'DiagnosticSign' .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
+
 -- nvim-cmp supports additional completion capabilities
 local capabilities = require('cmp_nvim_lsp').default_capabilities(
   vim.lsp.protocol.make_client_capabilities())
@@ -267,7 +274,7 @@ lspconfig.pylsp.setup {
     pylsp = {
       plugins = {
         black = { enabled = true },
-        ruff = { enabled = true }
+        ruff = { enabled = true, extendIgnore = {'F405'} }
       }
     }
   },
