@@ -61,16 +61,17 @@ window#waybar.hidden {
     font-weight: 500;
 }
 
-#clock,
-#battery,
-#cpu,
-#memory,
-#temperature,
+#mode,
+#systemd-failed-units,
+#wireplumber,
 #network,
-#tray,
-#mode {
-    padding: 0 10px;
-    margin: 0 4px;
+#cpu,
+#temperature,
+#battery,
+#clock,
+#tray {
+    padding: 0;
+    margin: 0 12px;
     color: @fg;
 }
 

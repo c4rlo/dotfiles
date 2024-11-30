@@ -1,11 +1,18 @@
 {
-    // "position": "bottom", // Waybar position (top|bottom|left|right)
-    "height": 30, // Waybar height (to be removed for auto height)
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
     "modules-center": [],
-    "modules-right": ["wireplumber", "network", "cpu", "temperature", "battery", "clock", "tray"],
+    "modules-right": ["systemd-failed-units", "wireplumber", "network", "cpu", "temperature", "battery", "clock", "tray"],
     "sway/workspaces": {
         "enable-bar-scroll": true
+    },
+    "sway/window": {
+        "icon": true
+    },
+    "systemd-failed-units": {
+	"hide-on-ok": true,
+	"format": "✗ {nr_failed}",
+	"system": true,
+	"user": true
     },
     "wireplumber": {
         "format": "🔉 {volume}%",

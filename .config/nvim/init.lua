@@ -9,6 +9,7 @@ vim.o.relativenumber = true
 vim.o.cursorline = true
 vim.o.cursorlineopt = 'number'
 vim.o.signcolumn = 'number'
+vim.o.colorcolumn = '+1'
 vim.o.mouse = 'a'
 vim.o.mousemodel = 'extend'
 vim.o.breakindent = true
@@ -64,7 +65,8 @@ vim.api.nvim_create_autocmd('VimEnter', {
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
-    'git', 'clone', '--filter=blob:none', 'https://github.com/folke/lazy.nvim.git', '--branch=stable', lazypath,
+    'git', 'clone', '--filter=blob:none', 'https://github.com/folke/lazy.nvim.git',
+    '--branch=stable', lazypath,
   }
 end
 vim.opt.rtp:prepend(lazypath)
@@ -91,73 +93,79 @@ require('lazy').setup({
   { 'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
-    config = function()
-      require'nvim-treesitter.configs'.setup{
-        ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'gomod', 'lua', 'python', 'rust', 'bash', 'markdown', 'html', 'css', 'javascript' },
-        highlight = { enable = true },
-        indent = { enable = true, disable = { 'cpp', 'python' } },
-        incremental_selection = {
+    main = 'nvim-treesitter.configs',
+    opts = {
+      ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'gomod', 'lua', 'python', 'rust',
+        'bash', 'markdown', 'html', 'css', 'javascript' },
+      highlight = { enable = true },
+      indent = { enable = true, disable = { 'cpp', 'python' } },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = '<C-Space>',
+          node_incremental = '<C-Space>',
+          node_decremental = '<C-Backspace>',
+        },
+      },
+      textobjects = {
+        select = {
           enable = true,
+          lookahead = true, -- Automatically jump forward to textobj
           keymaps = {
-            init_selection = '<C-Space>',
-            node_incremental = '<C-Space>',
-            node_decremental = '<C-Backspace>',
+            ['aa'] = '@parameter.outer',
+            ['ia'] = '@parameter.inner',
+            ['af'] = '@function.outer',
+            ['if'] = '@function.inner',
+            ['ac'] = '@class.outer',
+            ['ic'] = '@class.inner',
           },
         },
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true, -- Automatically jump forward to textobj
-            keymaps = {
-              ['aa'] = '@parameter.outer',
-              ['ia'] = '@parameter.inner',
-              ['af'] = '@function.outer',
-              ['if'] = '@function.inner',
-              ['ac'] = '@class.outer',
-              ['ic'] = '@class.inner',
-            },
+        move = {
+          enable = true,
+          set_jumps = true, -- whether to set jumps in the jumplist
+          goto_next_start = {
+            [']m'] = '@function.outer',
+            [']]'] = '@class.outer',
           },
-          move = {
-            enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
-            goto_next_start = {
-              [']m'] = '@function.outer',
-              [']]'] = '@class.outer',
-            },
-            goto_next_end = {
-              [']M'] = '@function.outer',
-              [']['] = '@class.outer',
-            },
-            goto_previous_start = {
-              ['[m'] = '@function.outer',
-              ['[['] = '@class.outer',
-            },
-            goto_previous_end = {
-              ['[M'] = '@function.outer',
-              ['[]'] = '@class.outer',
-            },
+          goto_next_end = {
+            [']M'] = '@function.outer',
+            [']['] = '@class.outer',
           },
-          swap = {
-            enable = true,
-            swap_next = { ['<Leader>>'] = '@parameter.inner' },
-            swap_previous = { ['<Leader><'] = '@parameter.inner' },
+          goto_previous_start = {
+            ['[m'] = '@function.outer',
+            ['[['] = '@class.outer',
           },
-          lsp_interop = {
-            enable = true,
-            peek_definition_code = { ['<Leader>d'] = '@function.outer' },
+          goto_previous_end = {
+            ['[M'] = '@function.outer',
+            ['[]'] = '@class.outer',
           },
         },
-      }
-    end,
+        swap = {
+          enable = true,
+          swap_next = { ['<Leader>>'] = '@parameter.inner' },
+          swap_previous = { ['<Leader><'] = '@parameter.inner' },
+        },
+        lsp_interop = {
+          enable = true,
+          peek_definition_code = { ['<Leader>d'] = '@function.outer' },
+        },
+      },
+    }
   },
   'neovim/nvim-lspconfig',
   { 'hrsh7th/nvim-cmp',
-    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip',
-      { 'rafamadriz/friendly-snippets', config = function() require'luasnip.loaders.from_vscode'.lazy_load() end }
+    dependencies = {
+      'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip',
+      { 'rafamadriz/friendly-snippets',
+        config = function() require'luasnip.loaders.from_vscode'.lazy_load() end
+      }
     }
   },
   { 'nvim-telescope/telescope.nvim', branch = '0.1.x',
-    dependencies = { 'nvim-lua/plenary.nvim', { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' } },
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
+    },
     config = function()
       local telescope = require 'telescope'
       local telescope_builtin = require 'telescope.builtin'
@@ -182,7 +190,8 @@ require('lazy').setup({
   },
   { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'nvim-lualine/lualine.nvim', opts = {} },
-  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = function() vim.cmd.colorscheme 'gruvbox' end },
+  { 'ellisonleao/gruvbox.nvim', priority = 1000,
+    config = function() vim.cmd.colorscheme 'gruvbox' end },
   'nvim-tree/nvim-web-devicons',
   'Vimjas/vim-python-pep8-indent',
   'Glench/Vim-Jinja2-Syntax',
@@ -229,6 +238,12 @@ local on_attach = function(_, bufnr)
   nmap('<Leader>ds', telescope_builtin.lsp_document_symbols)
   nmap('<Leader>ws', telescope_builtin.lsp_dynamic_workspace_symbols)
 
+  nmap('<F3>',  -- Toggle inlay hints
+    function()
+      local scope = { bufnr = 0 }  -- current buffer
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(scope), scope)
+    end)
+
   -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
@@ -238,11 +253,12 @@ local on_attach = function(_, bufnr)
 end
 
 -- Change diagnostic symbols in the sign column (gutter)
-local signs = { Error = '', Warn = '', Hint = '', Info = '' }
+local signs = { ERROR = '', WARN = '', INFO = '', HINT = '' }
+local diagnostic_signs = {}
 for type, icon in pairs(signs) do
-  local hl = 'DiagnosticSign' .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+  diagnostic_signs[vim.diagnostic.severity[type]] = icon
 end
+vim.diagnostic.config { signs = { text = diagnostic_signs } }
 
 -- nvim-cmp supports additional completion capabilities
 local capabilities = require('cmp_nvim_lsp').default_capabilities(
@@ -255,7 +271,10 @@ lspconfig.gopls.setup {
   capabilities = capabilities,
   settings = {
     gopls = {
-      gofumpt = true
+      gofumpt = true,
+      hints = {
+        parameterNames = true,
+      }
     }
   }
 }
@@ -296,9 +315,10 @@ local luasnip = require 'luasnip'
 
 cmp.setup {
   enabled = function()
-    -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
     if vim.api.nvim_get_mode().mode == 'c' then return true end
+    if vim.api.nvim_buf_get_option(0, "buftype") == 'prompt' then return false end
     if vim.bo.filetype == 'markdown' then return false end
+    -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
     local context = require 'cmp.config.context'
     return not context.in_treesitter_capture('comment') and
       not context.in_syntax_group('Comment')
@@ -341,4 +361,4 @@ cmp.setup {
   },
 }
 
--- vim: ts=2 sts=2 sw=2 et
+-- vim: ts=2 sts=2 sw=2 et tw=100
