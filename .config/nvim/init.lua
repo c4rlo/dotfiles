@@ -273,7 +273,11 @@ lspconfig.gopls.setup {
     gopls = {
       gofumpt = true,
       hints = {
+        assignVariableTypes = true,
+        compositeLiteralFields = true,
+        constantValues = true,
         parameterNames = true,
+        rangeVariableTypes = true,
       }
     }
   }
@@ -292,7 +296,6 @@ lspconfig.pylsp.setup {
   settings = {
     pylsp = {
       plugins = {
-        black = { enabled = true },
         ruff = { enabled = true, extendIgnore = {'F405'} }
       }
     }
@@ -350,9 +353,6 @@ cmp.setup {
       else
         fallback()
       end
-    end, { 'i', 's' }),
-    ['<C-,>'] = cmp.mapping(function()
-      luasnip.expand()
     end, { 'i', 's' }),
   },
   sources = {
