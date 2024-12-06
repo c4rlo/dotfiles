@@ -3,7 +3,7 @@
     "modules-center": [],
     "modules-right": ["systemd-failed-units", "wireplumber", "network", "cpu", "temperature", "battery", "clock", "tray"],
     "sway/workspaces": {
-        "enable-bar-scroll": true
+        "disable-scroll": true
     },
     "sway/window": {
         "icon": true

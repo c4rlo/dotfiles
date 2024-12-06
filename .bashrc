@@ -172,7 +172,7 @@ function vupd
 
 function nvupd
 {
-    nvim -c 'Lazy sync'
+    nvim -c 'autocmd User VeryLazy ++once Lazy sync'
 }
 
 function confdiff {
@@ -209,7 +209,7 @@ function _contains_match
 
 function sctl
 {
-    if _contains_match '^(start|stop|reload|restart|kill|enable|disable|mask|unmask|edit|revert|daemon-reload)$' "$@" &&
+    if _contains_match '^(start|stop|reload|restart|reload-or-restart|kill|enable|disable|mask|unmask|edit|revert|daemon-reload)$' "$@" &&
       ! _contains_match '^--user$' "$@"
     then
         sudo systemctl "$@"
