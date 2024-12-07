@@ -44,11 +44,16 @@ client.urgent             $colour_yellow  $colour_yellow  $colour_bg    $colour_
 
 floating_modifier Mod4
 
-bindsym XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 10%-
-bindsym XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 10%+
-bindsym XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
-
 bindsym {
+    # Control display brightness
+    XF86MonBrightnessDown exec brightnessctl -d intel_backlight set 10000-
+    XF86MonBrightnessUp   exec brightnessctl -d intel_backlight set 10000+
+
+    # Control volume
+    XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 10%-
+    XF86AudioRaiseVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 10%+
+    XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
+
     # Start a terminal
     Mod4+Return $run $term
 
