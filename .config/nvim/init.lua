@@ -69,15 +69,6 @@ vim.api.nvim_create_autocmd('VimEnter', {
   end
 })
 
--- Ensure cursor is restored on exit (needed for foot terminal)
--- https://github.com/neovim/neovim/issues/4396#issuecomment-1377191592
-vim.api.nvim_create_autocmd('VimLeave', {
-  callback = function()
-    vim.o.guicursor = ''
-    vim.api.nvim_chan_send(vim.v.stderr, '\x1b[ q')
-  end
-})
-
 -- Change diagnostic symbols in the sign column (gutter)
 
 local signs = { ERROR = '', WARN = '', INFO = '', HINT = '' }

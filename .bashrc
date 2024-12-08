@@ -48,19 +48,18 @@ function prompt_exitstatus {
         printf " \001\e[31m\002${status}"
     fi
 }
-if [ "$PS1" ]; then
-    . /usr/share/git/completion/git-prompt.sh
-    GIT_PS1_SHOWDIRTYSTATE=1
-    GIT_PS1_SHOWSTASHSTATE=1
-    PS1='\t \[\e[1m\]\w$(__git_ps1 " (%s)")\[\e[0m\]$(prompt_jobs)$(prompt_exitstatus) \[\e[0m\e[1m\]\$\[\e[0m\] '
-    case $TERM in
-    xterm*|alacritty|foot)
-        PROMPT_COMMAND='echo -ne "\033]0;${PWD/#$HOME/\~}\007"'
-        ;;
-    esac
-    if [[ -n "$VIRTUAL_ENV" ]]; then
-        . "$VIRTUAL_ENV"/bin/activate
-    fi
+PS0='\[\e[2 q\]'  # set cursor style to block; gets reset near end of PS1
+. /usr/share/git/completion/git-prompt.sh
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWSTASHSTATE=1
+PS1='\t \[\e[1m\]\w$(__git_ps1 " (%s)")\[\e[0m\]$(prompt_jobs)$(prompt_exitstatus) \[\e[0m\e[1m\]\$\[\e[0m\e[ q\] '
+case $TERM in
+xterm*|alacritty|foot)
+    PROMPT_COMMAND='echo -ne "\033]0;${PWD/#$HOME/\~}\007"'
+    ;;
+esac
+if [[ -n "$VIRTUAL_ENV" ]]; then
+    . "$VIRTUAL_ENV"/bin/activate
 fi
 
 # zoxide (modifies $PROMPT_COMMAND)
