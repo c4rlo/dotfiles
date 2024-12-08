@@ -1,6 +1,6 @@
 # Read `man 5 sway` for a complete reference.
 
-set $term kitty
+set $term foot
 set $run exec runapp
 
 input "1:1:AT_Translated_Set_2_keyboard" {

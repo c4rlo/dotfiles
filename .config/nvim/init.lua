@@ -29,6 +29,7 @@ vim.o.splitright = true
 vim.o.showmode = false
 vim.o.shortmess = 'aoOtTI'
 vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
+vim.o.title = true
 
 -- Basic keymaps
 
@@ -68,6 +69,15 @@ vim.api.nvim_create_autocmd('VimEnter', {
   end
 })
 
+-- Ensure cursor is restored on exit (needed for foot terminal)
+-- https://github.com/neovim/neovim/issues/4396#issuecomment-1377191592
+vim.api.nvim_create_autocmd('VimLeave', {
+  callback = function()
+    vim.o.guicursor = ''
+    vim.api.nvim_chan_send(vim.v.stderr, '\x1b[ q')
+  end
+})
+
 -- Change diagnostic symbols in the sign column (gutter)
 
 local signs = { ERROR = '', WARN = '', INFO = '', HINT = '' }
@@ -90,7 +100,13 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup {
   'tpope/vim-unimpaired',
-  'tpope/vim-characterize',
+  { 'tpope/vim-characterize',
+    config = function()
+      -- This plugin registers key map 'ga', but mini.align also uses that and overrides it.
+      -- Instead we set up an alternative keymap:
+      vim.keymap.set('n', 'g/', '<Plug>(characterize)')
+    end
+  },
   'tpope/vim-sleuth',
   'tpope/vim-fugitive',
   'tpope/vim-eunuch',
