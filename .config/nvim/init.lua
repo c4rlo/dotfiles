@@ -95,7 +95,7 @@ require('lazy').setup {
     config = function()
       -- This plugin registers key map 'ga', but mini.align also uses that and overrides it.
       -- Instead we set up an alternative keymap:
-      vim.keymap.set('n', 'g/', '<Plug>(characterize)')
+      vim.keymap.set('n', '<Leader>c', '<Plug>(characterize)')
     end
   },
   'tpope/vim-sleuth',
@@ -191,7 +191,7 @@ require('lazy').setup {
         },
         lsp_interop = {
           enable = true,
-          peek_definition_code = { ['<Leader>d'] = '@function.outer' },
+          peek_definition_code = { ['<Leader>p'] = '@function.outer' },
         },
       },
     }
@@ -273,9 +273,9 @@ require('lazy').setup {
     end,
     keys = {
       { '<C-k>', function() require'telescope.builtin'.buffers() end },
-      { '<C-;>', function() require'telescope.builtin'.find_files() end },
-      { '<Leader>p', function() require'telescope.builtin'.git_files() end },
-      { '<Leader>g', function() require'telescope.builtin'.live_grep() end },
+      { '<C-p>', function() require'telescope.builtin'.find_files() end },
+      { '<Leader>g', function() require'telescope.builtin'.git_files() end },
+      { '<Leader>/', function() require'telescope.builtin'.live_grep() end },
       { '<Leader>*', function() require'telescope.builtin'.grep_string() end },
     }
   },
