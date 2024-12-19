@@ -1,9 +1,10 @@
 {
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
     "modules-center": [],
-    "modules-right": ["systemd-failed-units", "wireplumber", "network", "cpu", "temperature", "battery", "clock", "tray"],
+    "modules-right": ["systemd-failed-units", "network", "battery", "backlight", "wireplumber", "cpu", "temperature", "clock", "tray"],
     "sway/workspaces": {
-        "disable-scroll": true
+        "disable-scroll": true,
+        "window-rewrite": {}  // silence warning: https://github.com/Alexays/Waybar/issues/3763
     },
     "sway/window": {
         "icon": true
@@ -14,28 +15,13 @@
 	"system": true,
 	"user": true
     },
-    "wireplumber": {
-        "format": "🔉 {volume}%",
-        "format-muted": "🔇"
-    },
     "network": {
-        // "interface": "wlp2*", // (Optional) To force the use of this interface
-        "format-wifi": " {essid} ({signalStrength}%)",
-        "format-ethernet": "爵 {ifname}: {ipaddr}/{cidr}",
-        "format-linked": "爵 {ifname} (No IP)",
+        "format-wifi": " {signalStrength}%",
+        "format-ethernet": " {ifname}: {ipaddr}/{cidr}",
+        "format-linked": "󰛳 {ifname} (No IP)",
         "format-disconnected": "⚠ Disconnected",
-        "format-alt": "{ifname}: {ipaddr}/{cidr}"
-    },
-    "cpu": {
-        "format": " {load:.1}"
-    },
-    "temperature": {
-        // "hwmon-path": "/sys/class/hwmon/hwmon6/temp1_input",
-        "thermal-zone": 9,
-        "critical-threshold": 80,
-        // "format-critical": "{temperatureC}°C {icon}",
-        "format": "{icon} {temperatureC}°C",
-        "format-icons": ["", "", ""]
+        "format": "{ifname}: {ipaddr}/{cidr}",
+        "tooltip-format-wifi": "{essid} ({ipaddr})"
     },
     "battery": {
         "bat": "BAT0",
@@ -47,15 +33,40 @@
         "format": "{icon} {capacity}%",
         "format-charging": " {capacity}%",
         "format-plugged": " {capacity}%",
-        "format-alt": "{icon} {time}",
+        // "format-alt": "{icon} {time}",
         // "format-good": "", // An empty format will hide the module
         // "format-full": "",
-        "format-icons": ["", "", "", "", ""]
+        "format-icons": ["", "", "", "", ""],
+        "tooltip-format": "{timeTo}\nHealth: {health}%"
+    },
+    "backlight": {
+        "format": "{icon} {percent}%",
+        "format-icons": ["🔅", "🔆"],
+        "tooltip": false
+    },
+    "wireplumber": {
+        "format": "🔉{volume}%",
+        "format-muted": "🔇"
+    },
+    "cpu": {
+        "format": " {load:.1f}"
+    },
+    "temperature": {
+        // "hwmon-path": "/sys/class/hwmon/hwmon6/temp1_input",
+        "thermal-zone": 9,
+        "critical-threshold": 80,
+        // "format-critical": "{temperatureC}°C {icon}",
+        "format": "{icon}{temperatureC}°C",
+        "format-icons": ["", "", ""],
+        "tooltip": false
     },
     "clock": {
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format": "{:%a %d %b %R}"
-        // "format-alt": "{:%Y-%m-%d}"
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "format": "{:%a %d %b %R}",
+        // "format-alt": "{:%Y-%m-%d}",
+        "calendar": {
+            "mode": "month"
+        }
     },
     "tray": {
         // "icon-size": 21,

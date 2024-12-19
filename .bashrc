@@ -157,7 +157,7 @@ function upd
 {
     local -
     set -x
-    while ! getent hosts archlinux.org >/dev/null; do sleep 0.1; done
+    while ! ping -c1 -w1 archlinux.org >/dev/null; do sleep 0.1; done
     paru -Sc --noconfirm &&
     paru -Syu &&
     paru -c
