@@ -1,7 +1,7 @@
 {
     "modules-left": ["sway/workspaces", "sway/mode", "sway/window"],
     "modules-center": [],
-    "modules-right": ["systemd-failed-units", "network", "battery", "backlight", "wireplumber", "cpu", "temperature", "clock", "tray"],
+    "modules-right": ["systemd-failed-units", "network", "backlight", "wireplumber", "cpu", "temperature", "battery", "clock", "tray"],
     "sway/workspaces": {
         "disable-scroll": true,
         "window-rewrite": {}  // silence warning: https://github.com/Alexays/Waybar/issues/3763
@@ -23,22 +23,6 @@
         "format": "{ifname}: {ipaddr}/{cidr}",
         "tooltip-format-wifi": "{essid} ({ipaddr})"
     },
-    "battery": {
-        "bat": "BAT0",
-        "states": {
-            // "good": 95,
-            "warning": 30,
-            "critical": 15
-        },
-        "format": "{icon} {capacity}%",
-        "format-charging": " {capacity}%",
-        "format-plugged": " {capacity}%",
-        // "format-alt": "{icon} {time}",
-        // "format-good": "", // An empty format will hide the module
-        // "format-full": "",
-        "format-icons": ["", "", "", "", ""],
-        "tooltip-format": "{timeTo}\nHealth: {health}%"
-    },
     "backlight": {
         "format": "{icon} {percent}%",
         "format-icons": ["🔅", "🔆"],
@@ -59,6 +43,22 @@
         "format": "{icon}{temperatureC}°C",
         "format-icons": ["", "", ""],
         "tooltip": false
+    },
+    "battery": {
+        "bat": "BAT0",
+        "states": {
+            // "good": 95,
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-plugged": " {capacity}%",
+        // "format-alt": "{icon} {time}",
+        // "format-good": "", // An empty format will hide the module
+        // "format-full": "",
+        "format-icons": ["", "", "", "", ""],
+        "tooltip-format": "{timeTo}\nHealth: {health}%"
     },
     "clock": {
         "tooltip-format": "<tt><small>{calendar}</small></tt>",

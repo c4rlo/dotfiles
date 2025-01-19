@@ -211,7 +211,8 @@ require('lazy').setup {
         enabled = function()
           if vim.api.nvim_get_mode().mode == 'c' then return true end
           if vim.api.nvim_buf_get_option(0, "buftype") == 'prompt' then return false end
-          if vim.bo.filetype == 'markdown' then return false end
+          local ft = vim.bo.filetype
+          if ft == 'text' or ft == 'markdown' or ft == 'gitcommit' or ft == nil then return false end
           -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
           local context = require 'cmp.config.context'
           return not context.in_treesitter_capture('comment') and

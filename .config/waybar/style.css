@@ -64,11 +64,11 @@ window#waybar.hidden {
 #mode,
 #systemd-failed-units,
 #network,
-#battery,
 #backlight,
 #wireplumber,
 #cpu,
 #temperature,
+#battery,
 #clock,
 #tray {
     padding: 0;
