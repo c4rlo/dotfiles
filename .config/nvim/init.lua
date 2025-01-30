@@ -39,6 +39,7 @@ vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
+vim.keymap.set('n', '<Leader>n', function() vim.fn.setreg('+', vim.fn.expand('%')) end)
 
 -- Some autocmds
 
