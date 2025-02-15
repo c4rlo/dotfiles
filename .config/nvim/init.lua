@@ -63,7 +63,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.api.nvim_create_autocmd('VimEnter', {
   callback = function()
     if vim.o.diff then
-      for i, win in ipairs(vim.api.nvim_list_wins()) do
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
         vim.wo[win].relativenumber = false
       end
     end
@@ -129,7 +129,7 @@ require('lazy').setup {
   { 'Wansmer/treesj',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
     opts = { use_default_keymaps = false },
-    keys = { 
+    keys = {
       { '<Leader>mm', function() require'treesj'.toggle() end },
       { '<Leader>mj', function() require'treesj'.join() end },
       { '<Leader>ms', function() require'treesj'.split() end },
@@ -206,12 +206,12 @@ require('lazy').setup {
       }
     },
     config = function()
-      cmp = require'cmp'
-      luasnip = require'luasnip'
+      local cmp = require'cmp'
+      local luasnip = require'luasnip'
       cmp.setup {
         enabled = function()
           if vim.api.nvim_get_mode().mode == 'c' then return true end
-          if vim.api.nvim_buf_get_option(0, "buftype") == 'prompt' then return false end
+          if vim.api.nvim_get_option_value('buftype', { scope = 'local' }) == 'prompt' then return false end
           local ft = vim.bo.filetype
           if ft == 'text' or ft == 'markdown' or ft == 'gitcommit' or ft == nil then return false end
           -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
@@ -248,6 +248,7 @@ require('lazy').setup {
         },
         sources = {
           { name = 'nvim_lsp' },
+          { name = 'lazydev', group_index = 0 },
           { name = 'luasnip' },
         },
       }
@@ -294,6 +295,8 @@ require('lazy').setup {
   'nvim-tree/nvim-web-devicons',
   'Vimjas/vim-python-pep8-indent',
   'Glench/Vim-Jinja2-Syntax',
+  { 'folke/lazydev.nvim', ft = 'lua',
+    opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } } },
   'jvirtanen/vim-hcl',
 }
 
@@ -394,15 +397,22 @@ lspconfig.pylsp.setup {
     }
   },
   before_init = function(_, config)
-    if not vim.env.VIRTUAL_ENV then
-      local path = require('lspconfig.util').path
-      local candidate = path.join(config.root_dir, '.venv')
-      if path.is_dir(candidate) then
+    if not vim.env.VIRTUAL_ENV and config.root_dir then
+      local candidate = config.root_dir .. '/.venv'
+      if vim.fn.isdirectory(candidate) == 1 then
         config.settings.pylsp.plugins.jedi = { environment = candidate }
         -- maybe should also set config.settings.python.pythonPath...
       end
     end
   end
+}
+lspconfig.lua_ls.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
+}
+lspconfig.ts_ls.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
 }
 
 -- vim: ts=2 sts=2 sw=2 et tw=100
