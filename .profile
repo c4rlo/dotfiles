@@ -3,7 +3,7 @@
 #
 
 export EDITOR=nvim \
-       LESS='FRMK--use-color' \
+       LESS='FRMKx4--use-color' \
        SYSTEMD_LESS='FRMK--use-color' \
        PS_PERSONALITY=linux \
        CMAKE_EXPORT_COMPILE_COMMANDS=ON \

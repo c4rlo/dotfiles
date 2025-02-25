@@ -140,8 +140,27 @@ require('lazy').setup {
     dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     main = 'nvim-treesitter.configs',
     opts = {
-      ensure_installed = { 'vim', 'vimdoc', 'c', 'cpp', 'go', 'gomod', 'gosum', 'gowork', 'lua',
-        'python', 'rust', 'bash', 'javascript', 'markdown', 'html', 'css', 'sql', 'git_config' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'cpp',
+        'css',
+        'git_config',
+        'go',
+        'gomod',
+        'gosum',
+        'gowork',
+        'html',
+        'javascript',
+        'just',
+        'lua',
+        'markdown',
+        'python',
+        'rust',
+        'sql',
+        'vim',
+        'vimdoc',
+      },
       highlight = { enable = true },
       indent = { enable = true, disable = { 'cpp', 'python' } },
       incremental_selection = {
@@ -213,7 +232,7 @@ require('lazy').setup {
           if vim.api.nvim_get_mode().mode == 'c' then return true end
           if vim.api.nvim_get_option_value('buftype', { scope = 'local' }) == 'prompt' then return false end
           local ft = vim.bo.filetype
-          if ft == 'text' or ft == 'markdown' or ft == 'gitcommit' or ft == nil then return false end
+          if ft == 'text' or ft == 'yaml' or ft == 'markdown' or ft == 'gitcommit' or ft == nil then return false end
           -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
           local context = require 'cmp.config.context'
           return not context.in_treesitter_capture('comment') and
@@ -381,6 +400,9 @@ lspconfig.gopls.setup {
 lspconfig.rust_analyzer.setup {
   on_attach = on_attach,
   capabilities = capabilities,
+  settings = {
+    ['rust-analyzer'] = { check = { command = 'clippy' } }
+  },
 }
 lspconfig.clangd.setup {
   on_attach = on_attach,
