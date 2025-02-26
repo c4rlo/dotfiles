@@ -8,10 +8,17 @@
 [diff]
     algorithm = histogram
     colorMoved = dimmed-zebra
+    mnemonicPrefix = true
     tool = nvimdiff
 
 [commit]
     verbose = true
+
+[branch]
+    sort = -committerdate
+
+[tag]
+    sort = version:refname
 
 [merge]
     conflictStyle = zdiff3
@@ -19,9 +26,18 @@
 
 [rebase]
     autoSquash = true
+    autoStash = true
+    updateRefs = true
 
 [rerere]
     enabled = true
+
+[fetch]
+    prune = true
+    pruneTags = true
+
+[push]
+    autoSetupRemote = true
 
 [credential]
     helper = cache
@@ -35,6 +51,9 @@
 
 [interactive]
     singleKey = true
+
+[column]
+    ui = auto
 
 [advice]
     detachedHead = false
