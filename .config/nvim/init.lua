@@ -23,7 +23,7 @@ vim.o.expandtab = true
 vim.o.shiftwidth = 4
 vim.o.formatoptions = 'tcroqlnj'
 vim.o.cinoptions = ':0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1'
-vim.o.completeopt = 'menuone,noselect,popup'
+vim.o.completeopt = 'menuone,noselect,popup,fuzzy'
 vim.o.splitbelow = true
 vim.o.splitright = true
 vim.o.showmode = false
@@ -77,7 +77,7 @@ local diagnostic_signs = {}
 for type, icon in pairs(signs) do
   diagnostic_signs[vim.diagnostic.severity[type]] = icon
 end
-vim.diagnostic.config { signs = { text = diagnostic_signs } }
+vim.diagnostic.config { signs = { text = diagnostic_signs }, virtual_lines = true }
 
 -- Plugins
 
@@ -345,6 +345,12 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr })
   end
   local telescope_builtin = require 'telescope.builtin'
+
+  -- Delete some default keymaps that conflict with our definition of 'gr'.
+  vim.keymap.del('n', 'grn')
+  vim.keymap.del('n', 'grr')
+  vim.keymap.del('n', 'gri')
+  vim.keymap.del('n', 'gra')
 
   nmap('<Leader>r', vim.lsp.buf.rename)
   nmap('<Leader>a', vim.lsp.buf.code_action)
