@@ -57,7 +57,7 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 })
 
 vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function() vim.highlight.on_yank() end
+  callback = function() vim.hl.on_yank() end
 })
 
 vim.api.nvim_create_autocmd('VimEnter', {
@@ -338,7 +338,12 @@ vim.api.nvim_create_autocmd('FileType', {
   end
 })
 
--- LSP keymaps
+-- Language Server Protocol (LSP) support
+
+if vim.o.diff then
+  -- Don't want LSP in diff mode
+  return
+end
 
 local on_attach = function(_, bufnr)
   local nmap = function(keys, func)
