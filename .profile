@@ -16,5 +16,5 @@ export PATH=$HOME/bin:$HOME/.local/bin/:$HOME/.cargo/bin:$HOME/go/bin:$HOME/goog
 
 if uwsm check may-start; then
     # GUI-relevant env vars are set in ~/.config/uwsm/env
-    exec systemd-cat -t uwsm_start uwsm start -S sway
+    exec uwsm start sway
 fi

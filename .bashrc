@@ -102,6 +102,8 @@ function _comp_gitalias {
 }
 complete -o bashdefault -o default -o nospace -F _comp_gitalias "${!git_aliases[@]}"
 
+alias gfm="git fetch origin main:main"
+
 # Functions
 
 function mkcd
@@ -126,6 +128,11 @@ function clonecd
 {
     local dir="${!###*[:/]}"
     git clone "$@" && cd "$dir"
+}
+
+function rgv
+{
+    rg --vimgrep "$@" | nvim -q -
 }
 
 # https://junegunn.github.io/fzf/tips/ripgrep-integration/

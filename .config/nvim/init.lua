@@ -352,10 +352,9 @@ local on_attach = function(_, bufnr)
   local telescope_builtin = require 'telescope.builtin'
 
   -- Delete some default keymaps that conflict with our definition of 'gr'.
-  vim.keymap.del('n', 'grn')
-  vim.keymap.del('n', 'grr')
-  vim.keymap.del('n', 'gri')
-  vim.keymap.del('n', 'gra')
+  for _, key in ipairs({'grn', 'grr', 'gri', 'gra', 'grt'}) do
+    pcall(vim.keymap.del, 'n', key)
+  end
 
   nmap('<Leader>r', vim.lsp.buf.rename)
   nmap('<Leader>a', vim.lsp.buf.code_action)
@@ -383,69 +382,62 @@ local on_attach = function(_, bufnr)
   nmap('<Leader>F', vim.lsp.buf.format)
 end
 
--- Enable some Language Servers
-
-local lspconfig = require 'lspconfig'
 local capabilities = require('cmp_nvim_lsp').default_capabilities(
   vim.lsp.protocol.make_client_capabilities())
-lspconfig.gopls.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    gopls = {
-      gofumpt = true,
-      usePlaceholders = true,
-      analyses = {
-        useany = true,
-      },
-      hints = {
-        assignVariableTypes = true,
-        compositeLiteralFields = true,
-        constantValues = true,
-        parameterNames = true,
-        rangeVariableTypes = true,
-      }
-    }
-  }
-}
-lspconfig.rust_analyzer.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    ['rust-analyzer'] = { check = { command = 'clippy' } }
-  },
-}
-lspconfig.clangd.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-}
-lspconfig.pylsp.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-  settings = {
-    pylsp = {
-      plugins = {
-        ruff = { enabled = true, extendIgnore = { 'F405' } }
+
+-- Enable some Language Servers
+
+local lss = {
+  gopls = {
+    settings = {
+      gopls = {
+        gofumpt = true,
+        usePlaceholders = true,
+        analyses = {
+          useany = true,
+        },
+        hints = {
+          assignVariableTypes = true,
+          compositeLiteralFields = true,
+          constantValues = true,
+          parameterNames = true,
+          rangeVariableTypes = true,
+        }
       }
     }
   },
-  before_init = function(_, config)
-    if not vim.env.VIRTUAL_ENV and config.root_dir then
-      local candidate = config.root_dir .. '/.venv'
-      if vim.fn.isdirectory(candidate) == 1 then
-        config.settings.pylsp.plugins.jedi = { environment = candidate }
-        -- maybe should also set config.settings.python.pythonPath...
+  rust_analyzer = {
+    settings = {
+      ['rust-analyzer'] = { check = { command = 'clippy' } }
+    }
+  },
+  clangd = { },
+  pylsp = {
+    settings = {
+      pylsp = {
+        plugins = {
+          ruff = { enabled = true, extendIgnore = { 'F405' } }
+        }
+      }
+    },
+    before_init = function(_, config)
+      if not vim.env.VIRTUAL_ENV and config.root_dir then
+        local candidate = config.root_dir .. '/.venv'
+        if vim.fn.isdirectory(candidate) == 1 then
+          config.settings.pylsp.plugins.jedi = { environment = candidate }
+          -- maybe should also set config.settings.python.pythonPath...
+        end
       end
     end
-  end
+  },
+  lua_ls = { },
+  ts_ls = { },
 }
-lspconfig.lua_ls.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-}
-lspconfig.ts_ls.setup {
-  on_attach = on_attach,
-  capabilities = capabilities,
-}
+
+for name, config in pairs(lss) do
+  vim.lsp.config(name,
+    vim.tbl_extend('keep', config, { on_attach = on_attach, capabilities = capabilities }))
+  vim.lsp.enable(name)
+end
 
 -- vim: ts=2 sts=2 sw=2 et tw=100
