@@ -35,11 +35,16 @@ vim.o.title = true
 
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', "'", '`')
-vim.keymap.set('n', ';', ':')
+-- vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
-vim.keymap.set('n', '<Leader>n', function() vim.fn.setreg('+', vim.fn.expand('%')) end)
+vim.keymap.set('n', '<Leader>n',
+  function()
+    local path = vim.fn.expand('%')
+    vim.fn.setreg('+', path)
+    vim.notify('Copied "'..path..'" to system clipboard')
+  end)
 
 -- Some autocmds
 
@@ -105,7 +110,7 @@ require('lazy').setup {
   { 'echasnovski/mini.align', opts = {}, keys = { 'ga', 'gA' } },
   { 'echasnovski/mini.bufremove', cmd = { 'Bdelete', 'Bwipeout' },
     config = function()
-      local bufremove = require('mini.bufremove')
+      local bufremove = require 'mini.bufremove'
       bufremove.setup()
       for cmd, func in pairs{Bdelete = 'delete', Bwipeout = 'wipeout'} do
         vim.api.nvim_create_user_command(
@@ -114,10 +119,6 @@ require('lazy').setup {
           { bang = true })
       end
     end
-  },
-  { 'echasnovski/mini.jump',
-    opts = { mappings = { repeat_jump = '' } },
-    keys = { 'f', 'F', 't', 'T' },
   },
   { 'jakemason/ouroboros',
     dependencies = { 'nvim-lua/plenary.nvim' },
@@ -218,12 +219,7 @@ require('lazy').setup {
   },
   'neovim/nvim-lspconfig',
   { 'hrsh7th/nvim-cmp',
-    dependencies = {
-      'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip',
-      { 'rafamadriz/friendly-snippets',
-        config = function() require'luasnip.loaders.from_vscode'.lazy_load() end
-      }
-    },
+    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
     config = function()
       local cmp = require'cmp'
       local luasnip = require'luasnip'
@@ -276,7 +272,8 @@ require('lazy').setup {
   { 'nvim-telescope/telescope.nvim', branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      { 'nvim-telescope/telescope-ui-select.nvim' },
     },
     config = function()
       local telescope = require 'telescope'
@@ -292,6 +289,7 @@ require('lazy').setup {
         },
       }
       telescope.load_extension('fzf')
+      telescope.load_extension('ui-select')
     end,
     keys = {
       { '<C-k>', function() require'telescope.builtin'.buffers() end },
