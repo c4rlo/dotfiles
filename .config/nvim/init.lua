@@ -41,7 +41,7 @@ vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 vim.keymap.set('n', '<Leader>n',
   function()
-    local path = vim.fn.expand('%')
+    local path = vim.fn.expand('%:p')
     vim.fn.setreg('+', path)
     vim.notify('Copied "'..path..'" to system clipboard')
   end)
@@ -167,8 +167,8 @@ require('lazy').setup {
       incremental_selection = {
         enable = true,
         keymaps = {
-          init_selection = '<C-Space>',
-          node_incremental = '<C-Space>',
+          init_selection = '<C-,>',
+          node_incremental = '<C-,>',
           node_decremental = '<C-Backspace>',
         },
       },
@@ -218,56 +218,38 @@ require('lazy').setup {
     }
   },
   'neovim/nvim-lspconfig',
-  { 'hrsh7th/nvim-cmp',
-    dependencies = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
-    config = function()
-      local cmp = require'cmp'
-      local luasnip = require'luasnip'
-      cmp.setup {
-        enabled = function()
-          if vim.api.nvim_get_mode().mode == 'c' then return true end
-          if vim.api.nvim_get_option_value('buftype', { scope = 'local' }) == 'prompt' then return false end
-          local ft = vim.bo.filetype
-          if ft == 'text' or ft == 'yaml' or ft == 'markdown' or ft == 'gitcommit' or ft == nil then return false end
-          -- https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
-          local context = require 'cmp.config.context'
-          return not context.in_treesitter_capture('comment') and
-            not context.in_syntax_group('Comment')
-        end,
-        snippet = {
-          expand = function(args) luasnip.lsp_expand(args.body) end
+  { 'saghen/blink.cmp',
+    version = '1.*',
+    opts = {
+      keymap = {
+        preset = 'enter',
+        ['<C-j>'] = { 'select_next', 'fallback' },
+        ['<C-k>'] = { 'select_prev', 'fallback' },
+        ['<Tab>'] = { 'accept', 'snippet_forward', 'fallback' },
+      },
+      completion = { documentation = { auto_show = true } },
+      sources = {
+        default = { 'lazydev', 'lsp', 'buffer' },
+        providers = {
+          lazydev = {
+            name = "LazyDev",
+            module = "lazydev.integrations.blink",
+            score_offset = 100,
+          },
         },
-        completion = { completeopt = 'menu,menuone,noinsert' },
-        mapping = {
-          ['<C-j>'] = cmp.mapping.select_next_item(),
-          ['<C-k>'] = cmp.mapping.select_prev_item(),
-          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-          ['<C-f>'] = cmp.mapping.scroll_docs(4),
-          ['<CR>'] = cmp.mapping.confirm { select = true },
-          ['<Tab>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.confirm()
-            elseif luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            else
-              fallback()
-            end
-          end, { 'i', 's' }),
-          ['<S-Tab>'] = cmp.mapping(function(fallback)
-            if luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { 'i', 's' }),
-        },
-        sources = {
-          { name = 'nvim_lsp' },
-          { name = 'lazydev', group_index = 0 },
-          { name = 'luasnip' },
-        },
-      }
-    end
+      },
+      enabled = function() -- Disable if cursor is inside a comment.
+        local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+        row = row - 1  -- convert row from 1-based to 0-based; column is already 0-based
+        if vim.api.nvim_get_mode().mode:sub(1, 1) == 'i' then
+          col = col - 1  -- adjust column in insert mode
+        end
+
+        local success, node = pcall(vim.treesitter.get_node, { pos = { row, col } })
+        return not (success and node and
+            vim.tbl_contains({'comment', 'line_comment', 'block_comment', 'comment_content'}, node:type()))
+      end,
+    },
   },
   { 'nvim-telescope/telescope.nvim', branch = '0.1.x',
     dependencies = {
@@ -296,7 +278,7 @@ require('lazy').setup {
       { '<C-p>', function() require'telescope.builtin'.find_files() end },
       { '<Leader>g', function() require'telescope.builtin'.git_files() end },
       { '<Leader>/', function() require'telescope.builtin'.live_grep() end },
-      { '<Leader>*', function() require'telescope.builtin'.grep_string() end },
+      { '<Leader>*', function() require'telescope.builtin'.grep_string({ word_match = '-w'}) end },
     }
   },
   { 'hedyhli/outline.nvim',
@@ -380,8 +362,7 @@ local on_attach = function(_, bufnr)
   nmap('<Leader>F', vim.lsp.buf.format)
 end
 
-local capabilities = require('cmp_nvim_lsp').default_capabilities(
-  vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('blink.cmp').get_lsp_capabilities()
 
 -- Enable some Language Servers
 
