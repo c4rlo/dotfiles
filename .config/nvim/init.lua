@@ -3,9 +3,6 @@
 
 -- Set some options
 
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.cursorline = true
@@ -31,12 +28,15 @@ vim.o.shortmess = 'aoOtTI'
 vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
 vim.o.title = true
 
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
+
 -- Basic keymaps
 
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', "'", '`')
 -- vim.keymap.set('n', ';', ':')
-vim.keymap.set('n', 'Q', '<Cmd>qa<CR>')
+vim.keymap.set('n', 'Q', vim.cmd.qa)
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 vim.keymap.set('n', '<Leader>n',
@@ -89,8 +89,8 @@ vim.diagnostic.config { signs = { text = diagnostic_signs }, virtual_lines = tru
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
-    'git', 'clone', '--filter=blob:none', 'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', lazypath,
+    'git', 'clone', '--filter=blob:none', '--branch=stable',
+    'https://github.com/folke/lazy.nvim.git', lazypath,
   }
 end
 vim.opt.rtp:prepend(lazypath)
@@ -98,11 +98,9 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup {
   'tpope/vim-unimpaired',
   { 'tpope/vim-characterize',
-    config = function()
-      -- This plugin registers key map 'ga', but mini.align also uses that and overrides it.
-      -- Instead we set up an alternative keymap:
-      vim.keymap.set('n', '<Leader>c', '<Plug>(characterize)')
-    end
+    -- This plugin registers key map 'ga', but mini.align also uses that and overrides it.
+    -- Instead we set up an alternative keymap:
+    keys = { { '<Leader>c', '<Plug>(characterize)' } },
   },
   'tpope/vim-sleuth',
   'tpope/vim-fugitive',
@@ -225,9 +223,12 @@ require('lazy').setup {
         preset = 'enter',
         ['<C-j>'] = { 'select_next', 'fallback' },
         ['<C-k>'] = { 'select_prev', 'fallback' },
-        ['<Tab>'] = { 'accept', 'snippet_forward', 'fallback' },
+        ['<Tab>'] = { 'select_and_accept', 'snippet_forward', 'fallback' },
       },
-      completion = { documentation = { auto_show = true } },
+      completion = {
+        list = { selection = { preselect = false } },
+        documentation = { auto_show = true },
+      },
       sources = {
         default = { 'lazydev', 'lsp', 'buffer' },
         providers = {
@@ -244,10 +245,10 @@ require('lazy').setup {
         if vim.api.nvim_get_mode().mode:sub(1, 1) == 'i' then
           col = col - 1  -- adjust column in insert mode
         end
-
         local success, node = pcall(vim.treesitter.get_node, { pos = { row, col } })
         return not (success and node and
-            vim.tbl_contains({'comment', 'line_comment', 'block_comment', 'comment_content'}, node:type()))
+            vim.tbl_contains(
+              {'comment', 'line_comment', 'block_comment', 'comment_content'}, node:type()))
       end,
     },
   },
@@ -282,9 +283,7 @@ require('lazy').setup {
     }
   },
   { 'hedyhli/outline.nvim',
-    keys = {
-      { "<Leader>o", function() require'outline'.toggle() end },
-    },
+    keys = { { "<Leader>o", function() require'outline'.toggle() end } },
     opts = {},
   },
   { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
@@ -362,8 +361,6 @@ local on_attach = function(_, bufnr)
   nmap('<Leader>F', vim.lsp.buf.format)
 end
 
-local capabilities = require('blink.cmp').get_lsp_capabilities()
-
 -- Enable some Language Servers
 
 local lss = {
@@ -413,9 +410,13 @@ local lss = {
   ts_ls = { },
 }
 
+local lsp_config = {
+  on_attach = on_attach,
+  capabilities = require('blink.cmp').get_lsp_capabilities()
+}
+
 for name, config in pairs(lss) do
-  vim.lsp.config(name,
-    vim.tbl_extend('keep', config, { on_attach = on_attach, capabilities = capabilities }))
+  vim.lsp.config(name, vim.tbl_extend('keep', config, lsp_config))
   vim.lsp.enable(name)
 end
 
