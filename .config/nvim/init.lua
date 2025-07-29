@@ -105,7 +105,10 @@ require('lazy').setup {
   'tpope/vim-sleuth',
   'tpope/vim-fugitive',
   'tpope/vim-eunuch',
-  { 'echasnovski/mini.align', opts = {}, keys = { 'ga', 'gA' } },
+  { 'echasnovski/mini.align',
+    opts = {},
+    keys = { { 'ga', mode = { 'n', 'x' } }, { 'gA', mode = { 'n', 'x' } } }
+  },
   { 'echasnovski/mini.bufremove', cmd = { 'Bdelete', 'Bwipeout' },
     config = function()
       local bufremove = require 'mini.bufremove'
@@ -141,7 +144,6 @@ require('lazy').setup {
     opts = {
       ensure_installed = {
         'bash',
-        'c',
         'cpp',
         'css',
         'git_config',
@@ -152,13 +154,9 @@ require('lazy').setup {
         'html',
         'javascript',
         'just',
-        'lua',
-        'markdown',
         'python',
         'rust',
         'sql',
-        'vim',
-        'vimdoc',
       },
       highlight = { enable = true },
       indent = { enable = true, disable = { 'cpp', 'python' } },
@@ -186,22 +184,10 @@ require('lazy').setup {
         move = {
           enable = true,
           set_jumps = true, -- whether to set jumps in the jumplist
-          goto_next_start = {
-            [']m'] = '@function.outer',
-            [']]'] = '@class.outer',
-          },
-          goto_next_end = {
-            [']M'] = '@function.outer',
-            [']['] = '@class.outer',
-          },
-          goto_previous_start = {
-            ['[m'] = '@function.outer',
-            ['[['] = '@class.outer',
-          },
-          goto_previous_end = {
-            ['[M'] = '@function.outer',
-            ['[]'] = '@class.outer',
-          },
+          goto_next_start     = { [']m'] = '@function.outer', [']]'] = '@class.outer', },
+          goto_next_end       = { [']M'] = '@function.outer', [']['] = '@class.outer', },
+          goto_previous_start = { ['[m'] = '@function.outer', ['[['] = '@class.outer', },
+          goto_previous_end   = { ['[M'] = '@function.outer', ['[]'] = '@class.outer', },
         },
         swap = {
           enable = true,
