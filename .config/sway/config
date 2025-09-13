@@ -80,7 +80,7 @@ bindsym {
     Mod4+Shift+e $run swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
 
     # Start your launcher
-    Mod4+d $run fuzzel -T $term --log-level=warning --log-no-syslog --launch-prefix runapp
+    Mod4+d $run fuzzel --terminal "$term --title '{cmd}' {cmd}" --log-level=warning --log-no-syslog --launch-prefix runapp
 
     # Move your focus around
     Mod4+h focus left

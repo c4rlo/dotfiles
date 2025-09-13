@@ -79,6 +79,7 @@ alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSU
 alias ip='ip -color=auto'
 alias ffmpeg='ffmpeg -hide_banner'
 alias ffprobe='ffprobe -hide_banner'
+alias gfm="git fetch origin main:main"
 
 declare -A git_aliases=(
     [gs]='status --short --branch'
@@ -102,14 +103,25 @@ function _comp_gitalias {
 }
 complete -o bashdefault -o default -o nospace -F _comp_gitalias "${!git_aliases[@]}"
 
-alias gfm="git fetch origin main:main"
 
 # Functions
 
-function mkcd
-{
+function mkcd {
     [[ -n "$1" ]] || return 1
     mkdir -p "$1" && cd "$1"
+}
+
+function lf {
+    # Run lf, then cd to the last directory we were in lf.
+    # We run lf with a modified LESS env var that has the 'F' flag, aka
+    # --quit-if-one-screen, removed (otherwise breaks some things inside lf).
+    cd -- "$(LESS=${LESS/F/} command lf -print-last-dir "$@")"
+}
+
+function view {
+    local -a args=(-R)
+    [[ $# -gt 0 ]] && args+=(+"setf $1")
+    NVIM_NO_LSP=1 nvim "${args[@]}" -
 }
 
 function vigs {
@@ -124,21 +136,18 @@ function gd {
     nvim -c "DiffviewOpen $*"
 }
 
-function clonecd
-{
+function clonecd {
     local dir="${!###*[:/]}"
     git clone "$@" && cd "$dir"
 }
 
-function rgv
-{
+function rgv {
     rg --vimgrep "$@" | nvim -q -
 }
 
 # https://junegunn.github.io/fzf/tips/ripgrep-integration/
 # https://github.com/junegunn/fzf/blob/master/ADVANCED.md#using-fzf-as-the-secondary-filter
-function rfv
-{
+function rfv {
     if [[ $# -lt 1 ]]; then
         echo "usage: $FUNCNAME ARGS..." >&2
         return 2
@@ -153,31 +162,33 @@ function rfv
             --bind 'ctrl-o:execute(nvim {1} +{2})'
 }
 
-function pkgs
-{
+function pkgs {
     pacman -Qq$@ |
         fzf --preview 'pacman -Qil {}' --layout=reverse \
             --bind 'enter:execute(pacman -Qil {} | less -+F)'
 }
 
-function upd
-{
+function pkgf {
+    pacman -Qql "$@" |
+        fzf --bind 'enter:execute(nvim {})'
+}
+
+function upd {
     local -
     set -x
-    while ! ping -c1 -w1 archlinux.org >/dev/null; do sleep 0.1; done
+    while ! ping -c1 -w1 google.com >/dev/null; do sleep 0.1; done
+    curl -sS -I https://archlinux.org >/dev/null
     paru -Sc --noconfirm &&
     paru -Syu &&
     paru -c
 }
 
-function vupd
-{
+function vupd {
     vim -E -c PlugUpgrade -c q >/dev/null
     vim -c PlugUpdate -c 'norm D'
 }
 
-function nvupd
-{
+function nvupd {
     nvim -c 'autocmd User VeryLazy ++once Lazy sync'
 }
 
@@ -203,8 +214,7 @@ function confdiff {
     nvim -d <(tar -xOf $pkgfile ${file#/}) $file
 }
 
-function _contains_match
-{
+function _contains_match {
     local -r pattern=$1
     shift
     for a in "$@"; do
@@ -213,9 +223,8 @@ function _contains_match
     return 1
 }
 
-function sctl
-{
-    if _contains_match '^(start|stop|reload|restart|reload-or-restart|kill|enable|disable|mask|unmask|edit|revert|daemon-reload)$' "$@" &&
+function sctl {
+    if _contains_match '^(start|stop|reload|restart|reload-or-restart|kill|enable|disable|mask|unmask|edit|revert|reset-failed|daemon-reload)$' "$@" &&
       ! _contains_match '^--user$' "$@"
     then
         sudo systemctl "$@"
@@ -229,13 +238,11 @@ function _comp_sctl {
 }
 complete -F _comp_sctl sctl
 
-function jctl
-{
+function jctl {
     journalctl -o short-full --no-hostname -e -n 20000 -b "$@"
 }
 
-function priv
-{
+function priv {
     case $1 in
         on)
             if systemctl is-active -q ~/private; then

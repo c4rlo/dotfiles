@@ -1,0 +1,72 @@
+#!/usr/bin/dash
+
+# TODO maybe ensure exit 0; lf may send SIGPIPE and disables caching if non-exit-0
+# TODO do we need a cleaner script?
+
+# $0 and $1 always get passed
+# $2 to $5 only get passed if invoked by lf as previewer
+readonly tool=${0##*/} path=$1 width=$2 height=$3 hpos=$4 vpos=$5
+
+viewing() [ "$tool" = previewer ]
+opening() [ "$tool" = opener ]
+
+viewing_fileinfo() {
+    viewing && file -Lb -- "$path" | fold -w "$width"
+}
+viewing_highlight() {
+    viewing && exec highlight --force -V -O truecolor -s base16/gruvbox-dark-hard -- "$path"
+}
+
+opening_noop() {
+    opening && exit 0
+}
+opening_nvim() {
+    opening && exec runapp foot nvim -- "$path"
+}
+opening_loffice() {
+    opening && exec runapp loffice -- "$path"
+}
+
+case "${path##*/}" in
+    *.tar.gz|*.tar.bz2|*.tar.xz|*.tar.zst)
+        viewing && exec tar -tvf "$path"
+        opening_noop
+        ;;
+    *.zip)
+        viewing && exec unzip -l -- "$path"
+        opening_noop
+        ;;
+esac
+
+case $(file -Lb --mime-type -- "$path") in
+    text/html)
+        viewing_highlight
+        opening && exec runapp firefox --new-window "$path"
+        ;;
+    text/*|*/xml|*/csv|*/json)
+        viewing_highlight
+        opening_nvim
+        ;;
+    image/*)
+        viewing && exec chafa -f sixel -s "${width}x${height}" --animate off --polite on -t 1 --bg black -- "$path"
+        opening && exec runapp imv -- "$path"
+        ;;
+    application/pdf)
+        viewing && { pdftoppm -singlefile -jpeg -r 90 -- "$path" | chafa -f sixel -s "${width}x${height}" --animate off --polite on -t 1 --bg black; }
+        opening && exec runapp zathura-sandbox -- "$path"
+        ;;
+    application/vnd.openxmlformats-officedocument.*)
+        viewing && loffice --cat "$path" | fold -w "$width"
+        opening_loffice
+        ;;
+    application/vnd.oasis.opendocument.*)
+        viewing && exec odt2txt --width="$width" "$path"
+        opening_loffice
+        ;;
+    *)
+        viewing_fileinfo
+        opening_nvim
+        ;;
+esac
+
+exit 0

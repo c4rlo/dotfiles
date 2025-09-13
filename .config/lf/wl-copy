@@ -1,0 +1,4 @@
+#!/usr/bin/dash
+
+setsid wl-copy "$@" </dev/null >/dev/null # &&
+# IFS= echo "Copied to clipboard: $@"

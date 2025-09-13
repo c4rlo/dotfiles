@@ -206,21 +206,20 @@ require('lazy').setup {
     version = '1.*',
     opts = {
       keymap = {
-        preset = 'enter',
+        preset = 'super-tab',
         ['<C-j>'] = { 'select_next', 'fallback' },
         ['<C-k>'] = { 'select_prev', 'fallback' },
-        ['<Tab>'] = { 'select_and_accept', 'snippet_forward', 'fallback' },
       },
       completion = {
         list = { selection = { preselect = false } },
         documentation = { auto_show = true },
       },
       sources = {
-        default = { 'lazydev', 'lsp', 'buffer' },
+        default = { 'lazydev', 'lsp' },
         providers = {
           lazydev = {
-            name = "LazyDev",
-            module = "lazydev.integrations.blink",
+            name = 'LazyDev',
+            module = 'lazydev.integrations.blink',
             score_offset = 100,
           },
         },
@@ -303,9 +302,17 @@ vim.api.nvim_create_autocmd('FileType', {
   end
 })
 
+-- lfrc fixup
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = {'lf'},
+  callback = function()
+    vim.bo.commentstring = '# %s'
+  end
+})
+
 -- Language Server Protocol (LSP) support
 
-if vim.o.diff then
+if vim.o.diff or vim.env.NVIM_NO_LSP == '1' then
   -- Don't want LSP in diff mode
   return
 end
