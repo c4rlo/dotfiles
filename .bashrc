@@ -48,12 +48,13 @@ function prompt_exitstatus {
         printf " \001\e[31m\002${status}"
     fi
 }
-PS0='\[\e[2 q\]'  # set cursor style to block; gets reset near end of PS1
+PS0='\[\e[2 q\]'     # set cursor style to block; gets reset near end of PS1
+PS0+='\e]133;C\e\\'  # mark beginning of command output
 . /usr/share/git/completion/git-prompt.sh
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWSTASHSTATE=1
 PS1='\t \[\e[1m\]\w$(__git_ps1 " (%s)")\[\e[0m\]$(prompt_jobs)$(prompt_exitstatus) \[\e[0m\e[1m\]\$\[\e[0m\e[ q\] '
-function _on_cwd_change {
+function _prompt_command_fn {
     local strlen=${#PWD} encoded='' pos c o
     for (( pos=0; pos<strlen; pos++ )); do
         c=${PWD:$pos:1}
@@ -63,12 +64,13 @@ function _on_cwd_change {
         esac
         encoded+=$o
     done
-    printf '\e]0;%s\e' "${PWD/#$HOME/\~}"
-    printf '\e]7;file://%s%s\e\\' "${HOSTNAME}" "${encoded}"
+    printf '\e]133;D\e\\'  # mark end of command output
+    printf '\e]0;%s\e' "${PWD/#$HOME/\~}"  # set terminal title
+    printf '\e]7;file://%s%s\e\\' "${HOSTNAME}" "${encoded}"  # tell current directory to terminal
 }
 case $TERM in
 foot)
-    PROMPT_COMMAND=_on_cwd_change
+    PROMPT_COMMAND=_prompt_command_fn
     ;;
 esac
 if [[ -n "$VIRTUAL_ENV" ]]; then
