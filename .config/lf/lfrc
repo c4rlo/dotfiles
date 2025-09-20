@@ -1,5 +1,4 @@
 set scrolloff 10
-set sixel true
 set mouse true
 
 set hidden true
@@ -59,8 +58,9 @@ map Z zi
 
 map U %du -hs "$PWD"
 
-map Y &{{
-    wl-copy "$fx" || exit
-    fxs=$(IFS= echo $fx)
-    lf -remote "send $id echo \"Copied paths to clipboard: $fxs\""
+map Y %{{
+    # We can remove the "2>/dev/null" once we have lf v39 is released, which should
+    # include https://github.com/gokcehan/lf/pull/2155
+    for fn in $fx; do echo "file://$fn"; done | wl-copy -t text/uri-list 2>/dev/null &&
+    echo "Copied path(s) to clipboard: $(echo $fx)"
 }}

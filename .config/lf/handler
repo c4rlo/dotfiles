@@ -24,7 +24,7 @@ opening_nvim() {
     opening && exec runapp foot nvim -- "$path"
 }
 opening_loffice() {
-    opening && exec runapp loffice -- "$path"
+    opening && exec runapp loffice "$path"
 }
 
 case "${path##*/}" in
