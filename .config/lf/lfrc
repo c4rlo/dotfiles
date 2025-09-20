@@ -1,66 +1,67 @@
+# UI options
 set scrolloff 10
 set mouse true
 
+# Dir listing options
 set hidden true
 
+# Shell options
 set shell dash
 set ifs "\n"
-
 map w $bash
 
-set previewer ~/.config/lf/previewer
-
-map P &{{
-    if [ "$lf_preview" = false ]; then
-        lf -remote "send $id :set ratios 1:2:3; set preview true"
-    else
-        lf -remote "send $id :set ratios 1:2; set preview false"
-    fi
-}}
-
-cmd open &{{
-    ~/.config/lf/opener "$f" &&
-    lf -remote "send $id :set ratios 1:2; set preview false"
-}}
-
-cmd on-focus-gained :set ratios 1:2:3; set preview true
-
-cmd z &{{
-    result="$(zoxide query --exclude "$PWD" "$@" | sed 's/\\/\\\\/g;s/"/\\"/g')" &&
-    lf -remote "send $id cd \"$result\""
-}}
-
-cmd zi ${{
-    result="$(zoxide query -i | sed 's/\\/\\\\/g;s/"/\\"/g')" &&
-    lf -remote "send $id cd \"$result\""
-}}
-
-cmd on-cd &zoxide add "$PWD"
-
-# Delete built-in mappings
+# Delete some built-in mappings – we need z for zoxide
 map za
 map zh
 map zn
 map zr
 map zs
 map zt
-# ... and re-bind them
+# ... and re-bind some of them
 nmap In set info
 nmap Is set info size
 nmap It set info time
 nmap Ia set info size:time
+
+# Some more maps
 nmap . set hidden!
 nmap R set reverse!
-
-# Now use z/Z for zoxide:
-map z push :z<space>
-map Z zi
-
-map U %du -hs "$PWD"
-
+nmap U %du -hs "$PWD"
+nmap P &{{
+    if [ "$lf_preview" = false ]; then
+        lf -remote "send $id :set ratios 1:2:3; set preview true"
+    else
+        lf -remote "send $id :set ratios 1:2; set preview false"
+    fi
+}}
 map Y %{{
     # We can remove the "2>/dev/null" once we have lf v39 is released, which should
     # include https://github.com/gokcehan/lf/pull/2155
     for fn in $fx; do echo "file://$fn"; done | wl-copy -t text/uri-list 2>/dev/null &&
     echo "Copied path(s) to clipboard: $(echo $fx)"
 }}
+map D delete
+
+# Previewing files
+set previewer ~/.config/lf/previewer
+
+# Opening files
+cmd open &{{
+    ~/.config/lf/opener "$f" &&
+    lf -remote "send $id :set ratios 1:2; set preview false"
+}}
+cmd on-focus-gained :set ratios 1:2:3; set preview true
+
+# Current directory changes: integrate with terminal and zoxide
+cmd z &{{
+    result="$(zoxide query --exclude "$PWD" "$@" | sed 's/\\/\\\\/g;s/"/\\"/g')" &&
+    lf -remote "send $id cd \"$result\""
+}}
+cmd zi ${{
+    result="$(zoxide query -i | sed 's/\\/\\\\/g;s/"/\\"/g')" &&
+    lf -remote "send $id cd \"$result\""
+}}
+cmd on-cd &~/.config/lf/on-cd --zoxide
+cmd on-init &~/.config/lf/on-cd
+map z push :z<space>
+map Z zi

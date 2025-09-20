@@ -53,9 +53,22 @@ PS0='\[\e[2 q\]'  # set cursor style to block; gets reset near end of PS1
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWSTASHSTATE=1
 PS1='\t \[\e[1m\]\w$(__git_ps1 " (%s)")\[\e[0m\]$(prompt_jobs)$(prompt_exitstatus) \[\e[0m\e[1m\]\$\[\e[0m\e[ q\] '
+function _on_cwd_change {
+    local strlen=${#PWD} encoded='' pos c o
+    for (( pos=0; pos<strlen; pos++ )); do
+        c=${PWD:$pos:1}
+        case "$c" in
+            [-/:_.!\'\(\)~[:alnum:]]) o=$c ;;
+            *) printf -v o '%%%02X' "'$c" ;;
+        esac
+        encoded+=$o
+    done
+    printf '\e]0;%s\e' "${PWD/#$HOME/\~}"
+    printf '\e]7;file://%s%s\e\\' "${HOSTNAME}" "${encoded}"
+}
 case $TERM in
-xterm*|alacritty|foot)
-    PROMPT_COMMAND='echo -ne "\033]0;${PWD/#$HOME/\~}\007"'
+foot)
+    PROMPT_COMMAND=_on_cwd_change
     ;;
 esac
 if [[ -n "$VIRTUAL_ENV" ]]; then

@@ -1,0 +1,41 @@
+#!/usr/bin/dash
+
+# If "--zoxide" arg given, add $PWD to zoxide
+[ "$1" = "--zoxide" ] && zoxide add "$PWD"
+
+# If $PWD is /home/myuser/blah, set $pwd_pretty to ~/blah
+pwd_pretty=$PWD pwd_rel=${PWD##"$HOME"}
+[ "$pwd_rel" != "$PWD" ] && pwd_pretty="~${pwd_rel}"
+
+# Build $pwd_pretty_esc by escaping '"' and '\' characters in $pwd_pretty
+pwd_pretty_esc='' tmp=$pwd_pretty
+while [ -n "$tmp" ]; do
+    cut=${tmp#?}
+    c=${tmp%"$cut"}
+    case "$c" in
+        [\"\\]) pwd_pretty_esc="$pwd_pretty_esc\\$c" ;;
+        *) pwd_pretty_esc="$pwd_pretty_esc$c" ;;
+    esac
+    tmp="$cut"
+done
+
+# Build $pwd_pctenc by percent-encoding $PWD
+pwd_pctenc='' tmp=$PWD
+while [ -n "$tmp" ]; do
+    cut=${tmp#?}
+    c=${tmp%"$cut"}
+    case "$c" in
+        [-/:_.!\'\(\)~[:alnum:]]) pwd_pctenc="$pwd_pctenc$c" ;;
+        *) pwd_pctenc=$(printf '%s%%%02X' "$pwd_pctenc" "'$c")  ;;
+    esac
+    tmp="$cut"
+done
+
+# Set terminal emulator window title.
+osc_title="\033]0;${pwd_pretty_esc} – lf\007"
+
+# Inform terminal emulator of current directory, so it is propagated
+# to new windows the user may create.
+osc_cwd="\033]7;file://${pwd_pctenc}\033\\"
+
+lf -remote "send ${id:?} tty-write \"${osc_title}${osc_cwd}\""

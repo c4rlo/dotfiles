@@ -16,6 +16,7 @@ viewing_fileinfo() {
 viewing_highlight() {
     viewing && exec highlight --force -V -O truecolor -s base16/gruvbox-dark-hard -- "$path"
 }
+readonly chafa="chafa -f sixel -s ${width}x${height} --animate off --polite on -t 1 --bg black"
 
 opening_noop() {
     opening && exit 0
@@ -48,19 +49,27 @@ case $(file -Lb --mime-type -- "$path") in
         opening_nvim
         ;;
     image/*)
-        viewing && exec chafa -f sixel -s "${width}x${height}" --animate off --polite on -t 1 --bg black -- "$path"
+        viewing && exec $chafa -- "$path"
         opening && exec runapp imv -- "$path"
         ;;
     application/pdf)
-        viewing && { pdftoppm -singlefile -jpeg -r 90 -- "$path" | chafa -f sixel -s "${width}x${height}" --animate off --polite on -t 1 --bg black; }
+        viewing && { pdftoppm -singlefile -jpeg -r 90 -- "$path" | $chafa; }
         opening && exec runapp zathura-sandbox -- "$path"
         ;;
     application/vnd.openxmlformats-officedocument.*)
         viewing && loffice --cat "$path" | fold -w "$width"
         opening_loffice
         ;;
-    application/vnd.oasis.opendocument.*)
+    application/vnd.oasis.opendocument.text)
         viewing && exec odt2txt --width="$width" "$path"
+        opening_loffice
+        ;;
+    application/vnd.oasis.opendocument.spreadsheet)
+        viewing &&
+            tmpdir=$(mktemp -d) &&
+            trap 'rm -rf $tmpdir' EXIT &&
+            loffice --convert-to jpeg --outdir "$tmpdir" "$path" >/dev/null && 
+            $chafa -- "$tmpdir"/*
         opening_loffice
         ;;
     *)
