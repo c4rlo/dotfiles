@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use v5.42;
+use utf8;
+
+my @urls;
+for (split /\n/, $ENV{fx}) {
+    s/([^-\/:_.!'()~A-Za-z0-9])/sprintf '%%%02X', ord($1)/ge;  # percent-encode
+    push @urls, "file://$_";
+}
+
+my @cmd = qw(wl-copy -t text/uri-list);
+push @cmd, (join "\n", @urls);
+
+my $paths = $ENV{fx} =~ s/\n/ /gr;
+say "Copied path(s) to clipboard: $paths";
+
+# We can remove the redirect to /dev/null once we have lf v39 is released, which should
+# include https://github.com/gokcehan/lf/pull/2155
+close STDERR;
+open (STDERR, '>', '/dev/null');
+exec @cmd;

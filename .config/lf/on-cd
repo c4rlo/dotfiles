@@ -1,41 +1,23 @@
-#!/usr/bin/dash
+#!/usr/bin/perl
 
-# If "--zoxide" arg given, add $PWD to zoxide
-[ "$1" = "--zoxide" ] && zoxide add "$PWD"
+use v5.42;
+use utf8;
 
-# If $PWD is /home/myuser/blah, set $pwd_pretty to ~/blah
-pwd_pretty=$PWD pwd_rel=${PWD##"$HOME"}
-[ "$pwd_rel" != "$PWD" ] && pwd_pretty="~${pwd_rel}"
+my $home = $ENV{HOME};
+my $pwd = $ENV{PWD};
 
-# Build $pwd_pretty_esc by escaping '"' and '\' characters in $pwd_pretty
-pwd_pretty_esc='' tmp=$pwd_pretty
-while [ -n "$tmp" ]; do
-    cut=${tmp#?}
-    c=${tmp%"$cut"}
-    case "$c" in
-        [\"\\]) pwd_pretty_esc="$pwd_pretty_esc\\$c" ;;
-        *) pwd_pretty_esc="$pwd_pretty_esc$c" ;;
-    esac
-    tmp="$cut"
-done
-
-# Build $pwd_pctenc by percent-encoding $PWD
-pwd_pctenc='' tmp=$PWD
-while [ -n "$tmp" ]; do
-    cut=${tmp#?}
-    c=${tmp%"$cut"}
-    case "$c" in
-        [-/:_.!\'\(\)~[:alnum:]]) pwd_pctenc="$pwd_pctenc$c" ;;
-        *) pwd_pctenc=$(printf '%s%%%02X' "$pwd_pctenc" "'$c")  ;;
-    esac
-    tmp="$cut"
-done
+if ($#ARGV == 0 && $ARGV[0] eq '--zoxide') {
+    system ('zoxide', 'add', '--', $pwd) == 0 or die;
+}
 
 # Set terminal emulator window title.
-osc_title="\033]0;${pwd_pretty_esc} – lf\007"
+my $pwd_title = $pwd =~ s/^\Q$home/~/r;
+my $osc_title = "\e]0;${pwd_title} – lf\a";
 
 # Inform terminal emulator of current directory, so it is propagated
 # to new windows the user may create.
-osc_cwd="\033]7;file://${pwd_pctenc}\033\\"
+my $pwd_pctenc = $pwd =~ s/([^-\/:_.!'()~A-Za-z0-9])/sprintf '%%%02X', ord($1)/ger;
+my $osc_cwd = "\e]7;file://${pwd_pctenc}\e\\";
 
-lf -remote "send ${id:?} tty-write \"${osc_title}${osc_cwd}\""
+my $tty_arg = ($osc_title . $osc_cwd) =~ s/(["\\])/\\$1/gr;
+exec 'lf', '-remote', qq(send $ENV{id} tty-write "$tty_arg");

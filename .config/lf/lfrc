@@ -34,12 +34,7 @@ nmap P &{{
         lf -remote "send $id :set ratios 1:2; set preview false"
     fi
 }}
-map Y %{{
-    # We can remove the "2>/dev/null" once we have lf v39 is released, which should
-    # include https://github.com/gokcehan/lf/pull/2155
-    for fn in $fx; do echo "file://$fn"; done | wl-copy -t text/uri-list 2>/dev/null &&
-    echo "Copied path(s) to clipboard: $(echo $fx)"
-}}
+map Y %~/.config/lf/clip-copy-paths
 map D delete
 
 # Previewing files
@@ -53,14 +48,8 @@ cmd open &{{
 cmd on-focus-gained :set ratios 1:2:3; set preview true
 
 # Current directory changes: integrate with terminal and zoxide
-cmd z &{{
-    result="$(zoxide query --exclude "$PWD" "$@" | sed 's/\\/\\\\/g;s/"/\\"/g')" &&
-    lf -remote "send $id cd \"$result\""
-}}
-cmd zi ${{
-    result="$(zoxide query -i | sed 's/\\/\\\\/g;s/"/\\"/g')" &&
-    lf -remote "send $id cd \"$result\""
-}}
+cmd z &~/.config/lf/zoxide-cd -- "$@"
+cmd zi $~/.config/lf/zoxide-cd --interactive -- "$@"
 cmd on-cd &~/.config/lf/on-cd --zoxide
 cmd on-init &~/.config/lf/on-cd
 map z push :z<space>
