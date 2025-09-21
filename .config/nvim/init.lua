@@ -201,6 +201,7 @@ require('lazy').setup {
         list = { selection = { preselect = false } },
         documentation = { auto_show = true },
       },
+      cmdline = { enabled = false },
       sources = {
         default = { 'lazydev', 'lsp' },
         providers = {
@@ -225,7 +226,6 @@ require('lazy').setup {
     },
   },
   { 'folke/snacks.nvim',
-    lazy = false,
     priority = 1000,
     opts = {
       picker = {
@@ -248,17 +248,16 @@ require('lazy').setup {
       { '<Leader>ds', function() require'snacks.picker'.lsp_symbols() end },
       { '<Leader>ws', function() require'snacks.picker'.lsp_workspace_symbols() end },
     },
-    config = function()
-      local bufdel = require 'snacks.bufdelete'
+    init = function()
       vim.api.nvim_create_user_command('Bdelete',
-        function(opts) bufdel.delete({ force = opts.bang }) end,
+        function(opts) require'snacks.bufdelete'.delete({ force = opts.bang }) end,
         { bang = true }
       )
       vim.api.nvim_create_user_command('Bwipeout',
-        function(opts) bufdel.delete({ wipe = true, force = opts.bang }) end,
+        function(opts) require'snacks.bufdelete'.delete({ wipe = true, force = opts.bang }) end,
         { bang = true }
       )
-    end
+    end,
   },
   { 'hedyhli/outline.nvim',
     keys = { { '<Leader>o', function() require'outline'.toggle() end } },
@@ -266,7 +265,7 @@ require('lazy').setup {
   },
   { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'nvim-lualine/lualine.nvim', opts = {} },
-  { 'ellisonleao/gruvbox.nvim', lazy = false, priority = 1000,
+  { 'ellisonleao/gruvbox.nvim', priority = 1000,
     config = function() vim.cmd.colorscheme 'gruvbox' end },
   'nvim-tree/nvim-web-devicons',
   'Vimjas/vim-python-pep8-indent',
