@@ -35,7 +35,6 @@ vim.g.maplocalleader = ' '
 
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', "'", '`')
--- vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', 'Q', vim.cmd.qa)
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
@@ -105,21 +104,9 @@ require('lazy').setup {
   'tpope/vim-sleuth',
   'tpope/vim-fugitive',
   'tpope/vim-eunuch',
-  { 'echasnovski/mini.align',
+  { 'nvim-mini/mini.align',
     opts = {},
     keys = { { 'ga', mode = { 'n', 'x' } }, { 'gA', mode = { 'n', 'x' } } }
-  },
-  { 'echasnovski/mini.bufremove', cmd = { 'Bdelete', 'Bwipeout' },
-    config = function()
-      local bufremove = require 'mini.bufremove'
-      bufremove.setup()
-      for cmd, func in pairs{Bdelete = 'delete', Bwipeout = 'wipeout'} do
-        vim.api.nvim_create_user_command(
-          cmd,
-          function(opts) bufremove[func](0, opts.bang) end,
-          { bang = true })
-      end
-    end
   },
   { 'jakemason/ouroboros',
     dependencies = { 'nvim-lua/plenary.nvim' },
@@ -237,43 +224,49 @@ require('lazy').setup {
       end,
     },
   },
-  { 'nvim-telescope/telescope.nvim', branch = '0.1.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-      { 'nvim-telescope/telescope-ui-select.nvim' },
+  { 'folke/snacks.nvim',
+    lazy = false,
+    priority = 1000,
+    opts = {
+      picker = {
+        matcher = {
+          frecency = true,
+          cwd_bonus = true,
+        }
+      },
+    },
+    keys = {
+      { '<C-k>', function() require'snacks.picker'.buffers() end },
+      { '<C-p>', function() require'snacks.picker'.files() end },
+      { '<Leader>g', function() require'snacks.picker'.git_files() end },
+      { '<Leader>/', function() require'snacks.picker'.grep() end },
+      { '<Leader>*', function() require'snacks.picker'.grep_word() end },
+      { 'gd', function() require'snacks.picker'.lsp_definitions() end },
+      { 'gr', function() require'snacks.picker'.lsp_references() end, nowait = true },
+      { 'gI', function() require'snacks.picker'.lsp_implementations() end },
+      { '<Leader>D', function() require'snacks.picker'.lsp_type_definitions() end },
+      { '<Leader>ds', function() require'snacks.picker'.lsp_symbols() end },
+      { '<Leader>ws', function() require'snacks.picker'.lsp_workspace_symbols() end },
     },
     config = function()
-      local telescope = require 'telescope'
-      telescope.setup{
-        defaults = {
-          mappings = {
-            i = {
-              ['<C-k>'] = 'move_selection_previous',
-              ['<C-j>'] = 'move_selection_next',
-              ['<Esc>'] = 'close'
-            },
-          },
-        },
-      }
-      telescope.load_extension('fzf')
-      telescope.load_extension('ui-select')
-    end,
-    keys = {
-      { '<C-k>', function() require'telescope.builtin'.buffers() end },
-      { '<C-p>', function() require'telescope.builtin'.find_files() end },
-      { '<Leader>g', function() require'telescope.builtin'.git_files() end },
-      { '<Leader>/', function() require'telescope.builtin'.live_grep() end },
-      { '<Leader>*', function() require'telescope.builtin'.grep_string({ word_match = '-w'}) end },
-    }
+      local bufdel = require 'snacks.bufdelete'
+      vim.api.nvim_create_user_command('Bdelete',
+        function(opts) bufdel.delete({ force = opts.bang }) end,
+        { bang = true }
+      )
+      vim.api.nvim_create_user_command('Bwipeout',
+        function(opts) bufdel.delete({ wipe = true, force = opts.bang }) end,
+        { bang = true }
+      )
+    end
   },
   { 'hedyhli/outline.nvim',
-    keys = { { "<Leader>o", function() require'outline'.toggle() end } },
+    keys = { { '<Leader>o', function() require'outline'.toggle() end } },
     opts = {},
   },
   { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'nvim-lualine/lualine.nvim', opts = {} },
-  { 'ellisonleao/gruvbox.nvim', priority = 1000,
+  { 'ellisonleao/gruvbox.nvim', lazy = false, priority = 1000,
     config = function() vim.cmd.colorscheme 'gruvbox' end },
   'nvim-tree/nvim-web-devicons',
   'Vimjas/vim-python-pep8-indent',
@@ -321,7 +314,6 @@ local on_attach = function(_, bufnr)
   local nmap = function(keys, func)
     vim.keymap.set('n', keys, func, { buffer = bufnr })
   end
-  local telescope_builtin = require 'telescope.builtin'
 
   -- Delete some default keymaps that conflict with our definition of 'gr'.
   for _, key in ipairs({'grn', 'grr', 'gri', 'gra', 'grt'}) do
@@ -330,17 +322,8 @@ local on_attach = function(_, bufnr)
 
   nmap('<Leader>r', vim.lsp.buf.rename)
   nmap('<Leader>a', vim.lsp.buf.code_action)
-
-  nmap('gd', telescope_builtin.lsp_definitions)
-  nmap('gr', telescope_builtin.lsp_references)
   nmap('gD', vim.lsp.buf.declaration)
-  nmap('<Leader>D', telescope_builtin.lsp_type_definitions)
-  nmap('gI', telescope_builtin.lsp_implementations)
-
   nmap('<Leader>k', vim.lsp.buf.signature_help)
-
-  nmap('<Leader>ds', telescope_builtin.lsp_document_symbols)
-  nmap('<Leader>ws', telescope_builtin.lsp_dynamic_workspace_symbols)
 
   nmap('<F3>',  -- Toggle inlay hints
     function()
