@@ -12,7 +12,7 @@ export EDITOR=nvim \
        CTEST_OUTPUT_ON_FAILURE=ON \
        CTEST_PROGRESS_OUTPUT=ON
 
-export PATH=$HOME/bin:$HOME/.local/bin/:$HOME/.cargo/bin:$HOME/go/bin:$HOME/google-cloud-sdk/bin:$PATH
+export PATH=$HOME/src/local/bin:$HOME/.cargo/bin:$HOME/go/bin:$HOME/opt/google-cloud-sdk/bin:$PATH
 
 if uwsm check may-start; then
     # GUI-relevant env vars are set in ~/.config/uwsm/env

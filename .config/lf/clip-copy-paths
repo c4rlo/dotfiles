@@ -9,14 +9,15 @@ for (split /\n/, $ENV{fx}) {
     push @urls, "file://$_";
 }
 
+my $word = @urls == 1 ? "path" : "paths";
+my $paths = $ENV{fx} =~ s/\n/ /gr;
+say "Copied $word to clipboard: $paths";
+
 my @cmd = qw(wl-copy -t text/uri-list);
 push @cmd, (join "\n", @urls);
 
-my $paths = $ENV{fx} =~ s/\n/ /gr;
-say "Copied path(s) to clipboard: $paths";
-
-# We can remove the redirect to /dev/null once we have lf v39 is released, which should
+# We can remove the redirect to /dev/null once lf v39 is released, which should
 # include https://github.com/gokcehan/lf/pull/2155
 close STDERR;
-open (STDERR, '>', '/dev/null');
+open STDERR, '>', '/dev/null';
 exec @cmd;

@@ -15,7 +15,7 @@ MAILCHECK=
 # Tab completion; note that /etc/bash.bashrc already loads
 # /usr/share/bash-completion/bash_completion, which sets up most of it.
 . /usr/share/fzf/completion.bash
-. ~/google-cloud-sdk/completion.bash.inc
+. ~/opt/google-cloud-sdk/completion.bash.inc
 . ~/.invoke-completion.sh
 
 # Key bindings
