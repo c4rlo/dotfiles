@@ -179,13 +179,11 @@ function rfv {
 
 function pkgs {
     pacman -Qq$@ |
-        fzf --preview 'pacman -Qil {}' --layout=reverse \
-            --bind 'enter:execute(pacman -Qil {} | less -+F)'
-}
-
-function pkgf {
-    pacman -Qql "$@" |
-        fzf --bind 'enter:execute(nvim {})'
+        fzf --layout=reverse \
+            --prompt 'Packages (Ctrl+F to browse files)> ' \
+            --preview 'pacman -Qil {}' \
+            --bind 'ctrl-f:unbind(ctrl-f)+change-prompt(Files> )+clear-query+reload(pacman -Qql {} | grep -v "/$")+change-preview(highlight --force -O truecolor -s base16/gruvbox-dark-hard {})' \
+            --bind 'enter:transform:[[ $FZF_PROMPT =~ Packages ]] && echo "execute(pacman -Qil {} | less -+F)" || echo "execute(nvim -- {})"'
 }
 
 function upd {

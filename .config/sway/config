@@ -202,11 +202,6 @@ for_window [app_id="soffice" title="Open"] {
     floating enable
 }
 
-for_window [app_id="pcmanfm-qt" title="File Properties|Choose an Application|Search Files|Preferences"] {
-    floating enable
-    border normal
-}
-
 for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }

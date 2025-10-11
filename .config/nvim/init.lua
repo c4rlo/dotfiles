@@ -138,6 +138,7 @@ require('lazy').setup {
         'gomod',
         'gosum',
         'gowork',
+        'hcl',
         'html',
         'javascript',
         'just',
@@ -272,7 +273,6 @@ require('lazy').setup {
   'Glench/Vim-Jinja2-Syntax',
   { 'folke/lazydev.nvim', ft = 'lua',
     opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } } },
-  'jvirtanen/vim-hcl',
 }
 
 -- Go-specific options
