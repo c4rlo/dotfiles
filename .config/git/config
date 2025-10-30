@@ -34,7 +34,6 @@
 
 [fetch]
     prune = true
-    pruneTags = true
 
 [push]
     autoSetupRemote = true
@@ -61,13 +60,14 @@
 [alias]
     pushf = push -f --force-with-lease
 
-[url "git@github.com:c4rlo/"]
-    insteadOf = c:
+[url "https://github.com/"]
+    insteadOf = g:
 
 [url "git@github.com:"]
-    insteadOf = g:
-    insteadOf = gh:
-    insteadOf = github.com:
+    insteadOf = G:
+
+[url "git@github.com:c4rlo/"]
+    insteadOf = c:
 
 ; [url "git@gitlab.com:"]  -- gives me "git@gitlab.com: Permission denied (publickey)."
 [url "https://gitlab.com/"]

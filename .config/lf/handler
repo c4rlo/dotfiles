@@ -44,7 +44,7 @@ case $(file -Lb --mime-type -- "$path") in
         viewing_highlight
         opening && exec runapp firefox --new-window "$path"
         ;;
-    text/*|*/xml|*/csv|*/json)
+    text/*|*/xml|*/csv|*/json|application/javascript)
         viewing_highlight
         opening_nvim
         ;;

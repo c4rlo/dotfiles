@@ -108,22 +108,7 @@ require('lazy').setup {
     opts = {},
     keys = { { 'ga', mode = { 'n', 'x' } }, { 'gA', mode = { 'n', 'x' } } }
   },
-  { 'jakemason/ouroboros',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    keys = {
-      { '<F2>', function() require'ouroboros'.switch() end, ft = { 'c', 'cpp' } },
-    }
-  },
   { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
-  { 'Wansmer/treesj',
-    dependencies = { 'nvim-treesitter/nvim-treesitter' },
-    opts = { use_default_keymaps = false },
-    keys = {
-      { '<Leader>mm', function() require'treesj'.toggle() end },
-      { '<Leader>mj', function() require'treesj'.join() end },
-      { '<Leader>ms', function() require'treesj'.split() end },
-    },
-  },
   { 'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
@@ -260,11 +245,6 @@ require('lazy').setup {
       )
     end,
   },
-  { 'hedyhli/outline.nvim',
-    keys = { { '<Leader>o', function() require'outline'.toggle() end } },
-    opts = {},
-  },
-  { 'sindrets/diffview.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
   { 'nvim-lualine/lualine.nvim', opts = {} },
   { 'ellisonleao/gruvbox.nvim', priority = 1000,
     config = function() vim.cmd.colorscheme 'gruvbox' end },

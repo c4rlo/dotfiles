@@ -230,7 +230,7 @@ function confdiff {
 function _contains_match {
     local -r pattern=$1
     shift
-    for a in "$@"; do
+    for a; do
         if [[ "$a" =~ $pattern ]]; then return 0; fi
     done
     return 1
