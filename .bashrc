@@ -7,6 +7,7 @@
 
 # Options
 shopt -s autocd extglob failglob globstar checkhash checkjobs histappend
+HISTFILE=~/.local/state/bash_history
 HISTCONTROL=ignoredups
 HISTSIZE=10000
 HISTTIMEFORMAT='[%F %T %Z] '
@@ -16,7 +17,7 @@ MAILCHECK=
 # /usr/share/bash-completion/bash_completion, which sets up most of it.
 . /usr/share/fzf/completion.bash
 . ~/opt/google-cloud-sdk/completion.bash.inc
-. ~/.invoke-completion.sh
+. ~/.local/share/invoke/completion.bash
 
 # Key bindings
 . /usr/share/fzf/key-bindings.bash
@@ -230,9 +231,7 @@ function confdiff {
 function _contains_match {
     local -r pattern=$1
     shift
-    for a; do
-        if [[ "$a" =~ $pattern ]]; then return 0; fi
-    done
+    for a; do [[ "$a" =~ $pattern ]] && return 0; done
     return 1
 }
 
@@ -253,26 +252,4 @@ complete -F _comp_sctl sctl
 
 function jctl {
     journalctl -o short-full --no-hostname -e -n 20000 -b "$@"
-}
-
-function priv {
-    case $1 in
-        on)
-            if systemctl is-active -q ~/private; then
-                echo "Already active"
-                return 1
-            fi
-            sudo systemctl start ~/private
-            ;;
-        off)
-            if ! systemctl is-active -q ~/private; then
-                echo "Already inactive"
-                return 1
-            fi
-            sudo systemctl stop ~/private
-            ;;
-        *)
-            echo "Usage: priv on|off"
-            return 1
-    esac
 }

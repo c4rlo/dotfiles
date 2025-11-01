@@ -7,6 +7,7 @@ set secure
 set hidden
 set noswapfile
 set undofile
+set viminfofile=$MYVIMDIR/viminfo
 set expandtab
 set shiftwidth=4
 set textwidth=88
@@ -33,43 +34,6 @@ set cinoptions=:0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1
 set termguicolors
 set ttymouse=sgr
 set pastetoggle=<F11>
-
-# https://sw.kovidgoyal.net/kitty/faq/#using-a-color-theme-with-a-background-color-does-not-work-well-in-vim
-if &term == 'xterm-kitty'
-    set balloonevalterm
-    # Styled and colored underline support
-    &t_AU = "\e[58:5:%dm"
-    &t_8u = "\e[58:2:%lu:%lu:%lum"
-    &t_Us = "\e[4:2m"
-    &t_Cs = "\e[4:3m"
-    &t_ds = "\e[4:4m"
-    &t_Ds = "\e[4:5m"
-    &t_Ce = "\e[4:0m"
-    # Strikethrough
-    &t_Ts = "\e[9m"
-    &t_Te = "\e[29m"
-    # Truecolor support
-    &t_8f = "\e[38:2:%lu:%lu:%lum"
-    &t_8b = "\e[48:2:%lu:%lu:%lum"
-    &t_RF = "\e]10;?\e\\"
-    &t_RB = "\e]11;?\e\\"
-    # Cursor control
-    &t_RC = "\e[?12$p"
-    &t_SH = "\e[%d q"
-    &t_RS = "\eP$q q\e\\"
-    &t_SI = "\e[5 q"
-    &t_SR = "\e[3 q"
-    &t_EI = "\e[1 q"
-    &t_VS = "\e[?12l"
-    # Focus tracking
-    &t_fe = "\e[?1004h"
-    &t_fd = "\e[?1004l"
-    # Window title
-    &t_ST = "\e[22;2t"
-    &t_RT = "\e[23;2t"
-    # Fix background color rendering
-    &t_ut = ''
-endif
 
 # Put all autocommands defined in this file into a "vimrc" group, and clear that
 # group. This ensures the autocommands don't get defined multiple times when
@@ -98,12 +62,12 @@ autocmd! vimStartup BufReadPost * {
 packadd! editorconfig
 
 # Set up plugins via vim-plug
-if empty(glob('~/.vim/autoload/plug.vim'))
-    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+if empty(glob('~/.config/vim/autoload/plug.vim'))
+    silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs
       \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
-plug#begin('~/.vim/plugged')
+plug#begin('~/.config/vim/plugged')
 Plug 'tpope/vim-sensible'
 Plug 'lifepillar/vim-gruvbox8'
 Plug 'itchyny/lightline.vim'
