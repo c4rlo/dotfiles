@@ -49,7 +49,7 @@ case $(file -Lb --mime-type -- "$path") in
         opening_nvim
         ;;
     image/*)
-        viewing && exec $chafa -- "$path"
+        viewing && { $chafa -- "$path" || viewing_fileinfo; }
         opening && exec runapp imv -- "$path"
         ;;
     application/pdf)
