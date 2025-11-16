@@ -274,14 +274,14 @@ require('lazy').setup {
       },
       enabled = function() -- Disable if cursor is inside a comment.
         local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-        row = row - 1  -- convert row from 1-based to 0-based; column is already 0-based
+        row = row - 1      -- convert row from 1-based to 0-based; column is already 0-based
         if vim.api.nvim_get_mode().mode:sub(1, 1) == 'i' then
-          col = col - 1  -- adjust column in insert mode
+          col = col - 1    -- adjust column in insert mode
         end
         local success, node = pcall(vim.treesitter.get_node, { pos = { row, col } })
         return not (success and node and
-            vim.tbl_contains(
-              {'comment', 'line_comment', 'block_comment', 'comment_content'}, node:type()))
+          vim.tbl_contains(
+            { 'comment', 'line_comment', 'block_comment', 'comment_content' }, node:type()))
       end,
     },
   },
@@ -296,15 +296,15 @@ require('lazy').setup {
       },
     },
     keys = {
-      { '<C-k>', function() require'snacks.picker'.buffers() end },
-      { '<C-p>', function() require'snacks.picker'.files() end },
-      { '<Leader>g', function() require'snacks.picker'.git_files() end },
-      { '<Leader>/', function() require'snacks.picker'.grep() end },
-      { '<Leader>*', function() require'snacks.picker'.grep_word() end },
-      { 'gd', function() require'snacks.picker'.lsp_definitions() end },
-      { 'gr', function() require'snacks.picker'.lsp_references() end, nowait = true },
-      { 'gI', function() require'snacks.picker'.lsp_implementations() end },
-      { '<Leader>D', function() require'snacks.picker'.lsp_type_definitions() end },
+      { '<C-k>',      function() require'snacks.picker'.buffers() end },
+      { '<C-p>',      function() require'snacks.picker'.files() end },
+      { '<Leader>g',  function() require'snacks.picker'.git_files() end },
+      { '<Leader>/',  function() require'snacks.picker'.grep() end },
+      { '<Leader>*',  function() require'snacks.picker'.grep_word() end },
+      { 'gd',         function() require'snacks.picker'.lsp_definitions() end },
+      { 'gr',         function() require'snacks.picker'.lsp_references() end, nowait = true },
+      { 'gI',         function() require'snacks.picker'.lsp_implementations() end },
+      { '<Leader>D',  function() require'snacks.picker'.lsp_type_definitions() end },
       { '<Leader>ds', function() require'snacks.picker'.lsp_symbols() end },
       { '<Leader>ws', function() require'snacks.picker'.lsp_workspace_symbols() end },
     },
@@ -332,7 +332,7 @@ require('lazy').setup {
 -- Go-specific options
 
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = {'go', 'gomod', 'gosum', 'gowork'},
+  pattern = { 'go', 'gomod', 'gosum', 'gowork' },
   callback = function()
     vim.bo.expandtab = false
     vim.bo.tabstop = 4
@@ -342,15 +342,15 @@ vim.api.nvim_create_autocmd('FileType', {
 -- C/C++-specific options
 
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = {'c', 'cpp'},
+  pattern = { 'c', 'cpp' },
   callback = function()
-    vim.bo.commentstring = '// %s'  -- default is /*%s*/
+    vim.bo.commentstring = '// %s' -- default is /*%s*/
   end
 })
 
 -- lfrc fixup
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = {'lf'},
+  pattern = { 'lf' },
   callback = function()
     vim.bo.commentstring = '# %s'
   end
@@ -363,13 +363,13 @@ if vim.o.diff or vim.env.NVIM_NO_LSP == '1' then
   return
 end
 
-local on_attach = function(_, bufnr)
-  local nmap = function(keys, func)
+local function on_attach(_, bufnr)
+  local function nmap(keys, func)
     vim.keymap.set('n', keys, func, { buffer = bufnr })
   end
 
   -- Delete some default keymaps that conflict with our definition of 'gr'.
-  for _, key in ipairs({'grn', 'grr', 'gri', 'gra', 'grt'}) do
+  for _, key in ipairs({ 'grn', 'grr', 'gri', 'gra', 'grt' }) do
     pcall(vim.keymap.del, 'n', key)
   end
 
@@ -378,7 +378,7 @@ local on_attach = function(_, bufnr)
   nmap('gD', vim.lsp.buf.declaration)
   nmap('<Leader>k', vim.lsp.buf.signature_help)
 
-  nmap('<F3>',  -- Toggle inlay hints
+  nmap('<F3>', -- Toggle inlay hints
     function()
       local scope = { bufnr = bufnr }
       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(scope), scope)
@@ -416,7 +416,7 @@ local lss = {
       ['rust-analyzer'] = { check = { command = 'clippy' } }
     }
   },
-  clangd = { },
+  clangd = {},
   pylsp = {
     settings = {
       pylsp = {
@@ -435,8 +435,8 @@ local lss = {
       end
     end
   },
-  lua_ls = { },
-  ts_ls = { },
+  lua_ls = {},
+  ts_ls = {},
 }
 
 local lsp_config = {
