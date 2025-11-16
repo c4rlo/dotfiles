@@ -349,6 +349,45 @@ vim.api.nvim_create_autocmd('FileType', {
   end
 })
 
+local function cpp_switch_header()
+  local file = vim.api.nvim_buf_get_name(0)
+  local stem, ext = file:match('(.+)%.(%w+)$')
+  if not stem then return end
+
+  local targets = {}
+
+  if ext == 'h' or ext == 'hpp' then
+    targets = { stem .. '.cpp', stem .. '.cxx', stem .. '.cc', stem .. '.c' }
+  else
+    targets = { stem .. '.h', stem .. '.hpp' }
+  end
+
+  for _, candidate in ipairs(targets) do
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_name(buf) == candidate
+      then
+        vim.api.nvim_set_current_buf(buf)
+        return
+      end
+    end
+  end
+
+  for _, candidate in ipairs(targets) do
+    if vim.uv.fs_stat(candidate) then
+      vim.cmd.edit(candidate)
+      return
+    end
+  end
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'c', 'cpp' },
+  callback = function()
+    vim.keymap.set('n', '<F2>', cpp_switch_header, { buffer = true })
+  end,
+})
+
+
 -- lfrc fixup
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'lf' },
