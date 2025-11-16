@@ -288,6 +288,7 @@ require('lazy').setup {
   { 'folke/snacks.nvim',
     priority = 1000,
     opts = {
+      input = {},
       picker = {
         matcher = {
           frecency = true,
