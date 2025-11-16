@@ -38,12 +38,86 @@ vim.keymap.set('n', "'", '`')
 vim.keymap.set('n', 'Q', vim.cmd.qa)
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
-vim.keymap.set('n', '<Leader>n',
+
+vim.keymap.set('n', '<Leader>np',
   function()
-    local path = vim.fn.expand('%:p')
+    local path = vim.fn.expand('%')
     vim.fn.setreg('+', path)
     vim.notify('Copied "'..path..'" to system clipboard')
   end)
+
+vim.keymap.set('n', '<Leader>nn',
+  function()
+    local path = vim.fn.expand('%')
+    local git_root = vim.fs.root(0, '.git')
+    if git_root then
+      local rel_path = vim.fs.relpath(git_root, path)
+      if rel_path then path = rel_path end
+    end
+    vim.fn.setreg('+', path)
+    vim.notify('Copied "'..path..'" to system clipboard')
+  end)
+
+local function github_url()
+  local path = vim.fn.expand('%')
+  local file_dir = vim.fs.dirname(path)
+
+  local git_cmds = {
+    remote = { 'remote', 'get-url', '--push', 'origin' },
+    branch = { 'rev-parse', '--abbrev-ref', 'HEAD' },
+    commit = { 'rev-parse', 'HEAD' },
+    root   = { 'rev-parse', '--show-toplevel' },
+  }
+  local git_jobs = {}
+  for name, cmd in pairs(git_cmds) do
+    git_jobs[name] = vim.system(vim.list_extend({ 'git', '-C', file_dir }, cmd),
+      { text = true })
+  end
+  local error = false
+  local git = {}
+  for name, job in pairs(git_jobs) do
+    local result = job:wait()
+    if result.code ~= 0 then
+      vim.notify(('Getting git %s: %s'):format(name, result.stderr),
+        vim.log.levels.ERROR)
+      error = true
+    end
+    git[name] = result.stdout:gsub('%s+$', '')
+  end
+  if error then return end
+
+  local repo = git.remote:gsub('git@github.com:', 'https://github.com/'):gsub('%.git$', '')
+
+  local range
+  if vim.fn.mode() == 'V' then
+    range = { start = vim.fn.line("'<"), finish = vim.fn.line("'>") }
+  end
+
+  local ref = range and git.commit or git.branch
+
+  local url = ('%s/blob/%s/%s'):format(repo, ref, vim.fs.relpath(git.root, path))
+  if range then
+    url = ('%s#L%d-L%d'):format(url, range.start, range.finish)
+  end
+  return url
+end
+
+vim.keymap.set({'n', 'v'}, '<Leader>ng',
+  function()
+    local url = github_url()
+    if url then
+      vim.fn.setreg('+', url)
+      vim.notify('Copied "'..url..'" to system clipboard')
+    end
+  end)
+
+vim.keymap.set({'n', 'v'}, '<Leader>nG',
+  function()
+    vim.system({'runapp', 'firefox', github_url()},
+      { stdout = false, stderr = false, detach = true },
+      function() end)
+  end)
+
 
 -- Some autocmds
 
