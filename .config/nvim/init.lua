@@ -51,55 +51,64 @@ vim.keymap.set('n', '<Leader>nn',
     local path = vim.fn.expand('%')
     local git_root = vim.fs.root(0, '.git')
     if git_root then
-      local rel_path = vim.fs.relpath(git_root, path)
-      if rel_path then path = rel_path end
+      path = vim.fs.relpath(git_root, path) or path
     end
     vim.fn.setreg('+', path)
     vim.notify('Copied "'..path..'" to system clipboard')
   end)
 
-local function github_url()
-  local path = vim.fn.expand('%')
-  local file_dir = vim.fs.dirname(path)
+local function github_url_impl()
+  local git_root = vim.fs.root(0, '.git')
+  if not git_root then error('Not in a Git repository') end
 
-  local git_cmds = {
-    remote = { 'remote', 'get-url', '--push', 'origin' },
-    branch = { 'rev-parse', '--abbrev-ref', 'HEAD' },
-    commit = { 'rev-parse', 'HEAD' },
-    root   = { 'rev-parse', '--show-toplevel' },
-  }
-  local git_jobs = {}
-  for name, cmd in pairs(git_cmds) do
-    git_jobs[name] = vim.system(vim.list_extend({ 'git', '-C', file_dir }, cmd),
-      { text = true })
-  end
-  local error = false
-  local git = {}
-  for name, job in pairs(git_jobs) do
-    local result = job:wait()
-    if result.code ~= 0 then
-      vim.notify(('Getting git %s: %s'):format(name, result.stderr),
-        vim.log.levels.ERROR)
-      error = true
+  local function git_async(...)
+    local args = {...}
+    local process = vim.system(vim.list_extend({ 'git', '-C', git_root }, args), { text = true })
+    return function()
+      local result = process:wait()
+      if result.code == 0 then
+        return result.stdout:gsub('%s+$', '')
+      else
+        error(('Git: %s: %s'):format(args[1], result.stderr))
+      end
     end
-    git[name] = result.stdout:gsub('%s+$', '')
   end
-  if error then return end
 
-  local repo = git.remote:gsub('git@github.com:', 'https://github.com/'):gsub('%.git$', '')
+  local function git(...)
+    return git_async(...)()
+  end
 
-  local range
+  local branch_async = git_async('symbolic-ref', '--short', 'HEAD')
+
+  local range, commit_async
   if vim.fn.mode() == 'V' then
-    range = { start = vim.fn.line("'<"), finish = vim.fn.line("'>") }
+    range = { vim.fn.line('.'), vim.fn.line('v') }
+    table.sort(range)
+    commit_async = git_async('rev-parse', 'HEAD')
   end
 
-  local ref = range and git.commit or git.branch
+  local branch = branch_async()
+  local remote = git('config', ('branch.%s.remote'):format(branch))
+  local base_url = git('remote', 'get-url', remote)
+    :gsub('^git@github.com:', 'https://github.com/')
+    :gsub('%.git$', '')
 
-  local url = ('%s/blob/%s/%s'):format(repo, ref, vim.fs.relpath(git.root, path))
+  local path = vim.fs.relpath(git_root, vim.api.nvim_buf_get_name(0))
   if range then
-    url = ('%s#L%d-L%d'):format(url, range.start, range.finish)
+    return ('%s/blob/%s/%s#L%d-L%d')
+      :format(base_url, commit_async(), path, range[1], range[2])
+  else
+    return ('%s/blob/%s/%s'):format(base_url, branch, path)
   end
-  return url
+end
+
+local function github_url()
+  local ok, result = pcall(github_url_impl)
+  if ok then
+    return result
+  else
+    vim.notify(result, vim.log.levels.WARN)
+  end
 end
 
 vim.keymap.set({'n', 'v'}, '<Leader>ng',
@@ -113,11 +122,13 @@ vim.keymap.set({'n', 'v'}, '<Leader>ng',
 
 vim.keymap.set({'n', 'v'}, '<Leader>nG',
   function()
-    vim.system({'runapp', 'firefox', github_url()},
-      { stdout = false, stderr = false, detach = true },
-      function() end)
+    local url = github_url()
+    if url then
+      vim.system({'runapp', 'firefox', url},
+        { stdout = false, stderr = false, detach = true },
+        function() end)
+    end
   end)
-
 
 -- Some autocmds
 
