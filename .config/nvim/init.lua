@@ -240,8 +240,8 @@ require('lazy').setup {
           },
         },
         move = {
-          enable = true,
-          set_jumps = true, -- whether to set jumps in the jumplist
+          enable              = true,
+          set_jumps           = true, -- whether to set jumps in the jumplist
           goto_next_start     = { [']m'] = '@function.outer', [']]'] = '@class.outer', },
           goto_next_end       = { [']M'] = '@function.outer', [']['] = '@class.outer', },
           goto_previous_start = { ['[m'] = '@function.outer', ['[['] = '@class.outer', },
@@ -289,8 +289,8 @@ require('lazy').setup {
         if vim.api.nvim_get_mode().mode:sub(1, 1) == 'i' then
           col = col - 1    -- adjust column in insert mode
         end
-        local success, node = pcall(vim.treesitter.get_node, { pos = { row, col } })
-        return not (success and node and
+        local ok, node = pcall(vim.treesitter.get_node, { pos = { row, col } })
+        return not (ok and node and
           vim.tbl_contains(
             { 'comment', 'line_comment', 'block_comment', 'comment_content' }, node:type()))
       end,
@@ -304,7 +304,14 @@ require('lazy').setup {
         matcher = {
           frecency = true,
           cwd_bonus = true,
-        }
+        },
+        win = {
+          input = {
+            keys = {
+              ['<Esc>'] = { 'close', mode = { 'n', 'i' } },
+            },
+          },
+        },
       },
     },
     keys = {
