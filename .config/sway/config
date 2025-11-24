@@ -1,6 +1,5 @@
 # Read `man 5 sway` for a complete reference.
 
-set $term foot
 set $run exec runapp
 
 input "1:1:AT_Translated_Set_2_keyboard" {
@@ -55,7 +54,7 @@ bindsym {
     XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
 
     # Start a terminal
-    Mod4+Return $run $term
+    Mod4+Return $run foot
 
     # Start Firefox
     Mod4+grave $run firefox
@@ -80,7 +79,7 @@ bindsym {
     Mod4+Shift+e $run swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
 
     # Start your launcher
-    Mod4+d $run fuzzel --terminal "$term --title '{cmd}' {cmd}" --log-level=warning --log-no-syslog --launch-prefix runapp
+    Mod4+d $run fuzzel --log-level=warning --log-no-syslog --launch-prefix runapp
 
     # Move your focus around
     Mod4+h focus left
@@ -206,7 +205,7 @@ for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }
 
-exec $run $term
+exec $run foot
 
 include /etc/sway/config.d/*
 
