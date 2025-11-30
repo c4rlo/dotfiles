@@ -1,7 +1,5 @@
 # Read `man 5 sway` for a complete reference.
 
-set $run exec runapp
-
 input "1:1:AT_Translated_Set_2_keyboard" {
     xkb_layout gb-custom
     xkb_options compose:prsc
@@ -54,32 +52,32 @@ bindsym {
     XF86AudioMute        exec wpctl set-mute   @DEFAULT_AUDIO_SINK@ toggle
 
     # Start a terminal
-    Mod4+Return $run foot
+    Mod4+Return exec runapp -c Foot foot
 
     # Start Firefox
-    Mod4+grave $run firefox
+    Mod4+grave exec runapp -c Firefox firefox
 
     # Start LibreOffice
-    Mod4+o $run libreoffice --nologo
+    Mod4+o exec runapp -c LibreOffice libreoffice --nologo
 
     # Kill focused window
     Mod4+Shift+q kill
     --release button2 kill
 
     # Insert Unicode character
-    Mod4+period $run rofimoji
+    Mod4+period exec runapp rofimoji
 
     # Take screenshot
-    Mod4+p $run grimshot copy anything
+    Mod4+p exec runapp grimshot copy anything
 
     # Reload the configuration file
     Mod4+Shift+c reload
 
     # Exit sway (logs you out of your Wayland session)
-    Mod4+Shift+e $run swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
+    Mod4+Shift+e exec runapp swaynag -t warning -f 'system-ui 16' -m 'Exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
 
     # Start your launcher
-    Mod4+d $run fuzzel --log-level=warning --log-no-syslog --launch-prefix runapp
+    Mod4+d exec runapp fuzzel --log-level=warning --log-no-syslog --launch-prefix "runapp -d '$PWD'"
 
     # Move your focus around
     Mod4+h focus left
@@ -205,7 +203,7 @@ for_window [app_id="electron|chromium|code" title="Open (?:File|Folder)"] {
     floating enable
 }
 
-exec $run foot
+exec exec runapp -c Foot foot
 
 include /etc/sway/config.d/*
 

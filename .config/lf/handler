@@ -22,10 +22,10 @@ opening_noop() {
     opening && exit 0
 }
 opening_nvim() {
-    opening && exec runapp foot nvim -- "$path"
+    opening && exec runapp -c Neovim foot -a nvim nvim -- "$path"
 }
 opening_loffice() {
-    opening && exec runapp loffice "$path"
+    opening && exec runapp -c LibreOffice loffice "$path"
 }
 
 case "${path##*/}" in
@@ -42,7 +42,7 @@ esac
 case $(file -Lb --mime-type -- "$path") in
     text/html)
         viewing_highlight
-        opening && exec runapp firefox --new-window "$path"
+        opening && exec runapp -c Firefox firefox --new-window "$path"
         ;;
     text/*|*/xml|*/csv|*/json|application/javascript)
         viewing_highlight
