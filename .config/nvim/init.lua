@@ -39,6 +39,8 @@ vim.keymap.set('n', 'Q', vim.cmd.qa)
 vim.keymap.set('n', '<Leader>s', [[:%s/\<<C-R><C-W>\>//cg<Left><Left><Left>]])
 vim.keymap.set('n', '<Leader>q', vim.diagnostic.setloclist)
 
+-- Copy path to clipboard / open in GitHub
+
 vim.keymap.set('n', '<Leader>np',
   function()
     local path = vim.fn.expand('%')
@@ -124,7 +126,7 @@ vim.keymap.set({'n', 'v'}, '<Leader>nG',
   function()
     local url = github_url()
     if url then
-      vim.system({'runapp', 'firefox', url},
+      vim.system({'runapp', '-c', 'Firefox', 'firefox', url},
         { stdout = false, stderr = false, detach = true },
         function() end)
     end
