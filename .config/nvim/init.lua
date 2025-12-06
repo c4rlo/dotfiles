@@ -197,69 +197,69 @@ require('lazy').setup {
   },
   { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
   { 'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
     build = ':TSUpdate',
-    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
-    main = 'nvim-treesitter.configs',
-    opts = {
-      ensure_installed = {
-        'bash',
-        'cpp',
-        'css',
-        'git_config',
-        'go',
-        'gomod',
-        'gosum',
-        'gowork',
-        'hcl',
-        'html',
-        'javascript',
-        'just',
-        'python',
-        'rust',
-        'sql',
+    dependencies = {
+      { 'nvim-treesitter/nvim-treesitter-textobjects',
+        branch = 'main',
+        opts = { move = { set_jumps = true }, },
       },
-      highlight = { enable = true },
-      indent = { enable = true, disable = { 'cpp', 'python' } },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = '<C-,>',
-          node_incremental = '<C-,>',
-          node_decremental = '<C-Backspace>',
-        },
-      },
-      textobjects = {
-        select = {
-          enable = true,
-          lookahead = true, -- Automatically jump forward to textobj
-          keymaps = {
-            ['aa'] = '@parameter.outer',
-            ['ia'] = '@parameter.inner',
-            ['af'] = '@function.outer',
-            ['if'] = '@function.inner',
-            ['ac'] = '@class.outer',
-            ['ic'] = '@class.inner',
-          },
-        },
-        move = {
-          enable              = true,
-          set_jumps           = true, -- whether to set jumps in the jumplist
-          goto_next_start     = { [']m'] = '@function.outer', [']]'] = '@class.outer', },
-          goto_next_end       = { [']M'] = '@function.outer', [']['] = '@class.outer', },
-          goto_previous_start = { ['[m'] = '@function.outer', ['[['] = '@class.outer', },
-          goto_previous_end   = { ['[M'] = '@function.outer', ['[]'] = '@class.outer', },
-        },
-        swap = {
-          enable = true,
-          swap_next = { ['<Leader>>'] = '@parameter.inner' },
-          swap_previous = { ['<Leader><'] = '@parameter.inner' },
-        },
-        lsp_interop = {
-          enable = true,
-          peek_definition_code = { ['<Leader>p'] = '@function.outer' },
-        },
-      },
-    }
+    },
+    init = function()
+      local langs_builtin = { 'c', 'lua', 'markdown', 'query', 'vim' }
+      local langs_install = { 'bash', 'cpp', 'css', 'git_config', 'go', 'gomod', 'gosum', 'gotmpl',
+        'gowork', 'hcl', 'html', 'javascript', 'jinja', 'just', 'make', 'perl', 'python', 'rust',
+        'sql' }
+      local langs_no_indent = { 'cpp', 'python' }
+      local langs_no_move = { 'python' }
+
+      local langs_all = vim.list_extend(vim.list_slice(langs_builtin), langs_install)
+
+      require'nvim-treesitter'.install(langs_install)
+
+      local function buf_set_keymap(mode, lhs, rhs)
+        vim.keymap.set(mode, lhs, rhs, { buffer = true })
+      end
+
+      local function ft_callback(ev)
+        -- Enable treesitter highlighting.
+        vim.treesitter.start()
+        -- Enable treesitter indentation.
+        if not vim.list_contains(langs_no_indent, ev.match) then
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
+        -- Add textobject keymaps.
+        local select_keymaps = {
+          ['aa'] = '@parameter.outer', ['ia'] = '@parameter.inner',
+          ['af'] = '@function.outer',  ['if'] = '@function.inner',
+          ['ac'] = '@class.outer',     ['ic'] = '@class.inner',
+        }
+        local select_fn = require'nvim-treesitter-textobjects.select'.select_textobject
+        for keys, object in pairs(select_keymaps) do
+          buf_set_keymap({'x', 'o'}, keys, function() select_fn(object) end)
+        end
+        -- Add motion keymaps.
+        if not vim.list_contains(langs_no_move, ev.match) then
+          local move_fns = require'nvim-treesitter-textobjects.move'
+          buf_set_keymap({'n', 'x', 'o'}, '[[',
+            function() move_fns.goto_previous('@function.outer', 'textobjects') end
+          )
+          buf_set_keymap({'n', 'x', 'o'}, ']]',
+            function() move_fns.goto_next('@function.outer', 'textobjects') end
+          )
+        end
+        -- Add swap keymaps.
+        local swap_fns = require'nvim-treesitter-textobjects.swap'
+        buf_set_keymap('n', '<Leader><',
+          function() swap_fns.swap_previous('@parameter.inner') end
+        )
+        buf_set_keymap('n', '<Leader>>',
+          function() swap_fns.swap_next('@parameter.inner') end
+        )
+      end
+
+      vim.api.nvim_create_autocmd('FileType', { pattern = langs_all, callback = ft_callback })
+    end
   },
   'neovim/nvim-lspconfig',
   { 'saghen/blink.cmp',
@@ -293,7 +293,7 @@ require('lazy').setup {
         end
         local ok, node = pcall(vim.treesitter.get_node, { pos = { row, col } })
         return not (ok and node and
-          vim.tbl_contains(
+          vim.list_contains(
             { 'comment', 'line_comment', 'block_comment', 'comment_content' }, node:type()))
       end,
     },
@@ -344,8 +344,6 @@ require('lazy').setup {
   { 'ellisonleao/gruvbox.nvim', priority = 1000,
     config = function() vim.cmd.colorscheme 'gruvbox' end },
   'nvim-tree/nvim-web-devicons',
-  'Vimjas/vim-python-pep8-indent',
-  'Glench/Vim-Jinja2-Syntax',
   { 'folke/lazydev.nvim', ft = 'lua',
     opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } } },
 }
