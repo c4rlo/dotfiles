@@ -2,7 +2,8 @@
 # ~/.profile
 #
 
-export EDITOR=nvim \
+export PATH=$HOME/src/local/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/go/bin:$HOME/opt/google-cloud-sdk/bin:$PATH \
+       EDITOR=nvim \
        INPUTRC=~/.config/readline/inputrc \
        LESS='FRMKx4--use-color' \
        SYSTEMD_LESS='FRMK--use-color' \

@@ -475,24 +475,7 @@ local lss = {
     }
   },
   clangd = {},
-  pylsp = {
-    settings = {
-      pylsp = {
-        plugins = {
-          ruff = { enabled = true, extendIgnore = { 'F405' } }
-        }
-      }
-    },
-    before_init = function(_, config)
-      if not vim.env.VIRTUAL_ENV and config.root_dir then
-        local candidate = config.root_dir .. '/.venv'
-        if vim.fn.isdirectory(candidate) == 1 then
-          config.settings.pylsp.plugins.jedi = { environment = candidate }
-          -- maybe should also set config.settings.python.pythonPath...
-        end
-      end
-    end
-  },
+  ty = {},
   lua_ls = {},
   ts_ls = {},
 }

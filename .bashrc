@@ -95,7 +95,6 @@ alias lsblk='lsblk -o NAME,MOUNTPOINT,LABEL,PARTLABEL,TYPE,FSTYPE,FSVER,SIZE,FSU
 alias ip='ip -color=auto'
 alias ffmpeg='ffmpeg -hide_banner'
 alias ffprobe='ffprobe -hide_banner'
-alias gfm="git fetch origin main:main"
 
 declare -A git_aliases=(
     [gs]='status --short --branch'
@@ -157,6 +156,22 @@ function clonecd {
     git clone "$@" && cd "$dir"
 }
 
+function gfm {
+    local remote=origin
+    [[ $# -ge 1 ]] && remote=$1
+    git remote get-url "$remote" >/dev/null || return
+
+    for branch in main master; do
+        if git rev-parse --verify -q "${branch}^{commit}" >/dev/null; then
+            git fetch "$remote" "$branch:$branch"
+            return
+        fi
+    done
+
+    echo "No matching branch (main or master) exists." >&2
+    return 1
+}
+
 function rgv {
     rg --vimgrep "$@" | nvim -q -
 }
@@ -195,6 +210,8 @@ function upd {
     paru -Sc --noconfirm &&
     paru -Syu &&
     paru -c
+    # https://gitlab.archlinux.org/pacman/pacman/-/issues/297
+    sudo find /var/cache/pacman/pkg/ -mindepth 1 -type d -empty -delete
 }
 
 function vupd {
