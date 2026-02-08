@@ -18,7 +18,6 @@ export PATH=$HOME/src/local/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/go/bin:$
        CTEST_PROGRESS_OUTPUT=ON \
        OCI_CONFIG_FILE=~/.config/oci
 
-export PATH=$HOME/src/local/bin:$HOME/.cargo/bin:$HOME/go/bin:$HOME/opt/google-cloud-sdk/bin:$PATH
 
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ] && uwsm check may-start; then
     # GUI-relevant env vars are set in ~/.config/uwsm/env

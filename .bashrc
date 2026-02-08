@@ -212,6 +212,7 @@ function upd {
     paru -c
     # https://gitlab.archlinux.org/pacman/pacman/-/issues/297
     sudo find /var/cache/pacman/pkg/ -mindepth 1 -type d -empty -delete
+    cargo install-update -a
 }
 
 function vupd {

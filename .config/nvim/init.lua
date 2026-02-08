@@ -28,6 +28,11 @@ vim.o.shortmess = 'aoOtTI'
 vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
 vim.o.title = true
 
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -182,170 +187,173 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup {
-  'tpope/vim-unimpaired',
-  { 'tpope/vim-characterize',
-    -- This plugin registers key map 'ga', but mini.align also uses that and overrides it.
-    -- Instead we set up an alternative keymap:
-    keys = { { '<Leader>c', '<Plug>(characterize)' } },
-  },
-  'tpope/vim-sleuth',
-  'tpope/vim-fugitive',
-  'tpope/vim-eunuch',
-  { 'nvim-mini/mini.align',
-    opts = {},
-    keys = { { 'ga', mode = { 'n', 'x' } }, { 'gA', mode = { 'n', 'x' } } }
-  },
-  { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
-  { 'nvim-treesitter/nvim-treesitter',
-    branch = 'main',
-    build = ':TSUpdate',
-    dependencies = {
-      { 'nvim-treesitter/nvim-treesitter-textobjects',
-        branch = 'main',
-        opts = { move = { set_jumps = true }, },
-      },
+  rocks = { enabled = false },
+  spec = {
+    'tpope/vim-unimpaired',
+    { 'tpope/vim-characterize',
+      -- This plugin registers key map 'ga', but mini.align also uses that and overrides it.
+      -- Instead we set up an alternative keymap:
+      keys = { { '<Leader>c', '<Plug>(characterize)' } },
     },
-    init = function()
-      local langs_builtin = { 'c', 'lua', 'markdown', 'query', 'vim' }
-      local langs_install = { 'bash', 'cpp', 'css', 'git_config', 'go', 'gomod', 'gosum', 'gotmpl',
-        'gowork', 'hcl', 'html', 'javascript', 'jinja', 'just', 'make', 'perl', 'python', 'rust',
-        'sql' }
-      local langs_no_indent = { 'cpp', 'python' }
-      local langs_no_move = { 'python' }
-
-      local langs_all = vim.list_extend(vim.list_slice(langs_builtin), langs_install)
-
-      require'nvim-treesitter'.install(langs_install)
-
-      local function buf_set_keymap(mode, lhs, rhs)
-        vim.keymap.set(mode, lhs, rhs, { buffer = true })
-      end
-
-      local function ft_callback(ev)
-        -- Enable treesitter highlighting.
-        vim.treesitter.start()
-        -- Enable treesitter indentation.
-        if not vim.list_contains(langs_no_indent, ev.match) then
-          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        end
-        -- Add textobject keymaps.
-        local select_keymaps = {
-          ['aa'] = '@parameter.outer', ['ia'] = '@parameter.inner',
-          ['af'] = '@function.outer',  ['if'] = '@function.inner',
-          ['ac'] = '@class.outer',     ['ic'] = '@class.inner',
-        }
-        local select_fn = require'nvim-treesitter-textobjects.select'.select_textobject
-        for keys, object in pairs(select_keymaps) do
-          buf_set_keymap({'x', 'o'}, keys, function() select_fn(object) end)
-        end
-        -- Add motion keymaps.
-        if not vim.list_contains(langs_no_move, ev.match) then
-          local move_fns = require'nvim-treesitter-textobjects.move'
-          buf_set_keymap({'n', 'x', 'o'}, '[[',
-            function() move_fns.goto_previous('@function.outer', 'textobjects') end
-          )
-          buf_set_keymap({'n', 'x', 'o'}, ']]',
-            function() move_fns.goto_next('@function.outer', 'textobjects') end
-          )
-        end
-        -- Add swap keymaps.
-        local swap_fns = require'nvim-treesitter-textobjects.swap'
-        buf_set_keymap('n', '<Leader><',
-          function() swap_fns.swap_previous('@parameter.inner') end
-        )
-        buf_set_keymap('n', '<Leader>>',
-          function() swap_fns.swap_next('@parameter.inner') end
-        )
-      end
-
-      vim.api.nvim_create_autocmd('FileType', { pattern = langs_all, callback = ft_callback })
-    end
-  },
-  'neovim/nvim-lspconfig',
-  { 'saghen/blink.cmp',
-    version = '1.*',
-    opts = {
-      keymap = {
-        preset = 'super-tab',
-        ['<C-j>'] = { 'select_next', 'fallback' },
-        ['<C-k>'] = { 'select_prev', 'fallback' },
+    'tpope/vim-sleuth',
+    'tpope/vim-fugitive',
+    'tpope/vim-eunuch',
+    { 'nvim-mini/mini.align',
+      opts = {},
+      keys = { { 'ga', mode = { 'n', 'x' } }, { 'gA', mode = { 'n', 'x' } } }
+    },
+    { 'kylechui/nvim-surround', version = '*', event = 'VeryLazy', opts = {} },
+    { 'nvim-treesitter/nvim-treesitter',
+      branch = 'main',
+      build = ':TSUpdate',
+      dependencies = {
+        { 'nvim-treesitter/nvim-treesitter-textobjects',
+          branch = 'main',
+          opts = { move = { set_jumps = true }, },
+        },
       },
-      completion = {
-        list = { selection = { preselect = false } },
-        documentation = { auto_show = true },
-      },
-      cmdline = { enabled = false },
-      sources = {
-        default = { 'lazydev', 'lsp' },
-        providers = {
-          lazydev = {
-            name = 'LazyDev',
-            module = 'lazydev.integrations.blink',
-            score_offset = 100,
+      init = function()
+        local langs_builtin = { 'c', 'lua', 'markdown', 'query', 'vim' }
+        local langs_install = { 'bash', 'cpp', 'css', 'git_config', 'go', 'gomod', 'gosum', 'gotmpl',
+          'gowork', 'hcl', 'html', 'javascript', 'jinja', 'just', 'make', 'perl', 'python', 'rust',
+          'sql' }
+        local langs_no_indent = { 'cpp', 'python' }
+        local langs_no_move = { 'python' }
+
+        local langs_all = vim.list_extend(vim.list_slice(langs_builtin), langs_install)
+
+        require'nvim-treesitter'.install(langs_install)
+
+        local function buf_set_keymap(mode, lhs, rhs)
+          vim.keymap.set(mode, lhs, rhs, { buffer = true })
+        end
+
+        local function ft_callback(ev)
+          -- Enable treesitter highlighting.
+          vim.treesitter.start()
+          -- Enable treesitter indentation.
+          if not vim.list_contains(langs_no_indent, ev.match) then
+            vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+          -- Add textobject keymaps.
+          local select_keymaps = {
+            ['aa'] = '@parameter.outer', ['ia'] = '@parameter.inner',
+            ['af'] = '@function.outer',  ['if'] = '@function.inner',
+            ['ac'] = '@class.outer',     ['ic'] = '@class.inner',
+          }
+          local select_fn = require'nvim-treesitter-textobjects.select'.select_textobject
+          for keys, object in pairs(select_keymaps) do
+            buf_set_keymap({'x', 'o'}, keys, function() select_fn(object) end)
+          end
+          -- Add motion keymaps.
+          if not vim.list_contains(langs_no_move, ev.match) then
+            local move_fns = require'nvim-treesitter-textobjects.move'
+            buf_set_keymap({'n', 'x', 'o'}, '[[',
+              function() move_fns.goto_previous('@function.outer', 'textobjects') end
+            )
+            buf_set_keymap({'n', 'x', 'o'}, ']]',
+              function() move_fns.goto_next('@function.outer', 'textobjects') end
+            )
+          end
+          -- Add swap keymaps.
+          local swap_fns = require'nvim-treesitter-textobjects.swap'
+          buf_set_keymap('n', '<Leader><',
+            function() swap_fns.swap_previous('@parameter.inner') end
+          )
+          buf_set_keymap('n', '<Leader>>',
+            function() swap_fns.swap_next('@parameter.inner') end
+          )
+        end
+
+        vim.api.nvim_create_autocmd('FileType', { pattern = langs_all, callback = ft_callback })
+      end
+    },
+    'neovim/nvim-lspconfig',
+    { 'saghen/blink.cmp',
+      version = '1.*',
+      opts = {
+        keymap = {
+          preset = 'super-tab',
+          ['<C-j>'] = { 'select_next', 'fallback' },
+          ['<C-k>'] = { 'select_prev', 'fallback' },
+        },
+        completion = {
+          list = { selection = { preselect = false } },
+          documentation = { auto_show = true },
+        },
+        cmdline = { enabled = false },
+        sources = {
+          default = { 'lazydev', 'lsp' },
+          providers = {
+            lazydev = {
+              name = 'LazyDev',
+              module = 'lazydev.integrations.blink',
+              score_offset = 100,
+            },
           },
         },
+        enabled = function() -- Disable if cursor is inside a comment.
+          local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+          row = row - 1      -- convert row from 1-based to 0-based; column is already 0-based
+          if vim.api.nvim_get_mode().mode:sub(1, 1) == 'i' then
+            col = col - 1    -- adjust column in insert mode
+          end
+          local ok, node = pcall(vim.treesitter.get_node, { pos = { row, col } })
+          return not (ok and node and
+            vim.list_contains(
+              { 'comment', 'line_comment', 'block_comment', 'comment_content' }, node:type()))
+        end,
       },
-      enabled = function() -- Disable if cursor is inside a comment.
-        local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-        row = row - 1      -- convert row from 1-based to 0-based; column is already 0-based
-        if vim.api.nvim_get_mode().mode:sub(1, 1) == 'i' then
-          col = col - 1    -- adjust column in insert mode
-        end
-        local ok, node = pcall(vim.treesitter.get_node, { pos = { row, col } })
-        return not (ok and node and
-          vim.list_contains(
-            { 'comment', 'line_comment', 'block_comment', 'comment_content' }, node:type()))
-      end,
     },
-  },
-  { 'folke/snacks.nvim',
-    priority = 1000,
-    opts = {
-      input = {},
-      picker = {
-        matcher = {
-          frecency = true,
-          cwd_bonus = true,
-        },
-        win = {
-          input = {
-            keys = {
-              ['<Esc>'] = { 'close', mode = { 'n', 'i' } },
+    { 'folke/snacks.nvim',
+      priority = 1000,
+      opts = {
+        input = {},
+        picker = {
+          matcher = {
+            frecency = true,
+            cwd_bonus = true,
+          },
+          win = {
+            input = {
+              keys = {
+                ['<Esc>'] = { 'close', mode = { 'n', 'i' } },
+              },
             },
           },
         },
       },
+      keys = {
+        { '<C-k>',      function() require'snacks.picker'.buffers() end },
+        { '<C-p>',      function() require'snacks.picker'.files() end },
+        { '<Leader>g',  function() require'snacks.picker'.git_files() end },
+        { '<Leader>/',  function() require'snacks.picker'.grep() end },
+        { '<Leader>*',  function() require'snacks.picker'.grep_word() end },
+        { 'gd',         function() require'snacks.picker'.lsp_definitions() end },
+        { 'gr',         function() require'snacks.picker'.lsp_references() end, nowait = true },
+        { 'gI',         function() require'snacks.picker'.lsp_implementations() end },
+        { '<Leader>D',  function() require'snacks.picker'.lsp_type_definitions() end },
+        { '<Leader>ds', function() require'snacks.picker'.lsp_symbols() end },
+        { '<Leader>ws', function() require'snacks.picker'.lsp_workspace_symbols() end },
+      },
+      init = function()
+        vim.api.nvim_create_user_command('Bdelete',
+          function(opts) require'snacks.bufdelete'.delete({ force = opts.bang }) end,
+          { bang = true }
+        )
+        vim.api.nvim_create_user_command('Bwipeout',
+          function(opts) require'snacks.bufdelete'.delete({ wipe = true, force = opts.bang }) end,
+          { bang = true }
+        )
+      end,
     },
-    keys = {
-      { '<C-k>',      function() require'snacks.picker'.buffers() end },
-      { '<C-p>',      function() require'snacks.picker'.files() end },
-      { '<Leader>g',  function() require'snacks.picker'.git_files() end },
-      { '<Leader>/',  function() require'snacks.picker'.grep() end },
-      { '<Leader>*',  function() require'snacks.picker'.grep_word() end },
-      { 'gd',         function() require'snacks.picker'.lsp_definitions() end },
-      { 'gr',         function() require'snacks.picker'.lsp_references() end, nowait = true },
-      { 'gI',         function() require'snacks.picker'.lsp_implementations() end },
-      { '<Leader>D',  function() require'snacks.picker'.lsp_type_definitions() end },
-      { '<Leader>ds', function() require'snacks.picker'.lsp_symbols() end },
-      { '<Leader>ws', function() require'snacks.picker'.lsp_workspace_symbols() end },
-    },
-    init = function()
-      vim.api.nvim_create_user_command('Bdelete',
-        function(opts) require'snacks.bufdelete'.delete({ force = opts.bang }) end,
-        { bang = true }
-      )
-      vim.api.nvim_create_user_command('Bwipeout',
-        function(opts) require'snacks.bufdelete'.delete({ wipe = true, force = opts.bang }) end,
-        { bang = true }
-      )
-    end,
-  },
-  { 'nvim-lualine/lualine.nvim', opts = {} },
-  { 'ellisonleao/gruvbox.nvim', priority = 1000,
-    config = function() vim.cmd.colorscheme 'gruvbox' end },
-  'nvim-tree/nvim-web-devicons',
-  { 'folke/lazydev.nvim', ft = 'lua',
-    opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } } },
+    { 'nvim-lualine/lualine.nvim', opts = {} },
+    { 'ellisonleao/gruvbox.nvim', priority = 1000,
+      config = function() vim.cmd.colorscheme 'gruvbox' end },
+    'nvim-tree/nvim-web-devicons',
+    { 'folke/lazydev.nvim', ft = 'lua',
+      opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } } },
+  }
 }
 
 -- Go-specific options
