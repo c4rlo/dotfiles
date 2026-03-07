@@ -21,7 +21,7 @@
         "format-linked": "󰛳 {ifname} (No IP)",
         "format-disconnected": "⚠ Disconnected",
         "format": "{ifname}: {ipaddr}/{cidr}",
-        "tooltip-format-wifi": "{essid} ({ipaddr})"
+        "tooltip-format-wifi": "{essid} ({frequency} GHz, {signaldBm} dBm)\n{ipaddr}"
     },
     "backlight": {
         "format": "{icon} {percent}%",
