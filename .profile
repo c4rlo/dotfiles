@@ -19,7 +19,7 @@ export PATH=$HOME/src/local/bin:$HOME/.local/bin:$HOME/.cargo/bin:$HOME/go/bin:$
        OCI_CONFIG_FILE=~/.config/oci
 
 
-if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ] && uwsm check may-start; then
+if [ -z "$WAYLAND_DISPLAY" ] && [ "${XDG_VTNR:-}" = 1 ] && uwsm check may-start; then
     # GUI-relevant env vars are set in ~/.config/uwsm/env
     exec uwsm start sway
 fi

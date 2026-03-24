@@ -66,7 +66,7 @@ function _prompt_command_fn {
         encoded+=$o
     done
     printf '\e]133;D\e\\'  # mark end of command output
-    printf '\e]0;%s\e' "${PWD/#$HOME/\~}"  # set terminal title
+    printf '\e]0;%s\e\\' "${PWD/#$HOME/\~}"  # set terminal title
     printf '\e]7;file://%s%s\e\\' "${HOSTNAME}" "${encoded}"  # tell current directory to terminal
 }
 case $TERM in
@@ -74,9 +74,6 @@ foot)
     PROMPT_COMMAND=_prompt_command_fn
     ;;
 esac
-if [[ -n "$VIRTUAL_ENV" ]]; then
-    . "$VIRTUAL_ENV"/bin/activate
-fi
 
 # zoxide (modifies $PROMPT_COMMAND)
 eval "$(zoxide init bash)"
@@ -213,11 +210,6 @@ function upd {
     # https://gitlab.archlinux.org/pacman/pacman/-/issues/297
     sudo find /var/cache/pacman/pkg/ -mindepth 1 -type d -empty -delete
     cargo install-update -a
-}
-
-function vupd {
-    vim -E -c PlugUpgrade -c q >/dev/null
-    vim -c PlugUpdate -c 'norm D'
 }
 
 function nvupd {
