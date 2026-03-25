@@ -8,16 +8,15 @@
 # Options
 shopt -s autocd extglob failglob globstar checkhash checkjobs histappend
 HISTFILE=~/.local/state/bash_history
-HISTCONTROL=ignoredups
+HISTCONTROL=ignoreboth
 HISTSIZE=10000
 HISTTIMEFORMAT='[%F %T %Z] '
 MAILCHECK=
 
 # Tab completion; note that /etc/bash.bashrc already loads
 # /usr/share/bash-completion/bash_completion, which sets up most of it.
+# Additional symlinks are in ~/.local/share/bash-completion/completions/.
 . /usr/share/fzf/completion.bash
-. ~/opt/google-cloud-sdk/completion.bash.inc
-. ~/.local/share/invoke/completion.bash
 
 # Key bindings
 . /usr/share/fzf/key-bindings.bash
