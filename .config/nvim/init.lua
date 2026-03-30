@@ -325,7 +325,7 @@ require('lazy').setup {
       },
       keys = {
         { '<C-k>',      function() require'snacks.picker'.buffers() end },
-        { '<C-p>',      function() require'snacks.picker'.files() end },
+        { '<C-p>',      function() require'snacks.picker'.files({ hidden = true }) end },
         { '<Leader>g',  function() require'snacks.picker'.git_files() end },
         { '<Leader>/',  function() require'snacks.picker'.grep() end },
         { '<Leader>*',  function() require'snacks.picker'.grep_word() end },
