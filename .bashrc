@@ -21,61 +21,40 @@ MAILCHECK=
 # Key bindings
 . /usr/share/fzf/key-bindings.bash
 
-# Prompt
-function prompt_jobs {
-    local status=$?  # we need to preserve this
-    local running=$(jobs -pr | wc -l)
-    local stopped=$(jobs -ps | wc -l)
-    if [[ $running -eq 0 && $stopped -eq 0 ]]; then
-        return $status
-    fi
-    printf ' \001\e[2m\002('
-    if [[ $running -ne 0 ]]; then
-        printf "${running}r"
-        if [[ $stopped -ne 0 ]]; then
-            printf ','
-        fi
-    fi
-    if [[ $stopped -ne 0 ]]; then
-        printf "${stopped}s"
-    fi
-    printf ')\001\e[0m\002'
-    return $status
-}
-function prompt_exitstatus {
-    local status=$?
-    if [[ $status -ne 0 ]]; then
-        printf " \001\e[31m\002${status}"
-    fi
-}
-PS0='\[\e[2 q\]'     # set cursor style to block; gets reset near end of PS1
-PS0+='\e]133;C\e\\'  # mark beginning of command output
-. /usr/share/git/completion/git-prompt.sh
-GIT_PS1_SHOWDIRTYSTATE=1
-GIT_PS1_SHOWSTASHSTATE=1
-PS1='\t \[\e[1m\]\w$(__git_ps1 " (%s)")\[\e[0m\]$(prompt_jobs)$(prompt_exitstatus) \[\e[0m\e[1m\]\$\[\e[0m\e[ q\] '
-function _prompt_command_fn {
-    local strlen=${#PWD} encoded='' pos c o
-    for (( pos=0; pos<strlen; pos++ )); do
-        c=${PWD:$pos:1}
-        case "$c" in
-            [-/:_.!\'\(\)~[:alnum:]]) o=$c ;;
-            *) printf -v o '%%%02X' "'$c" ;;
-        esac
-        encoded+=$o
-    done
-    printf '\e]133;D\e\\'  # mark end of command output
-    printf '\e]0;%s\e\\' "${PWD/#$HOME/\~}"  # set terminal title
-    printf '\e]7;file://%s%s\e\\' "${HOSTNAME}" "${encoded}"  # tell current directory to terminal
-}
-case $TERM in
-foot)
-    PROMPT_COMMAND=_prompt_command_fn
-    ;;
-esac
+# undo undesired PROMPT_COMMAND setting in /etc/bash.bashrc which
+# starship would otherwise preserve
+PROMPT_COMMAND=()
 
-# zoxide (modifies $PROMPT_COMMAND)
+# Prompt
+eval "$(starship init bash)"
+
+# zoxide (directory jumping)
 eval "$(zoxide init bash)"
+
+# Terminal emulator integration (see also ~/.config/readline/inputrc)
+PS0='\[\e[2 q\e]133;C\e\\\]'  # set cursor style to block and mark beginning of command output
+function _terminal_update {
+    local strlen encoded pos c o
+    case $TERM in
+    foot)
+        strlen=${#PWD}
+        encoded=''
+        for (( pos=0; pos<strlen; pos++ )); do
+            c=${PWD:$pos:1}
+            case "$c" in
+                [-/:_.!\'\(\)~[:alnum:]]) o=$c ;;
+                *) printf -v o '%%%02X' "'$c" ;;
+            esac
+            encoded+=$o
+        done
+        printf '\e]133;D\e\\'  # mark end of command output
+        printf '\e]0;%s\e\\' "${PWD/#$HOME/\~}"  # set terminal title
+        printf '\e]7;file://%s%s\e\\' "${HOSTNAME}" "${encoded}"  # tell current directory to terminal
+        ;;
+    esac
+    printf '\e[ q'  # reset cursor style
+}
+PROMPT_COMMAND+=(_terminal_update)
 
 # Aliases
 alias ls='ls --color=auto'
