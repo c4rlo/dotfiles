@@ -18,14 +18,15 @@ vim.o.swapfile = false
 vim.o.undofile = true
 vim.o.expandtab = true
 vim.o.shiftwidth = 4
-vim.o.formatoptions = 'tcroqlnj'
+vim.opt.formatoptions:append('roln')
 vim.o.cinoptions = ':0,l1,g0.5s,h0.5s,N-s,E-s,t0,+2s,(0,u0,w1,W2s,j1'
 vim.o.completeopt = 'menuone,noselect,popup,fuzzy'
 vim.o.splitbelow = true
 vim.o.splitright = true
 vim.o.showmode = false
 vim.o.shortmess = 'aoOtTI'
-vim.o.diffopt = 'internal,filler,closeoff,linematch:60'
+vim.opt.diffopt:remove('linematch:40')
+vim.opt.diffopt:append('linematch:60')
 vim.o.title = true
 
 vim.g.loaded_node_provider = 0
@@ -85,16 +86,17 @@ local function github_url_impl()
     return git_async(...)()
   end
 
-  local branch_async = git_async('symbolic-ref', '--short', 'HEAD')
+  local branch_fut = git_async('symbolic-ref', '--short', 'HEAD')
 
-  local range, commit_async
-  if vim.fn.mode() == 'V' then
+  local range, commit_fut
+  local mode = vim.fn.mode()
+  if mode == 'v' or mode == 'V' or mode == '\22' then  -- \22 = Ctrl-V
     range = { vim.fn.line('.'), vim.fn.line('v') }
     table.sort(range)
-    commit_async = git_async('rev-parse', 'HEAD')
+    commit_fut = git_async('rev-parse', 'HEAD')
   end
 
-  local branch = branch_async()
+  local branch = branch_fut()
   local remote = git('config', ('branch.%s.remote'):format(branch))
   local base_url = git('remote', 'get-url', remote)
     :gsub('^git@github.com:', 'https://github.com/')
@@ -103,7 +105,7 @@ local function github_url_impl()
   local path = vim.fs.relpath(git_root, vim.api.nvim_buf_get_name(0))
   if range then
     return ('%s/blob/%s/%s#L%d-L%d')
-      :format(base_url, commit_async(), path, range[1], range[2])
+      :format(base_url, commit_fut(), path, range[1], range[2])
   else
     return ('%s/blob/%s/%s'):format(base_url, branch, path)
   end
@@ -140,11 +142,11 @@ vim.keymap.set({'n', 'v'}, '<Leader>nG',
 -- Some autocmds
 
 vim.api.nvim_create_autocmd('WinEnter', {
-  callback = function() vim.o.cursorline = true end
+  callback = function() vim.wo.cursorline = true end
 })
 
 vim.api.nvim_create_autocmd('WinLeave', {
-  callback = function() vim.o.cursorline = false end
+  callback = function() vim.wo.cursorline = false end
 })
 
 vim.api.nvim_create_autocmd('BufWritePre', {
