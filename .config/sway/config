@@ -101,14 +101,10 @@ bindsym {
     Mod4+Shift+Up move up
     Mod4+Shift+Right move right
 
-    # You can "split" the current object of your focus with
-    # Mod4+b or Mod4+v, for horizontal and vertical splits
-    # respectively.
-    Mod4+b splith
-    Mod4+v splitv
+    Mod4+v splith  # This is a vertical split in Vim terminology
+    Mod4+s splitv  # This is a horizontal (or regular) split in Vim terminology
 
     # Switch the current container between different layout styles
-    Mod4+s layout stacking
     Mod4+w layout tabbed
     Mod4+e layout toggle split
 
