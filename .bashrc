@@ -73,8 +73,9 @@ alias ffprobe='ffprobe -hide_banner'
 
 declare -A git_aliases=(
     [gs]='status --short --branch'
-    [gdt]='difftool'
+    [gd]='diff'
     [gds]='diff --stat'
+    [gdt]='difftool'
     [gc]='commit'
     [gb]='branch'
     [gco]='checkout'
@@ -120,10 +121,6 @@ function vigs {
         [[ "${fields[0]}" != '#' ]] && files+=("${fields[8]}")
     done < <(git status -uno --no-renames --porcelain=2 -z)
     nvim "$@" "${files[@]}"
-}
-
-function gd {
-    nvim -c "DiffviewOpen $*"
 }
 
 function clonecd {

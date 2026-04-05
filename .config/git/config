@@ -3,7 +3,7 @@
     email = carlo@cteubner.net
 
 [init]
-    defaultBranch = master
+    defaultBranch = main
 
 [diff]
     algorithm = histogram

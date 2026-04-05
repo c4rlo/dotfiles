@@ -1,5 +1,6 @@
 # Get editor completions based on the config schema
 '$schema' = 'https://starship.rs/config-schema.json'
+
 add_newline = false
 format = '$time $directory( [\($git_branch$git_status$git_state\)](bold))$jobs$status $character'
 
@@ -45,7 +46,9 @@ style = 'dimmed'
 [status]
 disabled = false
 symbol = ''
-format = ' [$status]($style)'
+# format = ' [$status]($style)'
+# format = ' [$common_meaning$signal_name$maybe_int]($style)'
+format = ' [$status( $signal_name)]($style)'
 style = 'red'
 
 [character]
