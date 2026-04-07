@@ -47,8 +47,8 @@ style = 'dimmed'
 disabled = false
 symbol = ''
 # format = ' [$status]($style)'
-# format = ' [$common_meaning$signal_name$maybe_int]($style)'
-format = ' [$status( $signal_name)]($style)'
+format = ' [$common_meaning$signal_name$maybe_int]($style)'
+# format = ' [$status( $signal_name)]($style)'
 style = 'red'
 
 [character]
