@@ -187,7 +187,7 @@ function upd {
 }
 
 function nvupd {
-    nvim -c 'autocmd User VeryLazy ++once Lazy sync'
+    nvim -c 'lua vim.pack.update()' -c 'tabonly'
 }
 
 function confdiff {
