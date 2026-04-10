@@ -1,10 +1,6 @@
 -- Based on: https://github.com/nvim-lua/kickstart.nvim
 -- Also worth looking at: https://github.com/VonHeikemen/nvim-starter
 
--- Make it go fast
-
-vim.loader.enable()
-
 -- Set some options
 
 vim.o.number = true
@@ -41,6 +37,8 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.no_plugin_maps = true -- recommended by nvim-treemapper-textobjects
+
+vim.loader.enable()
 
 -- Some autocmds
 
