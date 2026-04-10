@@ -1,7 +1,7 @@
 -- Based on: https://github.com/nvim-lua/kickstart.nvim
 -- Also worth looking at: https://github.com/VonHeikemen/nvim-starter
 
-vim.loader.enable(true)
+vim.loader.enable()
 
 -- Set some options
 
@@ -196,7 +196,7 @@ local plugins = {
   'g:nvim-lualine/lualine.nvim',
   'g:ellisonleao/gruvbox.nvim',
   'g:nvim-tree/nvim-web-devicons',
-  'g:folke/lazydev.nvim'
+  { src = 'g:folke/lazydev.nvim', data = { skip_load = true } },
 }
 
 -- post-update hook for nvim-treesitter
@@ -208,46 +208,53 @@ vim.api.nvim_create_autocmd('PackChanged', { callback = function(ev)
   end
 end })
 
-vim.pack.add(plugins)
+vim.pack.add(plugins, {
+  load = function(plugin)
+    if not (plugin.spec.data or {}).skip_load then
+      vim.cmd('packadd! ' .. plugin.spec.name)
+    end
+  end
+})
 
 -- lazy-load lazydev for .lua files only
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'lua',
   once = true,
   callback = function()
+    vim.cmd.packadd('lazydev.nvim')
     require('lazydev').setup {
       library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } }
     }
   end
 })
 
+require('mini.align').setup()
+require('nvim-surround').setup()
+
 -- vim-characterize registers key map 'ga', but mini.align also uses that and overrides it.
 -- Instead we set up an alternative keymap:
 vim.keymap.set('n', '<Leader>c', '<Plug>(characterize)')
 
-require('mini.align').setup()
-require('nvim-surround').setup()
-
 -- nvim-treesitter setup
 
-local langs_builtin = { 'c', 'lua', 'markdown', 'query', 'vim' }
-local langs_install = { 'bash', 'cpp', 'css', 'git_config', 'go', 'gomod', 'gosum', 'gotmpl',
+local ts_langs_builtin = { 'c', 'lua', 'markdown', 'query', 'vim' }
+local ts_langs_install = { 'bash', 'cpp', 'css', 'git_config', 'go', 'gomod', 'gosum', 'gotmpl',
   'gowork', 'hcl', 'html', 'javascript', 'jinja', 'just', 'make', 'perl', 'python', 'rust', 'sql' }
-local langs_no_indent = { 'cpp', 'python' }
-local langs_no_move = { 'python' }
-local langs_all = vim.list_extend(vim.list_slice(langs_builtin), langs_install)
+local ts_langs_no_indent = { 'cpp', 'python' }
+local ts_langs_no_move = { 'python' }
+local ts_langs_all = vim.list_extend(vim.list_slice(ts_langs_builtin), ts_langs_install)
 
-require('nvim-treesitter').install(langs_install)
+require('nvim-treesitter').install(ts_langs_install)
 
 local function buf_set_keymap(mode, lhs, rhs)
   vim.keymap.set(mode, lhs, rhs, { buffer = true })
 end
 
-local function treesitter_ft_cb(ev)
+local function ts_on_filetype(ev)
   -- Enable treesitter highlighting.
   vim.treesitter.start()
   -- Enable treesitter indentation.
-  if not vim.list_contains(langs_no_indent, ev.match) then
+  if not vim.list_contains(ts_langs_no_indent, ev.match) then
     vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
   end
   -- Add textobject keymaps.
@@ -261,7 +268,7 @@ local function treesitter_ft_cb(ev)
     buf_set_keymap({'x', 'o'}, keys, function() select_fn(object) end)
   end
   -- Add motion keymaps.
-  if not vim.list_contains(langs_no_move, ev.match) then
+  if not vim.list_contains(ts_langs_no_move, ev.match) then
     local move_fns = require'nvim-treesitter-textobjects.move'
     buf_set_keymap({'n', 'x', 'o'}, '[[',
       function() move_fns.goto_previous('@function.outer', 'textobjects') end
@@ -280,9 +287,9 @@ local function treesitter_ft_cb(ev)
   )
 end
 
-require('nvim-treesitter-textobjects').setup { move = { set_jumps = true } }
+vim.api.nvim_create_autocmd('FileType', { pattern = ts_langs_all, callback = ts_on_filetype })
 
-vim.api.nvim_create_autocmd('FileType', { pattern = langs_all, callback = treesitter_ft_cb })
+require('nvim-treesitter-textobjects').setup { move = { set_jumps = true } }
 
 require('blink.cmp').setup {
   keymap = {
@@ -296,7 +303,10 @@ require('blink.cmp').setup {
   },
   cmdline = { enabled = false },
   sources = {
-    default = { 'lazydev', 'lsp' },
+    default = { 'lsp' },
+    per_filetype = {
+      lua = { inherit_defaults = true, 'lazydev' }
+    },
     providers = {
       lazydev = {
         name = 'LazyDev',
@@ -335,9 +345,8 @@ require('snacks').setup {
   },
 }
 
-local function picker_fn(f, ...)
-  local args = ...
-  return function() require'snacks.picker'[f](args) end
+local function picker_fn(f, opts)
+  return function() require'snacks.picker'[f](opts) end
 end
 
 vim.keymap.set('n', '<C-k>', picker_fn('buffers'))
@@ -376,13 +385,6 @@ vim.api.nvim_create_autocmd('FileType', {
 
 -- C/C++-specific options
 
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'c', 'cpp' },
-  callback = function()
-    vim.bo.commentstring = '// %s' -- default is /*%s*/
-  end
-})
-
 local function cpp_switch_header()
   local file = vim.api.nvim_buf_get_name(0)
   local stem, ext = file:match('(.+)%.(%w+)$')
@@ -416,6 +418,7 @@ end
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'c', 'cpp' },
   callback = function()
+    vim.bo.commentstring = '// %s' -- default is /*%s*/
     vim.keymap.set('n', '<F2>', cpp_switch_header, { buffer = true })
   end,
 })
@@ -431,7 +434,7 @@ vim.api.nvim_create_autocmd('FileType', {
 
 -- Language Server Protocol (LSP) support
 
-local function on_attach(_, bufnr)
+local function on_lsp_attach(_, bufnr)
   local function nmap(keys, func)
     vim.keymap.set('n', keys, func, { buffer = bufnr })
   end
@@ -490,13 +493,11 @@ local lss = {
   ts_ls = {},
 }
 
-local lsp_config = {
-  on_attach = on_attach,
-  capabilities = require('blink.cmp').get_lsp_capabilities()
-}
-
--- Don't want LSP in diff mode
 if not (vim.o.diff or vim.env.NVIM_NO_LSP == '1') then
+  local lsp_config = {
+    on_attach = on_lsp_attach,
+    capabilities = require('blink.cmp').get_lsp_capabilities()
+  }
   for name, config in pairs(lss) do
     vim.lsp.config(name, vim.tbl_extend('keep', config, lsp_config))
     vim.lsp.enable(name)
