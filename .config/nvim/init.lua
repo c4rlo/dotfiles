@@ -387,27 +387,27 @@ vim.api.nvim_create_autocmd('FileType', {
 
 local function cpp_switch_header()
   local file = vim.api.nvim_buf_get_name(0)
-  local stem, ext = file:match('(.+)%.(%w+)$')
+  local stem, ext = vim.fs.basename(file):match('(.+)%.(%w+)$')
   if not stem then return end
 
-  local targets = {}
-  if ext == 'h' or ext == 'hpp' then
-    targets = { stem .. '.cpp', stem .. '.cxx', stem .. '.cc', stem .. '.c' }
-  else
-    targets = { stem .. '.h', stem .. '.hpp' }
-  end
+  local suffixes = (ext == 'h' or ext == 'hpp')
+      and { 'cpp', 'cxx', 'cc', 'c' }
+      or { 'h', 'hpp' }
 
-  for _, candidate in ipairs(targets) do
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_name(buf) == candidate
-      then
-        vim.api.nvim_set_current_buf(buf)
-        return
-      end
+  local basenames = {}
+  for _, s in ipairs(suffixes) do basenames[stem .. '.' .. s] = true end
+
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf)
+        and basenames[vim.fs.basename(vim.api.nvim_buf_get_name(buf))] then
+      vim.api.nvim_set_current_buf(buf)
+      return
     end
   end
 
-  for _, candidate in ipairs(targets) do
+  local dir = vim.fs.dirname(file)
+  for _, s in ipairs(suffixes) do
+    local candidate = dir .. '/' .. stem .. '.' .. s
     if vim.uv.fs_stat(candidate) then
       vim.cmd.edit(candidate)
       return
