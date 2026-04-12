@@ -35,6 +35,9 @@
 [fetch]
     prune = true
 
+[pull]
+    rebase = true
+
 [push]
     autoSetupRemote = true
 
@@ -58,7 +61,7 @@
     detachedHead = false
 
 [alias]
-    pushf = push -f --force-with-lease
+    pushf = push --force-with-lease
 
 [url "https://github.com/"]
     insteadOf = g:

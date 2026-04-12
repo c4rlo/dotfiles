@@ -103,10 +103,9 @@ function mkcd {
 }
 
 function lf {
-    # Run lf, then cd to the last directory we were in lf.
     # We run lf with a modified LESS env var that has the 'F' flag, aka
     # --quit-if-one-screen, removed (otherwise breaks some things inside lf).
-    cd -- "$(LESS=${LESS/F/} command lf -print-last-dir "$@")"
+    LESS=${LESS/F/} command lf "$@"
 }
 
 function view {
