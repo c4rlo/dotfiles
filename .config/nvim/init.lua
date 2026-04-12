@@ -135,6 +135,9 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function()
     vim.bo.expandtab = false
     vim.bo.tabstop = 4
+    if vim.bo.filetype == 'go' then
+      vim.keymap.set('n', '<F2>', utils.switch_related_file, { buffer = true })
+    end
   end
 })
 
@@ -144,7 +147,7 @@ vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'c', 'cpp' },
   callback = function()
     vim.bo.commentstring = '// %s' -- default is /*%s*/
-    vim.keymap.set('n', '<F2>', utils.cpp_switch_header, { buffer = true })
+    vim.keymap.set('n', '<F2>', utils.switch_related_file, { buffer = true })
   end,
 })
 

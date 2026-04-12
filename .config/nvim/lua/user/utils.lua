@@ -56,19 +56,33 @@ function M.github_url()
   end
 end
 
--- Switch between .cpp / .h
+-- Switch between related source / header / test files.
 
-function M.cpp_switch_header()
+function M.switch_related_file()
   local file = vim.api.nvim_buf_get_name(0)
-  local stem, ext = vim.fs.basename(file):match('(.+)%.(%w+)$')
+  local basename = vim.fs.basename(file)
+  local stem, ext = basename:match('(.+)%.(%w+)$')
   if not stem then return end
 
-  local suffixes = (ext == 'h' or ext == 'hpp')
-      and { 'cpp', 'cxx', 'cc', 'c' }
-      or { 'h', 'hpp' }
+  local c_source_exts = { 'c', 'cc', 'cpp', 'cxx' }
+  local c_header_exts = { 'h', 'hpp' }
+  local candidates
+  if ext == 'go' then
+    if stem:sub(-5) == '_test' then
+      candidates = { stem:sub(1, -6) .. '.go' }
+    else
+      candidates = { stem .. '_test.go' }
+    end
+  elseif vim.list_contains(c_header_exts, ext) then
+    candidates = { stem .. '.cpp', stem .. '.cxx', stem .. '.cc', stem .. '.c' }
+  elseif vim.list_contains(c_source_exts, ext) then
+    candidates = { stem .. '.h', stem .. '.hpp' }
+  else
+    return
+  end
 
   local basenames = {}
-  for _, s in ipairs(suffixes) do basenames[stem .. '.' .. s] = true end
+  for _, candidate in ipairs(candidates) do basenames[candidate] = true end
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf)
@@ -79,8 +93,8 @@ function M.cpp_switch_header()
   end
 
   local dir = vim.fs.dirname(file)
-  for _, s in ipairs(suffixes) do
-    local candidate = dir .. '/' .. stem .. '.' .. s
+  for _, candidate in ipairs(candidates) do
+    candidate = dir .. '/' .. candidate
     if vim.uv.fs_stat(candidate) then
       vim.cmd.edit(candidate)
       return
