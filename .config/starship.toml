@@ -23,16 +23,14 @@ format = '$branch'
 style = 'bold'
 
 [git_status]
-format = '( $all_status$ahead_behind)'
-style = 'bold'
+format = '( $all_status)'
 modified = '*'
-staged = '+'
-stashed = '\$'
+deleted = ''
 untracked = ''
 ahead = ''
 behind = ''
 diverged = ''
-up_to_date = ''
+style = ''
 
 [git_state]
 format = ' $state( $progress_current/$progress_total)'

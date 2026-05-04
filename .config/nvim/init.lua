@@ -169,7 +169,7 @@ local plugins = {
   'g:tpope/vim-fugitive',
   'g:tpope/vim-eunuch',
   'g:nvim-mini/mini.align',
-  { src = 'g:kylechui/nvim-surround', version = vim.version.range('*') },
+  'g:nvim-mini/mini.surround',
   { src = 'g:nvim-treesitter/nvim-treesitter', version = 'main' },
   { src = 'g:nvim-treesitter/nvim-treesitter-textobjects', version = 'main' },
   'g:neovim/nvim-lspconfig',
@@ -193,7 +193,7 @@ end })
 vim.pack.add(plugins, {
   load = function(plugin)
     if not (plugin.spec.data or {}).skip_load then
-      vim.cmd('packadd! ' .. plugin.spec.name)
+      vim.cmd.packadd { plugin.spec.name, bang = true }
     end
   end
 })
@@ -214,7 +214,16 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Misc plugins setup
 
 require('mini.align').setup()
-require('nvim-surround').setup()
+require('mini.surround').setup {
+  mappings = {
+    add = 'ys',
+    delete = 'ds',
+    find = '',
+    find_left = '',
+    highlight = '',
+    replace = 'cs'
+  }
+}
 
 -- vim-characterize registers key map 'ga', but mini.align also uses that and overrides it.
 -- Instead we set up an alternative keymap:
@@ -272,7 +281,7 @@ vim.api.nvim_create_user_command('Bwipeout',
 local ts_langs_builtin = { 'c', 'lua', 'markdown', 'query', 'vim' }
 local ts_langs_install = { 'bash', 'cpp', 'css', 'git_config', 'go', 'gomod', 'gosum', 'gotmpl',
   'gowork', 'hcl', 'html', 'javascript', 'jinja', 'just', 'make', 'perl', 'python', 'rust', 'sql' }
-local ts_langs_no_indent = { 'cpp', 'python' }
+local ts_langs_no_indent = { 'cpp', 'lua', 'python' }
 local ts_langs_no_move = { 'python' }
 local ts_langs_all = vim.list_extend(vim.list_slice(ts_langs_builtin), ts_langs_install)
 
