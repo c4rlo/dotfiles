@@ -189,10 +189,6 @@ function upd {
     sudo find /var/cache/pacman/pkg/ -mindepth 1 -type d -empty -delete
 }
 
-function nvupd {
-    nvim -c 'lua vim.pack.update()' -c 'tabonly'
-}
-
 function confdiff {
     local file=$(realpath $1)
     local owner=$(pacman -Qqo $file)

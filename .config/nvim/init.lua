@@ -28,6 +28,7 @@ vim.o.shortmess = 'aoOtTI'
 vim.opt.diffopt:remove('linematch:40')
 vim.opt.diffopt:append('linematch:60')
 vim.o.title = true
+vim.opt.runtimepath:append('~/src/proj/neoplup')
 
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
@@ -190,7 +191,7 @@ vim.api.nvim_create_autocmd('PackChanged', { callback = function(ev)
   end
 end })
 
-vim.pack.add(plugins, {
+require('neoplup').add(plugins, {
   load = function(plugin)
     if not (plugin.spec.data or {}).skip_load then
       vim.cmd.packadd { plugin.spec.name, bang = true }
