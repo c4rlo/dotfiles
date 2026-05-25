@@ -32,26 +32,23 @@ eval "$(starship init bash)"
 eval "$(zoxide init bash)"
 
 # Terminal emulator integration (see also ~/.config/readline/inputrc)
-PS0='\[\e[2 q\e]133;C\e\\\]'  # set cursor style to block and mark beginning of command output
+PS0='\e[2 q'  # set cursor style to block
+[[ "$TERM" = foot ]] && PS0+='\e]133;C\e\\'  # mark beginning of command output
 function _terminal_update {
-    local strlen encoded pos c o
-    case $TERM in
-    foot)
-        strlen=${#PWD}
-        encoded=''
-        for (( pos=0; pos<strlen; pos++ )); do
-            c=${PWD:$pos:1}
-            case "$c" in
-                [-/:_.!\'\(\)~[:alnum:]]) o=$c ;;
-                *) printf -v o '%%%02X' "'$c" ;;
-            esac
-            encoded+=$o
-        done
-        printf '\e]133;D\e\\'  # mark end of command output
-        printf '\e]0;%s\e\\' "${PWD/#$HOME/\~}"  # set terminal title
-        printf '\e]7;file://%s%s\e\\' "${HOSTNAME}" "${encoded}"  # tell current directory to terminal
-        ;;
-    esac
+    [[ "$TERM" = foot ]] && printf '\e]133;D\e\\'  # mark end of command output
+    printf '\e]0;%s\e\\' "${PWD/#$HOME/\~}"  # set terminal title
+    local LC_ALL=C strlen encoded pos c o
+    strlen=${#PWD}
+    encoded=''
+    for (( pos=0; pos<strlen; pos++ )); do
+        c=${PWD:$pos:1}
+        case "$c" in
+            [-/:_.!\'\(\)~[:alnum:]]) o=$c ;;
+            *) printf -v o '%%%02X' "'$c" ;;
+        esac
+        encoded+=$o
+    done
+    printf '\e]7;file://%s%s\e\\' "${HOSTNAME}" "${encoded}"  # tell current directory to terminal
     printf '\e[ q'  # reset cursor style
 }
 PROMPT_COMMAND+=(_terminal_update)
@@ -84,13 +81,12 @@ for a in "${!git_aliases[@]}"; do alias $a="git ${git_aliases[$a]}"; done
 function _comp_gitalias {
     declare -F __git_complete >/dev/null || . /usr/share/bash-completion/completions/git
     local -r gitcmd="${git_aliases[$1]%% *}"
-    # We are relying on a git bash completion impl detail here; alternatively,
-    # we could figure out the correct completion function using "complete -p $1".
-    local -r compfunc="__git_wrap_git_$gitcmd" 
-    # The below line sets up $compfunc as the completion function; hence next time
-    # completion for $1 happens, that will get called directly, rather than this function.
+
+    # __git_complete installs a real git completion compspec for this alias.
+    # Returning 124 tells bash to restart completion after the compspec change,
+    # so the newly installed git wrapper handles this Tab press and later ones.
     __git_complete "$1" "_git_$gitcmd"
-    "$compfunc" "$@"
+    return 124
 }
 complete -o bashdefault -o default -o nospace -F _comp_gitalias "${!git_aliases[@]}"
 
@@ -128,19 +124,27 @@ function clonecd {
 }
 
 function gfm {
-    local remote=origin
-    [[ $# -ge 1 ]] && remote=$1
+    local remote branch
+    if [[ $# -ge 1 ]]; then
+        remote=$1
+    else
+        local -a remotes
+        mapfile -t remotes < <(git remote)
+        if ((${#remotes[@]} == 1)); then
+            remote=${remotes[0]}
+        else
+            remote=origin
+        fi
+    fi
     git remote get-url "$remote" >/dev/null || return
 
-    for branch in main master; do
-        if git rev-parse --verify -q "${branch}^{commit}" >/dev/null; then
-            git fetch "$remote" "$branch:$branch"
-            return
-        fi
-    done
+    branch=$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD") || {
+        echo "Could not determine default branch for remote '$remote'." >&2
+        return 1
+    }
+    branch=${branch#"$remote/"}
 
-    echo "No matching branch (main or master) exists." >&2
-    return 1
+    git fetch "$remote" "refs/heads/$branch:refs/heads/$branch"
 }
 
 function rgv {
