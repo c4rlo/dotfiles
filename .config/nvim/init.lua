@@ -169,7 +169,7 @@ local plugins = {
   'g:tpope/vim-fugitive',
   'g:tpope/vim-eunuch',
   'g:nvim-mini/mini.align',
-  'g:nvim-mini/mini.surround',
+  'g:kylechui/nvim-surround',
   { src = 'g:nvim-treesitter/nvim-treesitter', version = 'main' },
   { src = 'g:nvim-treesitter/nvim-treesitter-textobjects', version = 'main' },
   'g:neovim/nvim-lspconfig',
@@ -214,16 +214,6 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Misc plugins setup
 
 require('mini.align').setup()
-require('mini.surround').setup {
-  mappings = {
-    add = 'ys',
-    delete = 'ds',
-    find = '',
-    find_left = '',
-    highlight = '',
-    replace = 'cs'
-  }
-}
 
 -- vim-characterize registers key map 'ga', but mini.align also uses that and overrides it.
 -- Instead we set up an alternative keymap:
