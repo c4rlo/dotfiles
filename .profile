@@ -18,6 +18,8 @@ if [ -z "$INPUTRC" ]; then
            CMAKE_COLOR_DIAGNOSTICS=ON \
            CTEST_OUTPUT_ON_FAILURE=ON \
            CTEST_PROGRESS_OUTPUT=ON \
+           RUSTUP_HOME=~/.local/share/rustup \
+           CARGO_HOME=~/.local/share/cargo \
            CODEX_HOME=~/.config/codex \
            OCI_CONFIG_FILE=~/.config/oci
 fi
