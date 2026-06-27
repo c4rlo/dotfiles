@@ -185,9 +185,9 @@ local plugins = {
 vim.api.nvim_create_autocmd('PackChanged', { callback = function(ev)
   local name, kind = ev.data.spec.name, ev.data.kind
   if name == 'nvim-treesitter' and kind == 'update' then
-    -- TODO this doesn't seem to kick in?
-    if not ev.data.active then vim.cmd.packadd('nvim-treesitter') end
-    vim.cmd.TSUpdate()
+    vim.schedule(function()
+      require('nvim-treesitter').update(nil, { summary = true })
+    end)
   end
 end })
 
