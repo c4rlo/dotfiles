@@ -92,20 +92,21 @@ local utils = require('user.utils')
 
 -- Copy path to clipboard / open in GitHub
 
-vim.keymap.set('n', '<Leader>np',
+vim.keymap.set({'n', 'v'}, '<Leader>np',
   function()
-    local path = vim.fn.expand('%')
+    local path = vim.fn.expand('%') .. utils.visual_line_suffix(':')
     vim.fn.setreg('+', path)
     vim.notify(('Copied "%s" to system clipboard'):format(path))
   end)
 
-vim.keymap.set('n', '<Leader>nn',
+vim.keymap.set({'n', 'v'}, '<Leader>nn',
   function()
     local path = vim.fn.expand('%')
     local git_root = vim.fs.root(0, '.git')
     if git_root then
       path = vim.fs.relpath(git_root, path) or path
     end
+    path = path .. utils.visual_line_suffix(':')
     vim.fn.setreg('+', path)
     vim.notify(('Copied "%s" to system clipboard'):format(path))
   end)

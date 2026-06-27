@@ -2,6 +2,22 @@ local M = {}
 
 -- GitHb URL for current file / selection
 
+function M.visual_line_suffix(prefix, end_prefix)
+  end_prefix = end_prefix or ''
+
+  local visual_modes = { 'v', 'V', '\22', 's', 'S', '\19' }
+  if not vim.list_contains(visual_modes, vim.fn.mode()) then return '' end
+
+  local range = { vim.fn.line('.'), vim.fn.line('v') }
+  table.sort(range)
+
+  if range[1] == range[2] then
+    return ('%s%d'):format(prefix, range[1])
+  else
+    return ('%s%d-%s%d'):format(prefix, range[1], end_prefix, range[2])
+  end
+end
+
 local function github_url_impl()
   local git_root = vim.fs.root(0, '.git')
   if not git_root then error('Not in a Git repository') end
@@ -25,11 +41,9 @@ local function github_url_impl()
 
   local branch_fut = git_async('symbolic-ref', '--short', 'HEAD')
 
-  local range, commit_fut
-  local mode = vim.fn.mode()
-  if mode == 'v' or mode == 'V' or mode == '\22' then  -- \22 = Ctrl-V
-    range = { vim.fn.line('.'), vim.fn.line('v') }
-    table.sort(range)
+  local line_suffix = M.visual_line_suffix('#L', 'L')
+  local commit_fut
+  if line_suffix ~= '' then
     commit_fut = git_async('rev-parse', 'HEAD')
   end
 
@@ -40,8 +54,8 @@ local function github_url_impl()
     :gsub('%.git$', '')
 
   local path = vim.fs.relpath(git_root, vim.api.nvim_buf_get_name(0))
-  if range then
-    return ('%s/blob/%s/%s#L%d-L%d'):format(base_url, commit_fut(), path, range[1], range[2])
+  if line_suffix ~= '' then
+    return ('%s/blob/%s/%s%s'):format(base_url, commit_fut(), path, line_suffix)
   else
     return ('%s/blob/%s/%s'):format(base_url, branch, path)
   end
