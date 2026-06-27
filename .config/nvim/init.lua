@@ -282,7 +282,9 @@ local function ts_on_filetype(ev)
   vim.treesitter.start()
 
   -- Enable treesitter indentation.
-  if not vim.list_contains(ts_langs_no_indent, ev.match) then
+  local lang = vim.treesitter.language.get_lang(ev.match)  -- ev.match is filetype
+  local has_indent = lang ~= nil and vim.treesitter.query.get(lang, 'indents') ~= nil
+  if has_indent and not vim.list_contains(ts_langs_no_indent, ev.match) then
     vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
   end
 
