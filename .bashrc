@@ -76,6 +76,7 @@ declare -A git_aliases=(
     [gc]='commit'
     [gb]='branch'
     [gco]='checkout'
+    [gpl]='pull'
 )
 for a in "${!git_aliases[@]}"; do alias $a="git ${git_aliases[$a]}"; done
 function _comp_gitalias {
@@ -121,6 +122,21 @@ function vigs {
 function clonecd {
     local dir="${!###*[:/]}"
     git clone "$@" && cd "$dir"
+}
+
+function gcom {
+    if git show-ref --verify --quiet refs/heads/main; then
+        git checkout main
+    elif git show-ref --verify --quiet refs/heads/master; then
+        git checkout master
+    else
+        echo 'No local main or master branch found.' >&2
+        return 1
+    fi
+}
+
+function gcomp {
+    gcom && git pull
 }
 
 function gfm {
