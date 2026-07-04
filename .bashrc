@@ -113,9 +113,7 @@ function view {
 
 function vigs {
     local -a files
-    while IFS=' ' read -d '' -r -a fields; do
-        [[ "${fields[0]}" != '#' ]] && files+=("${fields[8]}")
-    done < <(git status -uno --no-renames --porcelain=2 -z)
+    mapfile -d '' -t files < <(git diff --name-only -z --no-renames HEAD --)
     nvim "$@" "${files[@]}"
 }
 
