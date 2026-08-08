@@ -5,9 +5,7 @@ After=graphical-session.target
 
 [Service]
 Type=exec
-ExecStart=swayidle -w \
-         timeout 600 '/usr/local/bin/on_idle idle' \
-              resume '/usr/local/bin/on_idle resume'
+ExecStart=swayidle -w
 Restart=on-failure
 Slice=session-graphical.slice
 

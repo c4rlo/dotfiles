@@ -25,7 +25,7 @@ style = 'bold'
 [git_status]
 format = '( $all_status)'
 modified = '*'
-deleted = ''
+deleted = '-'
 untracked = ''
 ahead = ''
 behind = ''

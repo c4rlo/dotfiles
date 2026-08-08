@@ -1,0 +1,4 @@
+timeout 600 '/usr/local/bin/on_idle idle' resume '/usr/local/bin/on_idle resume'
+
+# Workaround for https://github.com/swaywm/swayidle/issues/198
+before-sleep true
