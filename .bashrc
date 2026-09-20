@@ -197,7 +197,7 @@ function upd {
     while ! ping -c1 -w1 google.com >/dev/null; do sleep 0.1; done
     curl -sS -I https://archlinux.org >/dev/null
     paru -Sc --noconfirm &&
-    paru -Syu &&
+    paru-update &&
     paru -c
     # https://gitlab.archlinux.org/pacman/pacman/-/issues/297
     sudo find /var/cache/pacman/pkg/ -mindepth 1 -type d -empty -delete

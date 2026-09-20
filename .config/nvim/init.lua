@@ -365,8 +365,12 @@ local lsp_configs = {
       gopls = {
         gofumpt = true,
         usePlaceholders = true,
+        staticcheck = true,
         analyses = {
-          useany = true,
+          appendclipped = true,
+          slicesdelete = true,
+          QF1007 = true,
+          QF1011 = true,
         },
         hints = {
           assignVariableTypes = true,

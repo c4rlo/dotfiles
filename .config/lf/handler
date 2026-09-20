@@ -54,7 +54,7 @@ case $(file -Lb --mime-type -- "$path") in
         ;;
     application/pdf)
         viewing && { pdftoppm -singlefile -jpeg -r 90 -- "$path" | $chafa; }
-        opening && exec runapp zathura-sandbox -- "$path"
+        opening && exec runapp zathura -- "$path"
         ;;
     application/vnd.openxmlformats-officedocument.*)
         viewing && loffice --cat "$path" | fold -w "$width"
