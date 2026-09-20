@@ -182,15 +182,6 @@ local plugins = {
   { src = 'g:folke/lazydev.nvim', data = { skip_load = true } },
 }
 
-vim.api.nvim_create_autocmd('PackChanged', { callback = function(ev)
-  local name, kind = ev.data.spec.name, ev.data.kind
-  if name == 'nvim-treesitter' and kind == 'update' then
-    vim.schedule(function()
-      require('nvim-treesitter').update(nil, { summary = true })
-    end)
-  end
-end })
-
 vim.pack.add(plugins, {
   load = function(plugin)
     if not (plugin.spec.data or {}).skip_load then
@@ -198,6 +189,11 @@ vim.pack.add(plugins, {
     end
   end
 })
+
+vim.api.nvim_create_user_command('PackSync', function()
+  vim.pack.update(nil, { target = 'lockfile', force = true })
+  require('nvim-treesitter').update(nil, { summary = true }):wait(300000)
+end, { desc = 'Sync plugins to the lockfile and update treesitter parsers' })
 
 -- Load lazydev for .lua files only
 
