@@ -8,7 +8,6 @@ set hidden true
 # Shell options
 set shell dash
 set ifs "\n"
-map w $bash
 
 # Delete some built-in mappings – we need z for zoxide
 map za
@@ -26,6 +25,7 @@ nmap Ia set info size:time
 # Some more maps
 nmap . set hidden!
 nmap R set reverse!
+nmap S $bash
 nmap U %du -hs "$PWD"
 nmap P &{{
     if [ "$lf_preview" = false ]; then
