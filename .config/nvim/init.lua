@@ -27,6 +27,7 @@ vim.o.showmode = false
 vim.o.shortmess = 'aoOtTI'
 vim.opt.diffopt:remove('linematch:40')
 vim.opt.diffopt:append('linematch:60')
+vim.opt.diffopt:append('followwrap')
 vim.o.title = true
 
 vim.g.mapleader = ' '
@@ -59,11 +60,22 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end
 })
 
+vim.api.nvim_create_autocmd('BufWinEnter', {
+  pattern = 'quickfix',
+  callback = function()
+    local qf = vim.fn.getqflist({ size = 0, title = 0, winid = 0 })
+    if qf.title ~= 'DiffTool' or qf.winid == 0 then return end
+    vim.api.nvim_win_set_height(qf.winid,
+        math.min(qf.size, vim.api.nvim_win_get_height(qf.winid)))
+  end
+})
+
 vim.api.nvim_create_autocmd('VimEnter', {
   callback = function()
     if vim.o.diff then
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         vim.wo[win].relativenumber = false
+        vim.wo[win].wrap = true
       end
     end
   end
