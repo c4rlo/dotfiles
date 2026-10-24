@@ -70,6 +70,7 @@ alias ffprobe='ffprobe -hide_banner'
 
 declare -A git_aliases=(
     [gs]='status --short --branch'
+    [gl]='log'
     [gd]='diff'
     [gds]='diff --stat'
     [gdt]='difftool'
