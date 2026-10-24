@@ -12,8 +12,14 @@
     ; tool = nvimdiff
     tool = nvim_difftool
 
+[diff "jupyternotebook"]
+    command = git-nbdiffdriver diff
+
 [difftool "nvim_difftool"]
     cmd = nvim -c \"packadd nvim.difftool\" -d \"$LOCAL\" \"$REMOTE\"
+
+[difftool "nbdime"]
+    cmd = git-nbdifftool diff \"$LOCAL\" \"$REMOTE\" \"$BASE\"
 
 [commit]
     verbose = true

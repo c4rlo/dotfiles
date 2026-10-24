@@ -20,6 +20,11 @@ if [ -z "$INPUTRC" ]; then
            CTEST_PROGRESS_OUTPUT=ON \
            RUSTUP_HOME=~/.local/share/rustup \
            CARGO_HOME=~/.local/share/cargo \
+           IPYTHONDIR=~/.config/ipython \
+           JUPYTER_CONFIG_DIR=~/.config/jupyter \
+           JUPYTER_RUNTIME_DIR=~/.local/state/jupyter \
+           JUPYTERLAB_SETTINGS_DIR=~/.config/jupyter/lab/user-settings \
+           JUPYTERLAB_WORKSPACES_DIR=~/.local/state/jupyter/lab/workspaces \
            CODEX_HOME=~/.config/codex \
            OCI_CONFIG_FILE=~/.config/oci
 fi
